@@ -39,14 +39,14 @@ function makeFilter(params = {}) {
     if (year && year.length > 1) conditions.push(`${JSON.stringify(year)}.includes(data.year)`);
     else if (year) conditions.push(`data.year === '${year[0]}'`);
 
-    return `(data) => {${conditions.length > 0 ? `if (${conditions.join(' && ')}) ` : ''}results.push(data)}`;
+    return `(data) => ${conditions.length > 0 ? `${conditions.join(' && ')}` : 'true'}`;
 }
 
 function filterData(params = {}) {
     return new Promise((resolve) => {
         const results = [];
         const filterStr = makeFilter(params);
-        // console.log(filterStr);
+        console.log(filterStr);
 
         // IMPORTANT: use of eval() here is highly risky!
         // The purpose is to optimise the filter function as much as possible
@@ -54,12 +54,14 @@ function filterData(params = {}) {
         // Need to consider alternatives
         const filterFn = eval(filterStr);
 
-        fs.createReadStream(dataUrl)
-            .pipe(csv())
-            .on('data', filterFn)
-            .on('end', () => {
-                resolve(results);
-            });
+        const stream = fs.createReadStream(dataUrl).pipe(csv());
+        stream
+            .on('data', (data) => {
+                if (filterFn(data)) results.push(data);
+                if (results.length === 25000) stream.destroy();
+            })
+            .on('close', () => resolve(results))
+            .on('end', () => resolve(results));
     });
 }
 

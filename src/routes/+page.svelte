@@ -26,7 +26,7 @@
 </Header>
 
 <Section marginTop>
-    <p>Construct an API query by filtering indicators, areas and years.</p>
+    <p>Construct an API query by filtering indicators, areas and years. The API returns up to 25,000 rows of data in a CSV format.</p>
     <p>If you don't make a selection, the API will return all results (eg. selecting no years will return data for all years).</p>
 </Section>
 
