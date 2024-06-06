@@ -1,0 +1,7 @@
+{
+    "functions": {
+      "src/routes/api/+server.js": {
+        "includeFiles": "static/datasets.csv"
+      }
+    }
+  }
