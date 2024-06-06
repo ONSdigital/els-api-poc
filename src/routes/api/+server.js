@@ -1,9 +1,10 @@
 // import { error } from '@sveltejs/kit';
 import fs from 'fs';
+import path from 'path';
 import csv from 'csv-parser';
 import { csvFormat } from 'd3-dsv';
 
-const dataUrl = './static/datasets.csv';
+const dataUrl = path.join(process.cwd(), 'static/datasets.csv');
 
 function fillYears(year) {
     const years = year.split('-').map(yr => +yr);
