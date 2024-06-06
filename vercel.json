@@ -1,7 +1,0 @@
-{
-    "functions": {
-      "*": {
-        "includeFiles": "static/datasets.csv"
-      }
-    }
-  }
