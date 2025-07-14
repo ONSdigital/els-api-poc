@@ -53,12 +53,11 @@
   }
 
   function parseData(data) {
-    const _data = !["all", "topic"].includes(indicator.id) ? {[indicator.id]: data} : data;
     const parsedData = [];
 
-    for (const ind of Object.keys(_data)) {
+    for (const ind of Object.keys(data)) {
       const obj = {id: ind, label: metadata[ind].metadata.label, values: []};
-      const dat = _data[ind];
+      const dat = data[ind];
       const cols = Object.keys(dat);
 
       for (let i = 0; i < dat[cols[0]].length; i ++) {
@@ -110,7 +109,7 @@
         {:else}
           <p>No values available for this indicator.</p>
         {/if}
-        <div style:height="32px"></div>
+        <div class="ons-u-mb-3xl"></div>
       </NavSection>
     {/each}
   </NavSections>

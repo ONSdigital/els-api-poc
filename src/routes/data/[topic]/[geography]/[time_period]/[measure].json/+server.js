@@ -100,8 +100,5 @@ export function GET({ params }) {
 	}
 	if (!data) return error(500, "Request failed on measure parameter");
 
-	const indicators = Object.keys(data);
-	if (indicators.length === 1) return json(data[indicators[0]]);
-
 	return json(data);
 }
