@@ -1,63 +1,126 @@
 <script>
-    import { page } from "$app/stores"
-    import { Header, PhaseBanner, Footer, Section, Accordion, AccordionItem, Input, Button, Checkboxes } from "@onsvisual/svelte-components";
+  import { base } from "$app/paths";
+  import { page } from "$app/state";
+  import {
+    Header,
+    Section,
+    Footer,
+    Details,
+    Dropdown,
+    Input,
+    Button,
+    Table,
+    Indent,
+    NavSections,
+    NavSection,
+    Divider
+  } from "@onsvisual/svelte-components";
+  import metadata from "$lib/metadata.json";
+  import geoGroups from "$lib/geo-groups.js";
+  import measures from "$lib/measures.js";
+  import topics from "$lib/topics.js";
 
-    export let data;
-    const { indicators, areas, areaTypes, years } = data;
+  const indicators = Object.values(metadata);
+  const indicatorsList = [
+    {id: "all", label: "All indicators"},
+    {id: "topic", label: "Select by topic"},
+    ...indicators.map(ind => ({id: ind.code, label: ind.metadata.label})).sort((a, b) => a.label.localeCompare(b.label))
+  ];
+  let indicator = indicatorsList[2];
 
-    let indicatorsSelected = [];
-    let areasSelected = [];
-    let areaTypesSelected = [];
-    let yearsSelected = [];
+  let topic = topics[0];
 
-    function makeApiUrl(indicators, areaTypes, areas, years) {
-        let filters = [];
-        if (indicators[0]) filters.push(`indicator=${indicators.join()}`);
-        if (areaTypes[0] || areas[0]) filters.push(`geography=${[...areaTypes, ...areas].join()}`);
-        if (years[0]) filters.push(`year=${years.join()}`);
-        return `${$page.url.origin}/api${filters[0] ? `?${filters.join('&')}` : ''}`;
+  const geographyList = [
+    {id: "all", label: "All geographies"},
+    {id: "code", label: "Enter a GSS code"},
+    ...Object.keys(geoGroups).map(key => ({id: key, label: geoGroups[key].label}))
+  ];
+  let geography = geographyList[0];
+  let gssCode = "K02000001";
+
+  const years = Array.from(new Set(indicators.map(ind => ind.years).flat()))
+    .filter(d => Math.floor(d) === d)
+    .sort((a, b) => a - b);
+  const yearsList = [{id: "all", label: "All years"}, ...years.map(y => ({id: y, label: y})).reverse()];
+  let year = yearsList[0];
+
+  let measure = measures[0];
+
+  let data;
+
+  async function getData(permalink) {
+    data = await (await fetch(permalink)).json();
+  }
+
+  function parseData(data) {
+    const _data = !["all", "topic"].includes(indicator.id) ? {[indicator.id]: data} : data;
+    const parsedData = [];
+
+    for (const ind of Object.keys(_data)) {
+      const obj = {id: ind, label: metadata[ind].metadata.label, values: []};
+      const dat = _data[ind];
+      const cols = Object.keys(dat);
+
+      for (let i = 0; i < dat[cols[0]].length; i ++) {
+        const row = {};
+        for (const col of cols) row[col] = dat[col][i];
+        obj.values.push(row);
+      }
+      parsedData.push(obj);
     }
+    return parsedData;
+  }
+
+  $: permalink = `${page.url.origin}${base}/data/${indicator.id === "topic" ? topic.id : indicator.id}/${geography.id === "code" ? gssCode : geography.id}/${year.id}/${measure.id}.json`;
 </script>
 
-<Header title="Explore Local Statistics API Prototype" compact>
-    <div slot="before">
-        <PhaseBanner phase="prototype"/>
-    </div>
-</Header>
+<Header compact title="ELS filter API experiment" />
 
-<Section marginTop>
-    <p>Construct an API query by filtering indicators, areas and years. The API returns up to 25,000 rows of data in a CSV format.</p>
-    <p>If you don't make a selection, the API will return all results (eg. selecting no years will return data for all years).</p>
+<Section marginTop="{true}">
+  <p style:margin-bottom="32px">
+    Construct a query by indicator, geography and time period to view filtered data.
+    You can download the data in a JSON format using the permalink provided.
+  </p>
+
+  <Details title="Select your filters">
+    <Dropdown label="Select indicator" options={indicatorsList} bind:value={indicator}/>
+    {#if indicator.id === "topic"}
+      <Indent><Dropdown label="Select topic" options={topics} bind:value={topic}/></Indent>
+    {/if}
+    <Dropdown label="Select geography" options={geographyList} bind:value={geography}/>
+    {#if geography.id === "code"}
+      <Indent><Input label="Type a GSS code" bind:value={gssCode} disabled/></Indent>
+    {/if}
+    <Dropdown label="Select year" options={yearsList} bind:value={year}/>
+    <Dropdown label="Select measure" options={measures} bind:value={measure}/>
+  </Details>
+
+  <Input label="Permalink" value={permalink} width={100} disabled/>
+  <Button small on:click={() => getData(permalink)}>View data</Button>
+  <Button small href={permalink} name="datadownload.json">Download JSON</Button>
 </Section>
 
-{#if indicators && areas && areaTypes && years}
-<Section>
-    <Accordion>
-        <AccordionItem title="Select indicators">
-            <Checkboxes items={indicators} bind:value={indicatorsSelected} label="Select one or more indicator" compact/>
-        </AccordionItem>
-        <AccordionItem title="Select areas">
-            <Checkboxes items={areaTypes} bind:value={areaTypesSelected} label="Select one or more area types" compact/>
-            <Checkboxes items={areas} bind:value={areasSelected} label="Select one or more individual areas" compact/>
-        </AccordionItem>
-        <AccordionItem title="Select years">
-            <Checkboxes items={years} bind:value={yearsSelected} label="Select one or more years" compact/>
-        </AccordionItem>
-    </Accordion>
-</Section>
-<Section>
-    <Input value="{makeApiUrl(indicatorsSelected, areaTypesSelected, areasSelected, yearsSelected)}" label="Permalink"/>
-    <Button href="{makeApiUrl(indicatorsSelected, areaTypesSelected, areasSelected, yearsSelected)}">Get data</Button>
-</Section>
+{#if data}
+  <Divider/>
+  <NavSections>
+    {#each parseData(data) as ind}
+      <NavSection title={ind.label}>
+        {#if ind.values[0]}
+          <Table compact height={300} data={ind.values}/>
+        {:else}
+          <p>No values available for this indicator.</p>
+        {/if}
+        <div style:height="32px"></div>
+      </NavSection>
+    {/each}
+  </NavSections>
 {/if}
 
-<Footer compact/>
+<Footer compact />
 
 <style>
-    :global(input[type=text]) {
-        margin-bottom: 24px;
-    }
-    :global(.ons-checkboxes__items) {
-        margin-bottom: 24px;
-    }
+  :global(.ons-input) {
+    color: #707070;
+    margin-bottom: 10px;
+  }
 </style>
