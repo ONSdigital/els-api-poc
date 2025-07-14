@@ -1,5 +1,5 @@
 /** @type {import('@sveltejs/kit').Config} */
-import adapter from '@sveltejs/adapter-static';
+import adapter from '@sveltejs/adapter-auto';
 import { base_preview, base_prod } from "./src/app.config.js";
 
 const preview = process.env.PUBLIC_APP_ENV === 'preview';
