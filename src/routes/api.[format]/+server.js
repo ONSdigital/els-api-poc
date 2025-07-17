@@ -1,5 +1,6 @@
 import { json, text, error } from "@sveltejs/kit";
 import { csvFormat } from "d3-dsv";
+import cache from "./cache.js";
 import raw_data from "$lib/data.json";
 import metadata from "$lib/metadata.json";
 import geoGroups from "$lib/geo-groups.js";
@@ -99,9 +100,14 @@ function csvSerialise(data) {
 
 export function GET({ params, url }) {
   const format = params.format || "json";
+
+	const cacheKey = url.href;
+	const cachedValue = cache.get(cacheKey);
+	if (cachedValue) return format === "csv" ? text(cachedValue) : json(cachedValue);
+
   const topic = getParam(url, "topic", "all");
   const indicator = getParam(url, "indicator", "all");
-  const geography = getParam(url, "geography", "all");
+  const geography = getParam	(url, "geography", "all");
   const time = getParam(url, "time", "latest");
   const measure = getParam(url, "measure", "all");
 
@@ -170,5 +176,8 @@ export function GET({ params, url }) {
 		if (filter) data = filterAll(data, filterTime(filter));
 	}
 
-	return format === "csv" ? text(csvSerialise(data)) : json(data);
+	if (format === "csv") data = csvSerialise(data);
+	cache.set(cacheKey, data);
+
+	return format === "csv" ? text(data) : json(data);
 }
