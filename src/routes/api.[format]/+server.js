@@ -29,15 +29,15 @@ function getParam(url, key, fallback) {
 }
 
 function filterGeography(filters) {
-	return function(data) {
-		const filtered_data = {};
-		const cols = Object.keys(data);
-
-		const geoMatch = filters.prefix.size > 0 && filters.single.size > 0 ?
+	const geoMatch = filters.prefix.size > 0 && filters.single.size > 0 ?
 			(geo) => filters.prefix.has(geo.slice(0, 3)) || filters.single.has(geo) :
 			filters.prefix.size > 0 ? (geo) => filters.prefix.has(geo.slice(0, 3)) :
 			filters.single.size > 0 ? (geo) => filters.single.has(geo) :
 			() => false;
+			
+	return function(data) {
+		const filtered_data = {};
+		const cols = Object.keys(data);
 
 		for (const col of cols) filtered_data[col] = [];
 		for (let i = 0; i < data[cols[0]].length; i ++) {
