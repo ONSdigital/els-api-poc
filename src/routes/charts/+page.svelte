@@ -86,10 +86,16 @@
                   { data: chartData, x: "value", y: "y" },
                   { type: "uniform" }
                 )}
-              <Plot height={100} y={{axis: false}} r={{range: [3, 5]}}>
+              <Plot height={100} y={{axis: false}}>
                 <Dot {...props}
-                  fill={d => d.areacd === area.areacd ? "black" : "rgba(0,0,0,0.1)"}
-                  r={d => d.areacd === area.areacd ? 2 : 1}/>
+                  fill="#99999955"
+                  r={4}/>
+                <Dot
+                  data={props.data.filter(d => d.areacd === area.areacd)}
+                  x={props.x}
+                  y={props.y}
+                  fill="#206095"
+                  r={6}/>
                 <Text
                   data={props.data.filter(d => d.areacd === area.areacd)}
                   x={props.x}
