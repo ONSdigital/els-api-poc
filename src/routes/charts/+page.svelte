@@ -84,7 +84,7 @@
             {:then chartData}
               {@const props = jitterY(
                   { data: chartData, x: "value", y: "y" },
-                  { type: "normal" }
+                  { type: "uniform" }
                 )}
               {console.log(props)}
               <Plot height={100} y={{axis: false}} r={{range: [3, 5]}}>
