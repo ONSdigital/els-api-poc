@@ -28,59 +28,60 @@ function getParam(url, key, fallback) {
 	return param.includes(",") ? param.split(",") : param;
 }
 
-function filterGeography(filters) {
-	const geoMatch = filters.prefix.size > 0 && filters.single.size > 0 ?
-			(geo) => filters.prefix.has(geo.slice(0, 3)) || filters.single.has(geo) :
-			filters.prefix.size > 0 ? (geo) => filters.prefix.has(geo.slice(0, 3)) :
-			filters.single.size > 0 ? (geo) => filters.single.has(geo) :
-			() => false;
-			
-	return function(data) {
-		const filtered_data = {};
-		const cols = Object.keys(data);
-
-		for (const col of cols) filtered_data[col] = [];
-		for (let i = 0; i < data[cols[0]].length; i ++) {
-			if (geoMatch(data.areacd[i])) {
-				for (const col of cols) filtered_data[col].push(data[col][i]);
-			}
-		}
-		return filtered_data;
-	}
+function makeGeoMatch(filters) {
+	if (!filters) return null;
+	return filters.prefix.size > 0 && filters.single.size > 0 ?
+		(geo) => filters.prefix.has(geo.slice(0, 3)) || filters.single.has(geo) :
+		filters.prefix.size > 0 ? (geo) => filters.prefix.has(geo.slice(0, 3)) :
+		filters.single.size > 0 ? (geo) => filters.single.has(geo) :
+		null;
 }
 
-function filterTime(filter) {
-	return function(data, indicator) {
-		const filtered_data = {};
-		const cols = Object.keys(data);
-		const xMin = metadata[indicator].minXDomainNumb;
-		const xMax = metadata[indicator].maxXDomainNumb;
+function makeDateMatch(filter, indicator) {
+	if (!filter) return null;
+	const xMin = metadata[indicator].minXDomainNumb;
+	const xMax = metadata[indicator].maxXDomainNumb;
 
-		let dateMatch = () => null;
-		if (filter.type === "single") {
-			const year = filter.year === "earliest" || (filter.mode === "earliest" && filter.year < xMin) ? xMin :
-				filter.year === "latest" || (filter.mode === "latest" && filter.year > xMax) ? xMax :
-				filter.year;
-			dateMatch = (date) => date === year;
-		} else {
-			const start = filter.start === "earliest" || filter.earliest && filter.start < xMin ? xMin : filter.start;
-			const end = filter.end === "latest" || filter.latest && filter.end > xMax ? xMax : filter.end;
-			dateMatch = (date) => date >= start && date <= end;
-		}
-
-		for (const col of cols) filtered_data[col] = [];
-		for (let i = 0; i < data[cols[0]].length; i ++) {
-			if (dateMatch(data.date[i])) {
-				for (const col of cols) filtered_data[col].push(data[col][i]);
-			}
-		}
-		return filtered_data;
+	let dateMatch;
+	if (filter.type === "single") {
+		const year = filter.year === "earliest" || (filter.mode === "earliest" && filter.year < xMin) ? xMin :
+			filter.year === "latest" || (filter.mode === "latest" && filter.year > xMax) ? xMax :
+			filter.year;
+		dateMatch = (date) => date === year;
+	} else {
+		const start = filter.start === "earliest" || filter.earliest && filter.start < xMin ? xMin : filter.start;
+		const end = filter.end === "latest" || filter.latest && filter.end > xMax ? xMax : filter.end;
+		dateMatch = (date) => date >= start && date <= end;
 	}
+	return dateMatch;
 }
 
-function filterAll(data, filter) {
+function filterDataset(data, geoMatch, dateMatch) {
+	const rowFilter = geoMatch && dateMatch ? (i) => geoMatch(data.areacd[i]) && dateMatch(data.date[i]) :
+		geoMatch ? (i) => geoMatch(data.areacd[i]) :
+		dateMatch ? (i) => dateMatch(data.date[i]) :
+		null;
+	if (!geoMatch && !dateMatch) return data;
+
 	const filtered_data = {};
-	for (const key in data) filtered_data[key] = filter(data[key], key);
+	const cols = Object.keys(data);
+
+	for (const col of cols) filtered_data[col] = [];
+	for (let i = 0; i < data[cols[0]].length; i ++) {
+		if (rowFilter(i)) {
+			for (const col of cols) filtered_data[col].push(data[col][i]);
+		}
+	}
+	return filtered_data;
+}
+
+function filterAll(data, geoFilter, timeFilter) {
+	const filtered_data = {};
+	const geoMatch = makeGeoMatch(geoFilter);
+	for (const key in data) {
+		const dateMatch = makeDateMatch(timeFilter, key);
+		filtered_data[key] = filterDataset(data[key], geoMatch, dateMatch);
+	};
 	return filtered_data;
 }
 
@@ -103,6 +104,7 @@ export function GET({ params, url }) {
 
 	const cacheKey = url.href;
 	const cachedValue = cache.get(cacheKey);
+	// const cachedValue = null;
 	if (cachedValue) return format === "csv" ? text(cachedValue) : json(cachedValue);
 
   const topic = getParam(url, "topic", "all");
@@ -135,29 +137,29 @@ export function GET({ params, url }) {
 	}
 	if (Object.keys(data).length === 0) return error(500, "Indicator parameter returned no datasets");
 
+	let geoFilter;
 	if (geography !== "all") {
-		const filters = {single: new Set(), prefix: new Set()};
+		geoFilter = {single: new Set(), prefix: new Set()};
 		for (const geo of [geography].flat()) {
 			if (geo.match(/[EKNSW]\d{8}/)) {
-				filters.single.add(geo);
+				geoFilter.single.add(geo);
 			} else if (geo.match(/[EKNSW]\d{2}/)) {
-				filters.prefix.add(geo);
+				geoFilter.prefix.add(geo);
 			} else if (geoGroups[geo]) {
-				for (const cd of geoGroups[geo].codes) filters.prefix.add(cd);
+				for (const cd of geoGroups[geo].codes) geoFilter.prefix.add(cd);
 			}
 		}
-		data = filterAll(data, filterGeography(filters));
 	}
 
+	let timeFilter;
 	if (time !== "all") {
-		let filter;
 		if (time.includes("-")) {
 			const range = time.split("-");
 			const start = +range[0].slice(0, 4);
 			const earliest = range[0].slice(4) === "earliest";
 			const end = +range[1].slice(0, 4);
 			const latest = range[1].slice(4) === "latest";
-			filter = {
+			timeFilter = {
 				type: "range",
 				start: Number.isNaN(start) ? null : start,
 				end: Number.isNaN(end) ? null : end,
@@ -167,14 +169,15 @@ export function GET({ params, url }) {
 		} else if (typeof time === "string") {
 			const year = +time.slice(0, 4);
 			const mode = time.slice(4) || "exact";
-			filter = {
+			timeFilter = {
 				type: "single",
 				year: Number.isNaN(year) ? time : year,
 				mode
 			};
 		}
-		if (filter) data = filterAll(data, filterTime(filter));
 	}
+	
+	if (timeFilter || geoFilter) data = filterAll(data, geoFilter, timeFilter);
 
 	if (format === "csv") data = csvSerialise(data);
 	cache.set(cacheKey, data);
