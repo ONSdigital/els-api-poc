@@ -19,15 +19,18 @@
   </p>
 </Section>
 
-<Grid>
+<Grid colWidth="medium">
   <Card title="Path-based API" mode="featured" href="{base}/path">
     Request data based on a URL path.
   </Card>
   <Card title="Query-based API" mode="featured" href="{base}/query">
     Request data based on URL query parameters.
   </Card>
-  <Card title="Charts test" mode="featured" href="{base}/charts">
-    Show charts and make selections for a specific area.
+  <Card title="Area charts demo" mode="featured" href="{base}/area">
+    Load all data for a selected area and then render charts.
+  </Card>
+  <Card title="Lazy charts demo" mode="featured" href="{base}/charts">
+    Same as charts demo, but with data lazy loaded per chart.
   </Card>
 </Grid>
 

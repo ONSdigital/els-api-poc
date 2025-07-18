@@ -21,22 +21,6 @@
   let area;
   let topics;
 
-  function selectArea(selected) {
-    if (!selected) {
-      area = null;
-      topics = null;
-      return;
-    };
-    area = selected;
-    const indicators = Object.values(metadata).filter(ind => ind.inferredGeos.types.includes(area.areacd.slice(0, 3)));
-    topics = Array.from(new Set(indicators.map(ind => ind.topic)))
-      .map(topic => ({
-        key: topic,
-        label: `${topic[0].toUpperCase()}${topic.slice(1)}`,
-        indicators: indicators.filter(ind => ind.topic === topic)
-      }));
-  }
-
   function parseData(data) {
     const cols = Object.keys(data);
     const rows = [];
@@ -49,10 +33,33 @@
     return rows;
   }
 
-  async function fetchChartData(indicator, geography = "ltla") {
-    const url = `${base}/api.json?indicator=${indicator}&geography=${geography}&time=latest`;
-    const data = await (await fetch(url)).json();
-    return parseData(data[indicator]);
+  async function fetchData(selected, geography = "ltla") {
+    const url = `${base}/api.json?geography=${geography}&time=latest`;
+    let data = await (await fetch(url)).json();
+
+    // Filter out empty datasets
+    const indicators = Object.keys(data).map(key => {
+      const meta = metadata[key];
+      return {meta, data: parseData(data[key])};
+    }).filter(ind => ind.meta.inferredGeos.types.includes(selected.areacd.slice(0, 3)))
+      .filter(ind => ind.data[0])
+    topics = Array.from(new Set(indicators.map(ind => ind.meta.topic)))
+      .map(topic => ({
+        key: topic,
+        label: `${topic[0].toUpperCase()}${topic.slice(1)}`,
+        indicators: indicators.filter(ind => ind.meta.topic === topic)
+      }));
+    return topics;
+  }
+
+  async function selectArea(selected) {
+    if (!selected) {
+      area = null;
+      topics = null;
+      return;
+    };
+    topics = await fetchData(selected);
+    area = selected;
   }
 </script>
 
@@ -62,7 +69,7 @@
 
 <Section>
   <p style:margin="12px 0 32px">
-    Select an area to display indicators. Chart data for each indicator will be lazy loaded when the chart comes into view on the page.
+    Select an area to display indicators. Chart data for all indicators will be loaded at once. (Note: Charts are rendered lazily as the performance of SveltePlot does not seem to be optimised for this use case).
   </p>
   <form class="select-container" on:submit|preventDefault={() => selectArea(selected)}>
     <Select options={areas} bind:value={selected} labelKey="areanm" label="Select a local authority" placeholder="Eg. Fareham or Newport"/>
@@ -70,22 +77,20 @@
   </form>
 </Section>
 
-{#if topics}
+{#if topics && area}
   <Divider/>
-  <NavSections>
-    {#each topics as topic}
-      <NavSection title={topic.label}>
-        {#each topic.indicators as ind}
-        <h3>{ind.metadata.label}</h3>
-        <LazyLoad>
-          <div class="chart-container">
-            {#await fetchChartData(ind.code)}
-              Fetching chart data
-            {:then chartData}
-              {@const props = jitterY(
-                  { data: chartData, x: "value", y: "y" },
-                  { type: "uniform" }
-                )}
+  {#key topics}
+    <NavSections>
+      {#each topics as topic}
+        <NavSection title={topic.label}>
+          {#each topic.indicators as ind}
+            {@const props = jitterY(
+              { data: ind.data, x: "value", y: "y" },
+              { type: "uniform" }
+            )}
+            <h3>{ind.meta.metadata.label}</h3>
+            <div class="chart-container">
+              <LazyLoad>
               <Plot height={100} y={{axis: false}}>
                 <Dot {...props}
                   fill="#99999955"
@@ -108,15 +113,13 @@
                   strokeOpacity={0.7}
                   text={area.areanm} />
               </Plot>
-            {:catch}
-              Failed to load chart data
-            {/await}
-          </div>
-        </LazyLoad>
+              </LazyLoad>
+            </div>
+          {/each}
+        </NavSection>
       {/each}
-      </NavSection>
-    {/each}
-  </NavSections>
+    </NavSections>
+  {/key}
 {/if}
 
 <Footer compact />
