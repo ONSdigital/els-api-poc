@@ -86,7 +86,6 @@
                   { data: chartData, x: "value", y: "y" },
                   { type: "uniform" }
                 )}
-              {console.log(props)}
               <Plot height={100} y={{axis: false}} r={{range: [3, 5]}}>
                 <Dot {...props}
                   fill={d => d.areacd === area.areacd ? "black" : "rgba(0,0,0,0.1)"}
