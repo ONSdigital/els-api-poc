@@ -94,7 +94,7 @@
     {/if}
     <Dropdown label="Select geography" options={geographyList} bind:value={geography}/>
     {#if geography.id === "code"}
-      <Indent><Input label="Type a GSS code" bind:value={gssCode} disabled/></Indent>
+      <Indent><Input label="Type a GSS code" bind:value={gssCode}/></Indent>
     {/if}
     <Dropdown label="Select year" options={yearsList} bind:value={year}/>
     <Dropdown label="Select measure" options={measures} bind:value={measure}/>
