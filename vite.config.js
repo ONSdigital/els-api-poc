@@ -9,7 +9,7 @@ const config = {
                 drop: ['console', 'debugger'],
         },
         ssr: {
-                noExternal: ['layercake']
+                noExternal: ['layercake', 'd3-regression']
         } 
 };
 

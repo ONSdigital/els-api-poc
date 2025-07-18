@@ -16,7 +16,7 @@
   "license": "MIT",
   "devDependencies": {
     "@onsvisual/svelte-charts": "^0.4.11",
-    "@onsvisual/svelte-components": "^1.0.9",
+    "@onsvisual/svelte-components": "^1.0.11",
     "@sveltejs/kit": "^2.5.27",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
     "cross-env": "^7.0.3",
@@ -26,6 +26,7 @@
     "prettier": "^3.1.0",
     "prettier-plugin-svelte": "^3.2.6",
     "svelte": "^5.0.0",
+    "svelteplot": "^0.3.7",
     "vite": "^5.4.4"
   },
   "dependencies": {
