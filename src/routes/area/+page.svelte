@@ -64,7 +64,7 @@
 </script>
 
 <PhaseBanner phase="prototype"/>
-<Header compact title="Charts test" />
+<Header compact title="Area chart demo" />
 <Breadcrumb links={[{label: "ELS API experiments", href: `${base}/`}]}/>
 
 <Section>
