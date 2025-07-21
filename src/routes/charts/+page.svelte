@@ -13,7 +13,7 @@
     NavSection,
     LazyLoad
   } from "@onsvisual/svelte-components";
-  import { Plot, Dot, Text, jitterY } from "svelteplot";
+  import Beeswarm from "$lib/viz/Beeswarm.svelte";
   import areas from "$lib/areas.json";
   import metadata from "$lib/metadata.json";
 
@@ -82,32 +82,7 @@
             {#await fetchChartData(ind.code)}
               Fetching chart data
             {:then chartData}
-              {@const props = jitterY(
-                  { data: chartData, x: "value", y: "y" },
-                  { type: "uniform" }
-                )}
-              <Plot height={100} y={{axis: false}}>
-                <Dot {...props}
-                  fill="#99999955"
-                  r={4}/>
-                <Dot
-                  data={props.data.filter(d => d.areacd === area.areacd)}
-                  x={props.x}
-                  y={props.y}
-                  fill="#206095"
-                  r={6}/>
-                <Text
-                  data={props.data.filter(d => d.areacd === area.areacd)}
-                  x={props.x}
-                  y={props.y}
-                  dy={-5}
-                  lineAnchor="bottom"
-                  fill="black"
-                  stroke="white"
-                  strokeWidth={4}
-                  strokeOpacity={0.7}
-                  text={area.areanm} />
-              </Plot>
+              <Beeswarm data={chartData} selected={area}/>
             {:catch}
               Failed to load chart data
             {/await}

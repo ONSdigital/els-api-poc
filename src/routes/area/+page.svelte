@@ -13,7 +13,7 @@
     NavSection,
     LazyLoad
   } from "@onsvisual/svelte-components";
-  import { Plot, Dot, Text, jitterY } from "svelteplot";
+  import Beeswarm from "$lib/viz/Beeswarm.svelte";
   import areas from "$lib/areas.json";
   import metadata from "$lib/metadata.json";
 
@@ -84,35 +84,10 @@
       {#each topics as topic}
         <NavSection title={topic.label}>
           {#each topic.indicators as ind}
-            {@const props = jitterY(
-              { data: ind.data, x: "value", y: "y" },
-              { type: "uniform" }
-            )}
             <h3>{ind.meta.metadata.label}</h3>
             <div class="chart-container">
               <LazyLoad>
-              <Plot height={100} y={{axis: false}}>
-                <Dot {...props}
-                  fill="#99999955"
-                  r={4}/>
-                <Dot
-                  data={props.data.filter(d => d.areacd === area.areacd)}
-                  x={props.x}
-                  y={props.y}
-                  fill="#206095"
-                  r={6}/>
-                <Text
-                  data={props.data.filter(d => d.areacd === area.areacd)}
-                  x={props.x}
-                  y={props.y}
-                  dy={-5}
-                  lineAnchor="bottom"
-                  fill="black"
-                  stroke="white"
-                  strokeWidth={4}
-                  strokeOpacity={0.7}
-                  text={area.areanm} />
-              </Plot>
+                <Beeswarm data={ind.data} selected={area}/>
               </LazyLoad>
             </div>
           {/each}
