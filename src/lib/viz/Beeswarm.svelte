@@ -3,7 +3,7 @@
 
   let { data, xKey = "value", yKey = "y", selected = null } = $props();
   let props = $derived(jitterY(
-    { data, x: xKey, y: yKey },
+    { data: data.map(d => ({...d, y: 0})), x: xKey, y: yKey },
     { type: "uniform" }
   ));
 </script>

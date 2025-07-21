@@ -15,42 +15,11 @@
   } from "@onsvisual/svelte-components";
   import Beeswarm from "$lib/viz/Beeswarm.svelte";
   import areas from "$lib/areas.json";
-  import metadata from "$lib/metadata.json";
+  import { fetchTopicsData } from "$lib/utils.js";
 
   let selected;
   let area;
   let topics;
-
-  function parseData(data) {
-    const cols = Object.keys(data);
-    const rows = [];
-
-    for (let i = 0; i < data[cols[0]].length; i ++) {
-      const row = {y: 0};
-      for (const col of cols) row[col] = data[col][i];
-      rows.push(row);
-    }
-    return rows;
-  }
-
-  async function fetchData(selected, geography = "ltla") {
-    const url = `${base}/api.json?geography=${geography}&time=latest`;
-    let data = await (await fetch(url)).json();
-
-    // Filter out empty datasets
-    const indicators = Object.keys(data).map(key => {
-      const meta = metadata[key];
-      return {meta, data: parseData(data[key])};
-    }).filter(ind => ind.meta.inferredGeos.types.includes(selected.areacd.slice(0, 3)))
-      .filter(ind => ind.data[0])
-    topics = Array.from(new Set(indicators.map(ind => ind.meta.topic)))
-      .map(topic => ({
-        key: topic,
-        label: `${topic[0].toUpperCase()}${topic.slice(1)}`,
-        indicators: indicators.filter(ind => ind.meta.topic === topic)
-      }));
-    return topics;
-  }
 
   async function selectArea(selected) {
     if (!selected) {
@@ -58,7 +27,7 @@
       topics = null;
       return;
     };
-    topics = await fetchData(selected);
+    topics = await fetchTopicsData(selected);
     area = selected;
   }
 </script>

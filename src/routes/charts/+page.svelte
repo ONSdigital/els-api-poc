@@ -16,6 +16,7 @@
   import Beeswarm from "$lib/viz/Beeswarm.svelte";
   import areas from "$lib/areas.json";
   import metadata from "$lib/metadata.json";
+  import { fetchChartData } from "$lib/utils.js";
 
   let selected;
   let area;
@@ -35,24 +36,6 @@
         label: `${topic[0].toUpperCase()}${topic.slice(1)}`,
         indicators: indicators.filter(ind => ind.topic === topic)
       }));
-  }
-
-  function parseData(data) {
-    const cols = Object.keys(data);
-    const rows = [];
-
-    for (let i = 0; i < data[cols[0]].length; i ++) {
-      const row = {y: 0};
-      for (const col of cols) row[col] = data[col][i];
-      rows.push(row);
-    }
-    return rows;
-  }
-
-  async function fetchChartData(indicator, geography = "ltla") {
-    const url = `${base}/api.json?indicator=${indicator}&geography=${geography}&time=latest`;
-    const data = await (await fetch(url)).json();
-    return parseData(data[indicator]);
   }
 </script>
 
