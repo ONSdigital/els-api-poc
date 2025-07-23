@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build && node ./scripts/js-fix",
+    "build": "NODE_OPTIONS=--max-old-space-size=8192 vite build && node ./scripts/js-fix",
     "build:preview": "cross-env PUBLIC_APP_ENV=preview vite build",
     "package": "vite package",
     "preview": "vite preview",
