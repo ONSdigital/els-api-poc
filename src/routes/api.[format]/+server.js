@@ -103,8 +103,8 @@ export function GET({ params, url }) {
   const format = params.format || "json";
 
 	const cacheKey = url.href;
-	const cachedValue = cache.get(cacheKey);
-	// const cachedValue = null;
+	// const cachedValue = cache.get(cach	eKey);
+	const cachedValue = null;
 	if (cachedValue) return format === "csv" ? text(cachedValue) : json(cachedValue);
 
   const topic = getParam(url, "topic", "all");
