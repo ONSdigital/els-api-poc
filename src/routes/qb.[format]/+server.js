@@ -13,39 +13,6 @@ function getParam(url, key, fallback) {
 	return param.includes(",") ? param.split(",") : param;
 }
 
-// function filterCube(cube, params, measures) {
-// 	measures = measures === "all" ? allMeasures : [measures].flat();
-
-// 	const dims = [];
-// 	for (const dimension of cube.dimensions) {
-// 		const dim = {
-// 			key: dimension.key,
-// 			count: dimension.count,
-// 			values: dimension.key === "xDomainNumb" ?
-// 				Object.entries(dimension.values).map(v => [+v[0], v[1]]) :
-// 				Object.entries(dimension.values)
-// 		};
-// 		if (params[dim.key] && dim.key === "areacd") dim.values = dim.values.filter(d => d[0].startsWith(params[dim.key]));
-// 		else if (params[dim.key]) dim.values = dim.values.filter(d => d[0] === params[dim.key]);
-// 		dims.push(dim);
-// 	}
-	
-// 	let items;
-// 	while (dims.length > 0) {
-// 		const dim = dims.shift();
-// 		items = !items ?
-// 			dim.values.map(d => ({value: {[dim.key]: d[0]}, index: d[1]})) :
-// 			items.map(item => dim.values.map(d => ({value: {...item.value, [dim.key]: d[0]}, index: (item.index * dim.count) + d[1]}))).flat();
-// 	}
-
-// 	return items.map(item => {
-// 		for (const measure of measures) {
-// 			item.value[measure] = cube.values[measure][item.index];
-// 		}
-// 		return item.value;
-// 	});
-// }
-
 function filterCube(cube, params, measures) {
 	measures = measures === "all" ? allMeasures : [measures].flat();
 
@@ -80,27 +47,6 @@ function filterCube(cube, params, measures) {
 		for (let i = 0; i < dims.length; i ++) data[dims[i].key].push(item[i + 1]);
 		for (const measure of measures) data[measure].push(cube.values[measure][item[0]]);
 	}
-
-	// for (let i = 0; i < dims.length; i ++) {
-	// 	const dim = dims[i];
-	// 	if (i === dims.length - 1) {
-	// 		for (const item of items) {
-	// 			for (const val of dim.values) {
-	// 				const it = [(item[0] * dim.count) + val[1], ...item.slice(1), val[0]];
-	// 				for (let j = 0; j < dims.length; j ++) data[dims[j].key].push(it[j + 1]);
-	// 				for (const measure of measures) data[measure].push(cube.values[measure][it[0]]);
-	// 			}
-	// 		}
-	// 	} else {
-	// 		const newItems = [];
-	// 		for (const item of items) {
-	// 			for (const val of dim.values) {
-	// 				newItems.push([(item[0] * dim.count) + val[1], ...item.slice(1), val[0]]);
-	// 			}
-	// 		}
-	// 		items = newItems;
-	// 	}
-	// }
 	return data;
 }
 
@@ -111,16 +57,6 @@ function filterAll(data, params, measures) {
 	}
 	return filtered_data;
 }
-
-// function csvSerialise(data) {
-// 	const rows = [];
-// 	const keys = Object.keys(data);
-// 	for (const key of keys) {
-// 		const dat = data[key];
-// 		for (const d of dat) rows.push({indicator: key, ...d});
-// 	}
-// 	return csvFormat(rows);
-// }
 
 function csvSerialise(data) {
 	const rows = [];
