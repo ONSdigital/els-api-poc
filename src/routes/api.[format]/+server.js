@@ -6,11 +6,11 @@ import metadata from "$lib/metadata.json";
 import geoGroups from "$lib/geo-groups.js";
 import topics from "$lib/topics.js";
 
-const columns = ["areacd", "date", "value", "lci", "uci"];
+const allMeasures = ["value", "lci", "uci"];
 
 function removeKeys(data, measure = "all") {
 	const stripped_data = {};
-	const cols = measure === "all" ? columns.slice(-3) : [measure].flat();
+	const cols = measure === "all" ? allMeasures : [measure].flat();
 	for (const indicator in data) {
 		const obj = {
 			areacd: data[indicator].areacd,
@@ -113,7 +113,7 @@ export function GET({ params, url }) {
   const time = getParam(url, "time", "latest");
   const measure = getParam(url, "measure", "all");
 
-  let data = removeKeys(raw_data.combinedDataObjectColumnOriented, measure);
+  let data = {...raw_data.combinedDataObjectColumnOriented};
 
 	if (topic !== "all") {
 		const _data = {};
@@ -136,6 +136,8 @@ export function GET({ params, url }) {
 		data = _data;
 	}
 	if (Object.keys(data).length === 0) return error(500, "Indicator parameter returned no datasets");
+
+	data = removeKeys(data, measure)
 
 	let geoFilter;
 	if (geography !== "all") {
