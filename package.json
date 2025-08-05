@@ -11,7 +11,8 @@
     "deploy": "gh-pages -d build -t true",
     "lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. .",
     "format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. .",
-    "make-data-cube": "node ./scripts/make-data-cube.js"
+    "make-data-cube": "node ./scripts/make-data-cube.js",
+    "make-json-stat": "node ./scripts/make-json-stat.js"
   },
   "author": "Ahmad Barclay",
   "license": "MIT",
