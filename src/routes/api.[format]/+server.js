@@ -74,7 +74,7 @@ function toRows(cube, dims) {
 
 	const rows = [];
 	for (const item of items) {
-		const row = {indicator: cube.extension.slug};
+		const row = {indicator: cube.extension.code};
 		for (let i = 0; i < dims.length - 1; i ++) row[dims[i].key] = item[i + 1];
 		for (let j = 0; j < measuresLength; j ++) {
 			row[measures.values[j][0]] = cube.value[(item[0] * measures.count) + j]
