@@ -1,26 +1,7 @@
-import { json, text, error } from "@sveltejs/kit";
+import { json, text } from "@sveltejs/kit";
 import { csvFormat } from "d3-dsv";
-import cache from "./cache.js";
-import raw_data from "$lib/data.json";
-import metadata from "$lib/metadata.json";
+import cube from "$lib/json-stat.json";
 import geoGroups from "$lib/geo-groups.js";
-import topics from "$lib/topics.js";
-
-const allMeasures = ["value", "lci", "uci"];
-
-function removeKeys(data, measure = "all") {
-	const stripped_data = {};
-	const cols = measure === "all" ? allMeasures : [measure].flat();
-	for (const indicator in data) {
-		const obj = {
-			areacd: data[indicator].areacd,
-			date: data[indicator].xDomainNumb
-		};
-		for (const col of cols) if (data[indicator][col]) obj[col] = data[indicator][col];
-		stripped_data[indicator] = obj;
-	}
-	return stripped_data;
-}
 
 function getParam(url, key, fallback) {
 	const param = url.searchParams.get(key);
@@ -28,161 +9,237 @@ function getParam(url, key, fallback) {
 	return param.includes(",") ? param.split(",") : param;
 }
 
-function makeGeoMatch(filters) {
-	if (!filters) return null;
-	return filters.prefix.size > 0 && filters.single.size > 0 ?
-		(geo) => filters.prefix.has(geo.slice(0, 3)) || filters.single.has(geo) :
-		filters.prefix.size > 0 ? (geo) => filters.prefix.has(geo.slice(0, 3)) :
-		filters.single.size > 0 ? (geo) => filters.single.has(geo) :
-		null;
-}
+function toJSONStat(qb, dims) {
+	const cube = structuredClone(qb);
+	let indices = [0];
 
-function makeDateMatch(filter, indicator) {
-	if (!filter) return null;
-	const xMin = metadata[indicator].minXDomainNumb;
-	const xMax = metadata[indicator].maxXDomainNumb;
+	for (let i = 0; i < dims.length; i ++) {
+		const dim = dims[i];
+		const size = dim.values.length;
 
-	let dateMatch;
-	if (filter.type === "single") {
-		const year = filter.year === "earliest" || (filter.mode === "earliest" && filter.year < xMin) ? xMin :
-			filter.year === "latest" || (filter.mode === "latest" && filter.year > xMax) ? xMax :
-			filter.year;
-		dateMatch = (date) => date === year;
-	} else {
-		const start = filter.start === "earliest" || filter.earliest && filter.start < xMin ? xMin : filter.start;
-		const end = filter.end === "latest" || filter.latest && filter.end > xMax ? xMax : filter.end;
-		dateMatch = (date) => date >= start && date <= end;
-	}
-	return dateMatch;
-}
-
-function filterDataset(data, geoMatch, dateMatch) {
-	const rowFilter = geoMatch && dateMatch ? (i) => geoMatch(data.areacd[i]) && dateMatch(data.date[i]) :
-		geoMatch ? (i) => geoMatch(data.areacd[i]) :
-		dateMatch ? (i) => dateMatch(data.date[i]) :
-		null;
-	if (!geoMatch && !dateMatch) return data;
-
-	const filtered_data = {};
-	const cols = Object.keys(data);
-
-	for (const col of cols) filtered_data[col] = [];
-	for (let i = 0; i < data[cols[0]].length; i ++) {
-		if (rowFilter(i)) {
-			for (const col of cols) filtered_data[col].push(data[col][i]);
+		if (dim.values.length !== 1) {
+			const newIndices = [];
+			// const newIndices = Array(indices.length * size);
+			// let j = 0;
+			for (const index of indices) {
+				for (const val of dim.values) {
+					newIndices.push((index * dim.count) + val[1]);
+					// newIndices[j] = (index * dim.count) + val[1];
+					// j ++;
+				}
+			}
+			indices = newIndices;
+			// indices = indices.flatMap(index => dim.values.map(val => (index * dim.count) + val[1]));
 		}
+
+		cube.dimension[dim.key].category.index = Object.fromEntries(dim.values.map((val, i) => [val[0], i]));
+		if (cube.dimension[dim.key].category.label && size < cube.size[i]) {
+			const label = {};
+			for (const val of dim.values) label[val[1]] = cube.dimension[dim.key].category.label[val[1]];
+			cube.dimension[dim.key].category.label = label;
+		}
+		cube.size[i] = size;
 	}
-	return filtered_data;
+
+	const value = Array(indices.length).fill(null);
+
+	for (let i = 0; i < indices.length; i ++) {
+		value[i] = cube.value[indices[i]];
+	}
+	cube.value = value;
+	
+	return cube;
 }
 
-function filterAll(data, geoFilter, timeFilter) {
-	const filtered_data = {};
-	const geoMatch = makeGeoMatch(geoFilter);
-	for (const key in data) {
-		const dateMatch = makeDateMatch(timeFilter, key);
-		filtered_data[key] = filterDataset(data[key], geoMatch, dateMatch);
-	};
-	return filtered_data;
+function dimsToItems(dims) {
+	let items = [[0]];
+	for (const dim of dims) {
+		const newItems = [];
+		for (const item of items) {
+			for (const val of dim.values) {
+				newItems.push([(item[0] * dim.count) + val[1], ...item.slice(1), val[0]]);
+			}
+		}
+		items = newItems;
+	}
+	return items;
 }
 
-function csvSerialise(data) {
+function toRows(cube, dims) {
+	const measures = dims[dims.length - 1];
+	const measuresLength = measures.values.length;
+	if (measuresLength === 0) return [];
+
+	const items = dimsToItems(dims.slice(0, -1));
+
 	const rows = [];
-	const keys = Object.keys(data);
-	for (const key of keys) {
-		const cols = Object.keys(data[key]);
-		for (let i = 0; i < data[key][cols[0]].length; i ++) {
-			const row = {indicator: key};
-			for (const col of cols) row[col] = data[key][col][i];
-			rows.push(row);
+	for (const item of items) {
+		const row = {indicator: cube.extension.slug};
+		for (let i = 0; i < dims.length - 1; i ++) row[dims[i].key] = item[i + 1];
+		for (let j = 0; j < measuresLength; j ++) {
+			row[measures.values[j][0]] = cube.value[(item[0] * measures.count) + j]
+		}
+		rows.push(row);
+	}
+	return rows;
+}
+
+function toJSON(cube, dims) {
+	const measures = dims[dims.length - 1];
+	const measuresLength = measures.values.length;
+
+	const data = {};
+	for (const dim of dims.slice(0, -1)) data[dim.key] = [];
+	for (const val of measures.values) data[val[0]] = [];
+
+	const items = dimsToItems(dims.slice(0, -1));
+	for (const item of items) {
+		for (let i = 0; i < dims.length - 1; i ++) data[dims[i].key].push(item[i + 1]);
+		for (let j = 0; j < measuresLength; j ++) {
+			data[measures.values[j][0]].push(cube.value[(item[0] * measures.count) + j]);
 		}
 	}
-	return csvFormat(rows);
+	return [cube.extension.code, data];
+}
+
+function makeFilter(param) {
+	const set = new Set([param].flat());
+	return d => set.has(d[0]);
+}
+
+function makeGeoFilter(param) {
+	const codes = new Set();
+	const types = new Set();
+	for (const geo of [param].flat()) {
+		if (geo.match(/^[EKNSW]\d{2}$/)) types.add(geo);
+		else if (geoGroups[geo]) {
+			for (const code of geoGroups[geo].codes) types.add(code);
+		}
+		else if (geo.match(/^[EKNSW]\d{8}$/) && !types.has(geo.slice(0, 3))) codes.add(geo);
+	}
+	return codes.size > 0 && types.size > 0 ? d => codes.has(d[0]) || types.has(d[0].slice(0, 3)) :
+		types.size > 0 ? d => types.has(d[0].slice(0, 3)) :
+		codes.size > 0 ? d => codes.has(d[0]) :
+		() => false;
+}
+
+function filterTime(values, param) {
+	if (param === "latest") return [values[values.length - 1]];
+	if (param === "earliest") return [values[0]];
+	
+	const params = [param].flat();
+	const props = {
+		start: params[0].match(/^\d{4}(-\d{2}){0,2}/)?.[0],
+		end: params[params.length - 1].match(/^\d{4}(-\d{2}){0,2}/)?.[0],
+		earliest: params[0].endsWith("earliest"),
+		latest: params[params.length - 1].endsWith("latest")
+	};
+	if (!props.start && !props.end && !props.earliest && !props.latest) return [];
+
+	const dates = values.map(d => d[0].split("/")[0]);
+	let startIndex;
+	if (!props.start && props.earliest) startIndex = 0;
+	else if (props.start) {
+		const startDates = props.start.length > dates[0].length ? dates.map(d => d.padEnd(props.start.length, "-01")) :
+			props.start.length < dates[0].length ? dates.map(d => d.slice(0, props.start.length)) :
+			dates;
+		const index = startDates.indexOf(props.start);
+		startIndex = index !== -1 ? index : props.earliest ? 0 : null;
+	}
+	let endIndex;
+	if (!props.end && props.latest) endIndex = values.length;
+	if (props.end) {
+		const endDates = props.end.length > dates[0].length ? dates.map(d => d.padEnd(props.end.length, "-01")) :
+			props.end.length < dates[0].length ? dates.map(d => d.slice(0, props.end.length)) :
+			dates;
+		const index = endDates.lastIndexOf(props.end);
+		endIndex = index !== -1 ? index + 1 : props.latest ? values.length : null;
+	}
+	if (!Number.isInteger(startIndex) && !Number.isInteger(endIndex)) return [];
+	return values.slice(
+		Number.isInteger(startIndex) ? startIndex : endIndex - 1,
+		Number.isInteger(endIndex) ? endIndex : startIndex + 1
+	);
+}
+
+function filterCube(cube, filters, format) {
+	const dims = [];
+	for (let i = 0; i < cube.id.length; i ++) {
+		const key = cube.id[i];
+		const dimension = cube.dimension[key];
+		const dim = {
+			key: key,
+			count: cube.size[i],
+			values: Object.entries(dimension.category.index)
+		};
+		const filter = filters[key];
+		if (filter && dim.key === "date") {
+			dim.values = filterTime(dim.values, filter);
+		}
+		else if (filter) dim.values = dim.values.filter(filter);
+		dims.push(dim);
+	}
+	const length = dims.map(dim => dim.values.length).reduce((a, b) => a * b, 1);
+	if (length === 0) return null;
+
+	if (format === "json") return toJSON(cube, dims);
+	if (format === "csv") return toRows(cube, dims);
+	return toJSONStat(cube, dims);
+}
+
+function filterAll(datasets, params, format) {
+	const filtered = [];
+	for (const cube of datasets) {
+		const data = filterCube(cube, params, format)
+		if (data) filtered.push(data);
+	}
+	if (format === "csv") return filtered;
+	if (format === "json") return Object.fromEntries(filtered);
+	return {
+		version: "2.0",
+		class: "collection",
+		label: "ELS API response",
+		updated: cube.updated,
+		link: {item: filtered}
+	};
+}
+
+function csvSerialise(datasets) {
+	return csvFormat(datasets.flat());
 }
 
 export function GET({ params, url }) {
   const format = params.format || "json";
-
-	const cacheKey = url.href;
-	// const cachedValue = cache.get(cach	eKey);
-	const cachedValue = null;
-	if (cachedValue) return format === "csv" ? text(cachedValue) : json(cachedValue);
-
   const topic = getParam(url, "topic", "all");
   const indicator = getParam(url, "indicator", "all");
   const geography = getParam	(url, "geography", "all");
   const time = getParam(url, "time", "latest");
   const measure = getParam(url, "measure", "all");
 
-  let data = {...raw_data.combinedDataObjectColumnOriented};
+	let datasets = cube.link.item;
 
+	// Filter datasets by topic OR sub-topic
 	if (topic !== "all") {
-		const _data = {};
-		for (const tpc of [topic].flat()) {
-			const topic_ids = topics.map(t => t.id);
-			if (topic_ids.includes(tpc)) {
-				const ids = Object.values(metadata).filter(ind => ind.topic === tpc).map(ind => ind.code);
-				for (const id of ids) _data[id] = data[id];
-			}
-		}
-		data = _data;
+		datasets = datasets.filter(
+			d => [topic].flat().some(t => [d.extension.topic, d.extension.subTopic].includes(t))
+		);
 	}
-	if (Object.keys(data).length === 0) return error(500, "Topic parameter returned no datasets");
 
+	// Filter datasets by indicator
 	if (indicator !== "all") {
-		const _data = {};
-		for (const ind of [indicator].flat()) {
-			if (data[ind]) _data[ind] = data[ind]; 
-		}
-		data = _data;
-	}
-	if (Object.keys(data).length === 0) return error(500, "Indicator parameter returned no datasets");
-
-	data = removeKeys(data, measure)
-
-	let geoFilter;
-	if (geography !== "all") {
-		geoFilter = {single: new Set(), prefix: new Set()};
-		for (const geo of [geography].flat()) {
-			if (geo.match(/[EKNSW]\d{8}/)) {
-				geoFilter.single.add(geo);
-			} else if (geo.match(/[EKNSW]\d{2}/)) {
-				geoFilter.prefix.add(geo);
-			} else if (geoGroups[geo]) {
-				for (const cd of geoGroups[geo].codes) geoFilter.prefix.add(cd);
-			}
-		}
+		datasets = datasets.filter(
+			d => [indicator].flat().includes(d.extension.code)
+		);
 	}
 
-	let timeFilter;
-	if (time !== "all") {
-		if (time.includes("-")) {
-			const range = time.split("-");
-			const start = +range[0].slice(0, 4);
-			const earliest = range[0].slice(4) === "earliest";
-			const end = +range[1].slice(0, 4);
-			const latest = range[1].slice(4) === "latest";
-			timeFilter = {
-				type: "range",
-				start: Number.isNaN(start) ? null : start,
-				end: Number.isNaN(end) ? null : end,
-				earliest,
-				latest
-			};
-		} else if (typeof time === "string") {
-			const year = +time.slice(0, 4);
-			const mode = time.slice(4) || "exact";
-			timeFilter = {
-				type: "single",
-				year: Number.isNaN(year) ? time : year,
-				mode
-			};
-		}
-	}
-	
-	if (timeFilter || geoFilter) data = filterAll(data, geoFilter, timeFilter);
+	// Create filters for data cube dimensions
+	const filters = {};
+	if (geography !== "all") filters.areacd = makeGeoFilter(geography);
+	if (time !== "all") filters.date = time;
+	if (measure !== "all") filters.measure = makeFilter(measure);
 
-	if (format === "csv") data = csvSerialise(data);
-	cache.set(cacheKey, data);
+	// Apply filters to datasets and generate output for selected format
+	datasets = filterAll(datasets, filters, format);
 
-	return format === "csv" ? text(data) : json(data);
+	return format === "csv" ? text(csvSerialise(datasets)) : json(datasets);
 }
