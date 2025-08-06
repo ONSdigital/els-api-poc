@@ -26,6 +26,18 @@ function parseSourceDate(str) {
   return dates[0].toISOString().slice(0, 10);
 }
 
+function makeSource(meta) {
+  const orgs = meta.sourceOrg.split("|");
+  const urls = meta.sourceURL.split("|");
+  const dates = meta.sourceDate.split("|").map(d => parseSourceDate(d));
+
+  return orgs.map((d, i) => ({
+    org: d,
+    url: urls[i],
+    date: dates[i]
+  }));
+}
+
 function parsePeriod(str) {
   if (str.match(/\d{4}-\d{4}/)) str = str.replace("-", "/");
   const parts = str.split("/").map(p => p.slice(0, 10));
@@ -33,13 +45,11 @@ function parsePeriod(str) {
 }
 
 function filterMetadata(metadata) {
-  const skipKeys = ["label", "caveats"];
-  const arrayKeys = ["sourceDate", "sourceURL", "sourceOrg"];
+  const skipKeys = ["label", "caveats", "longDescription", "sourceDate", "sourceURL", "sourceOrg"];
 
   const filtered = {};
   for (const key of Object.keys(metadata).filter(k => !skipKeys.includes(k))) {
-    if (arrayKeys.includes(key)) filtered[key] = metadata[key].split("|");
-    else filtered[key] = metadata[key] === "T" ? true : metadata[key] === "F" ? false : metadata[key];
+    filtered[key] = metadata[key] === "T" ? true : metadata[key] === "F" ? false : metadata[key];
   }
   return filtered;
 }
@@ -71,6 +81,7 @@ function toRows(data, periods) {
 function toCube(data, meta) {
   // Scaffold dataset and copy over metadata
   const dataset = {
+    version: "2.0",
     class: "dataset",
     label: meta.metadata.label,
     note: [meta.metadata.caveats].filter(n => n),
@@ -80,6 +91,8 @@ function toCube(data, meta) {
       id: meta.id,
       topic: meta.topic,
       subTopic: meta.subTopic,
+      description: meta.metadata.longDescription,
+      source: makeSource(meta.metadata),
       ...filterMetadata(meta.metadata),
       geography: {
         countries: meta.inferredGeos.ctrys,
@@ -112,7 +125,7 @@ function toCube(data, meta) {
     };
     if (key === "measure") {
       const labels = values.map(d => [d, columnsLookup?.[d]?.label || d]);
-      dimension[key].label = Object.fromEntries(labels);
+      dimension[key].category.label = Object.fromEntries(labels);
     }
     if (col.role) {
       if (!role[col.role]) role[col.role] = [];
