@@ -30,7 +30,7 @@
 </script>
 
 <PhaseBanner phase="prototype"/>
-<Header compact title="Lazy charts demo" />
+<Header compact title="Single indicator demo" />
 <Breadcrumb links={[{label: "ELS API experiments", href: `${base}/`}]}/>
 
 <Section>

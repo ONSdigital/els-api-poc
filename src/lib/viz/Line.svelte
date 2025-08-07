@@ -1,12 +1,12 @@
 <script>
   import { Plot, Line } from "svelteplot";
 
-  let { data, xKey = "date", yKey = "value", zKey = "areacd", selected = null } = $props();
+  let { data, xKey = "time", yKey = "value", zKey = "areacd", selected = null } = $props();
 </script>
 
-<Plot x={{grid: true, tickFormat: (d) => d}}>
+<Plot x={{grid: true}}>
   <Line
-    data={[...data].sort((a, b) => a[xKey] - b[xKey]).sort((a, b) => a[zKey].localeCompare(b[zKey]))}
+    data={data.map(d => ({...d, time: new Date(d.date.split("/")[0])}))}
     x={xKey}
     y={yKey}
     z={zKey}
