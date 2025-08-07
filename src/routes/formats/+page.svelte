@@ -1,4 +1,5 @@
 <script>
+  import { onMount } from "svelte";
   import { base } from "$app/paths";
   import {
     PhaseBanner,
@@ -14,7 +15,7 @@
   import { utcYear, utcDay } from "d3-time";
   import metadata from "$lib/metadata.json";
 
-  export let data;
+  let data;
 
   function formatDate(str) {
     const parts = str.split("/");
@@ -36,6 +37,12 @@
       endDate ? `${type === "fy" ? "FY " : ""}${utcFormat("%Y")(date)}-${utcFormat("%y")(endDate)}` :
       utcFormat("%Y")(date);
   }
+
+  async function fetchData() {
+    const url = `${base}/api.json?geography=E92000001&time=latest&measure=value`;
+    const data = await (await fetch(url)).json();
+    return data;
+  }
 </script>
 
 <PhaseBanner phase="prototype"/>
@@ -49,14 +56,20 @@
 </Section>
 
 <Grid colWidth="medium" title="Indicators for England">
-  {#each Object.keys(data) as key}
-    {@const meta = metadata[key].metadata}
-    <DataCard
-      title={meta.label.split(" (")[0]}
-      value="{meta.prefix}{format(`,.${meta.decimalPlaces}f`)(data[key].value[0])}{meta.suffix}"
-      caption="{meta.subText ? `${meta.subText} ` : ""}<span class='nobr'>in {formatDate(data[key].date[0])}</span>"
-      source="Source: {meta.sourceOrg.split("|").join(", ")}"/>
-  {/each}
+  {#await fetchData()}
+    Fetching data
+  {:then data}
+    {#each Object.keys(data) as key}
+      {@const meta = metadata[key].metadata}
+      <DataCard
+        title={meta.label.split(" (")[0]}
+        value="{meta.prefix}{format(`,.${meta.decimalPlaces}f`)(data[key].value[0])}{meta.suffix}"
+        caption="{meta.subText ? `${meta.subText} ` : ""}<span class='nobr'>in {formatDate(data[key].date[0])}</span>"
+        source="Source: {meta.sourceOrg.split("|").join(", ")}"/>
+    {/each}
+  {:catch}
+    Failed to load data
+  {/await}
 </Grid>
 
 <Footer compact />
