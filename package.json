@@ -8,10 +8,8 @@
     "build:preview": "cross-env PUBLIC_APP_ENV=preview vite build",
     "package": "vite package",
     "preview": "vite preview",
-    "deploy": "gh-pages -d build -t true",
     "lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. .",
     "format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. .",
-    "make-data-cube": "node ./scripts/make-data-cube.js",
     "make-json-stat": "node ./scripts/make-json-stat.js"
   },
   "author": "Ahmad Barclay",
@@ -19,16 +17,14 @@
   "devDependencies": {
     "@onsvisual/svelte-charts": "^0.4.11",
     "@onsvisual/svelte-components": "^1.0.12",
+    "@sveltejs/adapter-auto": "^6.0.1",
     "@sveltejs/kit": "^2.5.27",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
-    "arquero": "^8.0.3",
     "cross-env": "^7.0.3",
     "d3-dsv": "^3.0.1",
     "d3-format": "^3.1.0",
     "d3-time": "^3.1.0",
     "d3-time-format": "^4.1.0",
-    "gh-pages": "^6.1.1",
-    "node-cache": "^5.1.2",
     "prettier": "^3.1.0",
     "prettier-plugin-svelte": "^3.2.6",
     "svelte": "^5.0.0",
@@ -37,7 +33,6 @@
     "vite": "^5.4.4"
   },
   "dependencies": {
-    "@sveltejs/adapter-auto": "^6.0.1",
     "sirv-cli": "^1.0.0"
   },
   "type": "module"
