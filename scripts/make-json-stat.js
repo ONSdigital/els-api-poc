@@ -39,6 +39,7 @@ function makeSource(meta) {
 }
 
 function parsePeriod(str, isQuarterly = false) {
+  str = str.replace("T00:00:00", "");
   if (str.match(/\d{4}-\d{4}/)) str = str.replace("-", "/");
   const parts = str.split("/").map(p => p.slice(0, 10));
   if (isQuarterly && parts.length === 1) parts.push("P3M");
