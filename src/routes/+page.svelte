@@ -35,6 +35,9 @@
   <Card title="Single indicator demo" mode="featured" href="{base}/indicator">
     Indicator page demo, with data lazy loaded per chart/map.
   </Card>
+  <Card title="Formats and units" mode="featured" href="{base}/formats">
+    Adding automatic units, dates and descriptions to data.
+  </Card>
 </Grid>
 
 <Footer compact />

@@ -38,9 +38,10 @@ function makeSource(meta) {
   }));
 }
 
-function parsePeriod(str) {
+function parsePeriod(str, isQuarterly = false) {
   if (str.match(/\d{4}-\d{4}/)) str = str.replace("-", "/");
   const parts = str.split("/").map(p => p.slice(0, 10));
+  if (isQuarterly && parts.length === 1) parts.push("P3M");
   return parts.join("/");
 }
 
@@ -58,7 +59,8 @@ function toRows(data, periods) {
   const vals = measures.filter(val => data[val].filter(d => d).length > 0);
   const cols = Object.keys(data).filter(col => !["id", "code", ...measures].includes(col));
   const periodsLookup = {};
-  for (const p of periods) periodsLookup[p.xDomainNumb] = parsePeriod(p.period);
+  const isQuarterly = periods.map(p => p.xDomainNumb % 1).filter(n => n).length > 0;
+  for (const p of periods) periodsLookup[p.xDomainNumb] = parsePeriod(p.period, isQuarterly);
 
   const rows = [];
   for (let i = 0; i < data[cols[0]].length; i ++) {
