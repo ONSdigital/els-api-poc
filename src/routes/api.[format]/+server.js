@@ -3,6 +3,10 @@ import { csvFormat } from "d3-dsv";
 import cube from "$lib/json-stat.json";
 import geoGroups from "$lib/geo-groups.js";
 
+function ascending(a, b) {
+  return a == null || b == null ? NaN : a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
+}
+
 function getParam(url, key, fallback) {
 	const param = url.searchParams.get(key);
 	if (!param) return fallback;
@@ -140,20 +144,28 @@ function filterTime(values, param) {
 	let startIndex;
 	if (!props.start && props.earliest) startIndex = 0;
 	else if (props.start) {
-		const startDates = props.start.length > dates[0].length ? dates.map(d => d.padEnd(props.start.length, "-01")) :
-			props.start.length < dates[0].length ? dates.map(d => d.slice(0, props.start.length)) :
+		props.start = props.start.slice(0, dates[0].length);
+		const startDates = props.start.length < dates[0].length ?
+			dates.map(d => d.slice(0, props.start.length)) :
 			dates;
 		const index = startDates.indexOf(props.start);
-		startIndex = index !== -1 ? index : props.earliest ? 0 : null;
+		const indexForce = index === -1 && props.earliest ?
+			[props.start, ...startDates].sort(ascending).indexOf(props.start) :
+			null;
+		startIndex = !indexForce ? index : indexForce && indexForce < dates.length ? indexForce : null;
 	}
 	let endIndex;
 	if (!props.end && props.latest) endIndex = values.length;
 	if (props.end) {
-		const endDates = props.end.length > dates[0].length ? dates.map(d => d.padEnd(props.end.length, "-01")) :
-			props.end.length < dates[0].length ? dates.map(d => d.slice(0, props.end.length)) :
+		props.end = props.end.slice(0, dates[0].length);
+		const endDates = props.end.length < dates[0].length ?
+			dates.map(d => d.slice(0, props.end.length)) :
 			dates;
 		const index = endDates.lastIndexOf(props.end);
-		endIndex = index !== -1 ? index + 1 : props.latest ? values.length : null;
+		const indexForce = index === -1 && props.latest ?
+			[...endDates, props.end].sort(ascending).lastIndexOf(props.end) :
+			null;
+		endIndex = !indexForce ? index + 1 : indexForce && indexForce > 0 ? indexForce : null;
 	}
 	if (!Number.isInteger(startIndex) && !Number.isInteger(endIndex)) return [];
 	return values.slice(
