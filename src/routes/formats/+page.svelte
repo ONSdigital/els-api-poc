@@ -52,7 +52,7 @@
   {#each Object.keys(data) as key}
     {@const meta = metadata[key].metadata}
     <DataCard
-      title="{meta.label.split(" (")[0]}"
+      title={meta.label.split(" (")[0]}
       value="{meta.prefix}{format(`,.${meta.decimalPlaces}f`)(data[key].value[0])}{meta.suffix}"
       caption="{meta.subText ? `${meta.subText} ` : ""}<span class='nobr'>in {formatDate(data[key].date[0])}</span>"
       source="Source: {meta.sourceOrg.split("|").join(", ")}"/>
