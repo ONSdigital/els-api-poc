@@ -1,5 +1,4 @@
 <script>
-  import { onMount } from "svelte";
   import { base } from "$app/paths";
   import {
     PhaseBanner,
@@ -15,26 +14,24 @@
   import { utcYear, utcDay } from "d3-time";
   import metadata from "$lib/metadata.json";
 
-  let data;
-
   function formatDate(str) {
     const parts = str.split("/");
     const date = new Date(parts[0]);
     const period = parts?.[1];
     const type = period === "P3M" ? "quarter" :
-      period === "P1Y" ? "12months" :
       period === "P3Y" ? "36months" :
-      period?.match(/\d{4}/) ? "fy" :
-      parts[0].length === 7 ? "month" :
+      period?.match(/^\d{4}/) ? "FY" :
+      period === "P1Y" && ["08-01", "09-01"].includes(parts[0].slice(5)) ? "AY" :
+      period === "P1Y" && parts[0].slice(5) === "01-01" ? "year" :
+      period === "P1Y" ? "12months" :
+      parts[0].length > 6 ? "month" :
       "year";
-    const endDate = !period ? null :
-      type === "fy" ? new Date(period) :
-      type === "36months" ? utcDay.offset(utcYear.offset(date, 3), -1) :
-      type === "12months" && parts[0].slice(5) !== "01-01" ? utcYear.offset(date, 1) :
+    const endDate = type === "36months" ? utcDay.offset(utcYear.offset(date, 3), -1) :
+      ["12months", "FY", "AY"].includes(type) ? utcDay.offset(utcYear.offset(date, 1), -1) :
       null;
     return type === "quarter" ? `Q${utcFormat("%q %Y")(date)}` :
       type === "month" ? utcFormat("%b %Y")(date) :
-      endDate ? `${type === "fy" ? "FY " : ""}${utcFormat("%Y")(date)}-${utcFormat("%y")(endDate)}` :
+      endDate ? `${type?.length === 2 ? `${type} ` : ""}${utcFormat("%Y")(date)}-${utcFormat("%y")(endDate)}` :
       utcFormat("%Y")(date);
   }
 
