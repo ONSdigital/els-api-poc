@@ -106,6 +106,76 @@ function toJSON(cube, dims) {
 	return [cube.extension.code, data];
 }
 
+function toCSVW(datasets, measure, url) {
+	let metadata = {
+    "@context": "http://www.w3.org/ns/csvw",
+    url: url.href.replace(".csvw", ".csv"),
+		"rdfs:label": "Filtered datasets from ONS Explore Local Statistics API",
+	}
+	if (datasets.length === 1) {
+		const ds = datasets[0];
+		const sourceOrg = ds.extension.source[0].url.split("/").slice(0, 3).join("/") + "/";
+		metadata = {
+			...metadata,
+			"rdfs:label": "Filtered dataset from ONS Explore Local Statistics API",
+			"dc:title": ds.label,
+			"rdfs:comment": ds.extension.description,
+			"dc:issued": {
+					"@type": "date",
+					"@value": ds.updated
+			},
+			"dc:creator": {
+					"@id": sourceOrg
+			},
+			"dc:publisher": {
+					"@id": sourceOrg
+			},
+			"dcat:landingPage": {
+					"@id": ds.extension.source[0].url
+			}
+		}
+	}
+	let measures = [
+		{
+			titles: "Lower confidence interval",
+			name: "lci",
+			datatype: "number"
+		},
+		{
+			titles: "Value",
+			name: "value",
+			datatype: "number"
+		},
+		{
+			titles: "Upper confidence interval",
+			name: "uci",
+			datatype: "number"
+		},
+	];
+	if (measure !== "all") measures = measures.filter(m => [measure].flat().includes(m.name));
+	metadata.tableSchema = {
+		columns: [
+			{
+				titles: "Indicator",
+				name: "indicator",
+				datatype: "string"
+			},
+			{
+				titles: "Time period",
+				name: "date",
+				datatype: "date"
+			},
+			{
+				titles: "Area code",
+				name: "areacd",
+				datatype: "string"
+			},
+			...measures
+		]
+	};
+	return metadata;
+}
+
 function makeFilter(param) {
 	const set = new Set([param].flat());
 	return d => set.has(d[0]);
@@ -210,7 +280,7 @@ function filterAll(datasets, params, format) {
 	return {
 		version: "2.0",
 		class: "collection",
-		label: "ELS API response",
+		label: "ONS Explore Local Statistics API response",
 		updated: cube.updated,
 		link: {item: filtered}
 	};
@@ -242,6 +312,12 @@ export function GET({ params, url }) {
 		datasets = datasets.filter(
 			d => [indicator].flat().includes(d.extension.code)
 		);
+	}
+
+	// Return only CSVW metadata, if requested
+	if (format === "csvw") {
+		const metadata = toCSVW(datasets, measure, url);
+		return json(metadata);
 	}
 
 	// Create filters for data cube dimensions
