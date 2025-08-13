@@ -137,11 +137,13 @@ As part of this proof of concept, we wanted to investigate whether it is prefera
 
 In the Netlify demo, the single large data request seems to perform significantly better than the lazy loading approach in terms of the aggregate response time (ie. total response time across all requests). However, the lazy loading approach would have the benefit of not serving data for charts that are not viewed, so it would seem worth continuing to investigate the performance trade-offs in real world scenarios.
 
-#### Caching
+#### Cacheing
 
 Our current deployment of the live ELS app offers a significant performance advantage for any URL-based API since all public URLs (including API paths) are automatically cached by Cloudflare. Changes to the data always coincide with a fresh deployment of the app, at which point the entire cache is purged, meaning that the cache for the API would always be aligned with changes to other parts of the app.
 
-The performance would need to be assessed in the sandbox or staging environment to assess the true benefits of the Cloudflare cache, and whether there are any possible downsides.
+#### Test run on AWS infrastructure
+
+We have run a test deployment of the API endpoint within the AWS (EKS) sandbox environment for the live ELS app and it functions as expected, including the server-side cacheing.
 
 ## Preferred approach
 
@@ -155,13 +157,9 @@ Due to its flexibility and extensibility, our preferred approach based on this e
 
 ### A public (cacheable) endpoint
 
-To benefit from the existing caching on the ELS app, and the ability to offer users data downloads in thir preferred format(s) within the app, our preference would be to have **publicly exposed API endpoint** where the responses would be cached by Cloudflare.
+To benefit from the existing cacheing on the ELS app, and the ability to offer users data downloads in thir preferred format(s) within the app, our preference would be to have **publicly exposed API endpoint** where the responses would be cached by Cloudflare.
 
 ## Next steps
-
-### Testing on ELS intrastructure
-
-Before proceeding further, we will look to test the PoC API in a sandbox/staging version of our current infrastructure to ensure that our current assumptions are correct vis-a-vis performance in our live environment, and to ensure that there are no unexpected "show stopper" issues that would prevent a data API from being implemented and deployed.
 
 ### Assuring the design
 
