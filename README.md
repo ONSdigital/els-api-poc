@@ -175,5 +175,5 @@ Before moving into production on any public-facing API, we would want to have an
 
 If a publicly exposed API is not considered advisable due to performance, security or other considerations, we would look at alternative ways to implement a more performant way to serve data to the ELS app. These include:
 - A private API that cannot be accessed directly by external users.
-- An alternative internal data querying system, potentially leveraging SvelteKit's "server functions".
+- An alternative internal data querying system, potentially leveraging SvelteKit's [remote functions](https://svelte.dev/docs/kit/remote-functions).
 - Pre-generated data files that could serve relevant chunks of data to the app when the user makes selections.
