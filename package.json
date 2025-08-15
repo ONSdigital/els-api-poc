@@ -3,7 +3,7 @@
   "homepage": "http://onsvisual.github.io/sveltekit-starter",
   "version": "1.0.0",
   "scripts": {
-    "dev": "vite dev",
+    "dev": "NODE_OPTIONS=--max-old-space-size=8192 vite dev",
     "build": "NODE_OPTIONS=--max-old-space-size=8192 vite build && node ./scripts/js-fix",
     "build:preview": "cross-env PUBLIC_APP_ENV=preview vite build",
     "package": "vite package",
