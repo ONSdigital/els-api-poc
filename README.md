@@ -125,11 +125,13 @@ Being able to serve these formats from an API would allow us to offer our users 
 
 In terms of query performance (response time), there is no meaningful difference between the path-based or query-based requests, since the underlying data store and filtering would be identical.
 
-With regards to the choice of underlying file format for the data store, the use of JSON-Stat and column-oriented JSON data produced fairly similar results, with JSON-Stat out-performing the alternative when querying for smaller chunks of data. However, the cube-based JSON-Stat format also offers benefits in terms of extensibility (particularly for multi-variate datasets), and in terms of potential for further performance optimisation.
+With regards to the choice of the internal file format for the data store, the use of JSON-Stat and column-oriented JSON data produced fairly similar results, with JSON-Stat out-performing the alternative when querying for smaller chunks of data. However, the cube-based JSON-Stat format also offers benefits in terms of smaller file size, extensibility (particularly for multi-variate datasets), and in terms of potential for further performance optimisation.
 
-Running locally on a 2018 Macbook Pro, response times are in the range of 10-100ms, depending mostly on the volume of data being requested (also, more verbose formats like CSV take longer for the same requests, suggesting that serialising the response may be more expensive than running the filters). Running on Netlify, response times are typically in the 200-300ms range, but can be up to 2 seconds when making the first in a series of requests.*
+Running locally on a 2018 Macbook Pro, response times are in the range of 10-100ms, depending mostly on the volume of data being requested (also, more verbose formats like CSV take longer for the same requests, suggesting that writing/sending the response may be more expensive than running the filters).
 
-*This lag seems to be related to the nature of initialising "edge functions", whereas the live ELS app runs continuously on AWS and so should not have an initialisation cost.
+Running on Netlify, response times are typically in the 200-300ms range, but can be up to 2 seconds when making the first in a series of requests. This initial lag seems to be related to the nature of initialising "edge functions".
+
+Running on the ONS EKS sandbox environment, performance was similar to Netlify, but without any obvious lag for the initial request. There was a slight performance improvement for cached requests when running behind Cloudflare. However, the connection and response times for these cached requests did not seem optimal given they should simply be serving static files/data. For this reason, it would be useful to test further in the staging environment, which should be identical to production. Performance metrics for these environments can be [viewed here](https://svelte.dev/playground/a14e87dee218440d9fe95bdef2699fde?version=5.38.1).
 
 #### Small vs large requests
 
@@ -141,10 +143,6 @@ In the Netlify demo, the single large data request seems to perform significantl
 
 Our current deployment of the live ELS app offers a significant performance advantage for any URL-based API since all public URLs (including API paths) are automatically cached by Cloudflare. Changes to the data always coincide with a fresh deployment of the app, at which point the entire cache is purged, meaning that the cache for the API would always be aligned with changes to other parts of the app.
 
-#### Test run on AWS infrastructure
-
-We have run a test deployment of the API endpoint within the AWS (EKS) sandbox environment for the live ELS app and it functions as expected, including the server-side caching.
-
 ## Preferred approach
 
 ### Implementation in SvelteKit
@@ -153,11 +151,11 @@ This proof-of-concept exercise has demonstrated the feasibility of adopting an A
 
 ### A query-based API backed by JSON-Stat
 
-Due to its flexibility and extensibility, our preferred approach based on this exercise is to develop a **query-based URL structure** backed by a **JSON-Stat data file**.
+Due to its flexibility, extensibility and smaller file size, our preferred approach based on this exercise is to develop a **query-based URL structure** backed by a **JSON-Stat data file**.
 
 ### A public (cacheable) endpoint
 
-To benefit from the existing caching on the ELS app, and the ability to offer users data downloads in thir preferred format(s) within the app, our preference would be to have **publicly exposed API endpoint** where the responses would be cached by Cloudflare.
+To benefit from the existing Cloudflare cache on the ELS app, and the ability to offer users data downloads in thir preferred format(s) within the app, our preference would be to have **publicly exposed API endpoint** where the responses would be cached by Cloudflare.
 
 ## Next steps
 
@@ -167,7 +165,7 @@ Our next step is to reach out to the relevant teams and working groups across ON
 
 ### Testing and optimising performance
 
-Before moving into production on any public-facing API, we would want to have an independent review of our API implementation, and to work with penetration testing experts to assure that the API would be secure and performant in a production environment.
+Before moving into production on any public-facing API, we would seek to have an independent review of our API implementation, and to work with penetration testing experts to assure that the API would be secure and performant in a production environment.
 
 ### Considering alternative implementations
 
