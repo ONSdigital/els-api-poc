@@ -185,4 +185,4 @@ If a publicly exposed API is not considered advisable due to performance, securi
 2. An alternative internal data querying system, potentially leveraging SvelteKit's [remote functions](https://svelte.dev/docs/kit/remote-functions).
 3. Pre-generated data files that could serve relevant chunks of data to the app when the user makes selections.
 
-Notably, options 1 and 2 would not benefit from Cloudflare caching of its responses, whereas option 3 would require a significant volume of static data files to be generated at the build step and uploaded with the deployment. On face value, this may make all of the options sub-optimal, although additional approaches &mdash; or hybrid approaches &mdash; may emerge with additional research and testing.
+Notably, options 1 and 2 would not benefit from Cloudflare caching of responses, whereas option 3 would require a significant volume of static data files to be generated at the build step and uploaded with the deployment. On face value, this may make all of these alternatives sub-optimal, although additional approaches &mdash; or hybrid approaches &mdash; may emerge with additional research and testing.
