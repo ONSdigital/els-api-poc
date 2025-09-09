@@ -1,4 +1,504 @@
 {
+  "population-indicators-Population count": {
+    "id": 99,
+    "topic": "population",
+    "subTopic": "population",
+    "code": "population-indicators-Population count",
+    "": null,
+    "minXDomainNumb": 1991,
+    "maxXDomainNumb": 2024,
+    "metadata": {
+      "code": "population-indicators-Population count",
+      "slug": "population-count",
+      "label": "Total population",
+      "prefix": "",
+      "suffix": "",
+      "subText": "people",
+      "decimalPlaces": 0,
+      "howToMeasureChange": null,
+      "subtitle": "Mid-year estimate of the total number of people",
+      "zeroBaseline": "F",
+      "canBeNegative": "F",
+      "experimentalStatistic": "F",
+      "sourceDate": "30/07/2025",
+      "sourceURL": "https://www.nomisweb.co.uk/datasets/pestsyoala",
+      "sourceOrg": "Office for National Statistics",
+      "longDescription": "This indicator shows the mid-year estimate of the total population, in the United Kingdom, for 1991 to 2024.",
+      "standardised": "F",
+      "caveats": "Population estimates in Explore Local Statistics (ELS) are informed by those available on Nomis at the time of publication on ELS.\n\nFor Northern Ireland, estimates for mid-2024 are not yet available and are planned for publication on Nomis in September 2025. For Scotland, Nomis does not yet include estimates for mid-2024 or reflect revisions for mid-2023 published in August 2025. These are also planned for publication on Nomis in September 2025 and will be updated in ELS in October 2025.\n\nMid-2011 to mid-2022 revisions for Scotland published in January 2025 are available in Nomis and ELS. These are due to be updated in the Office for National Statistics UK population estimates in September 2025.",
+      "confidenceIntervals": "F",
+      "initialGeographyLevel": "ltla",
+      "beeswarmRowUseMinMax": "F"
+    },
+    "inferredGeos": {
+      "ctrys": ["E", "N", "S", "W"],
+      "types": [
+        "E06",
+        "E07",
+        "E08",
+        "E09",
+        "E10",
+        "E12",
+        "E47",
+        "E92",
+        "K02",
+        "K03",
+        "K04",
+        "N09",
+        "N92",
+        "S12",
+        "S92",
+        "W06",
+        "W92"
+      ],
+      "groups": [
+        { "key": "uk", "codes": ["K02"], "label": "United Kingdom" },
+        {
+          "key": "ctry",
+          "codes": ["E92", "S92", "N92", "W92"],
+          "label": "Countries"
+        },
+        {
+          "key": "rgn",
+          "codes": ["E12", "S92", "N92", "W92"],
+          "label": "Countries and regions"
+        },
+        { "key": "cauth", "codes": ["E47"], "label": "Combined authorities" },
+        {
+          "key": "utla",
+          "codes": ["E06", "E08", "E09", "E10", "N09", "S12", "W06"],
+          "label": "Upper-tier/unitary authorities"
+        },
+        {
+          "key": "ltla",
+          "codes": ["E06", "E07", "E08", "E09", "N09", "S12", "W06"],
+          "label": "Lower-tier/unitary authorities"
+        }
+      ],
+      "year": 2023
+    },
+    "years": [
+      1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
+      2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014,
+      2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024
+    ]
+  },
+  "population-indicators-Population density": {
+    "id": 102,
+    "topic": "population",
+    "subTopic": "population",
+    "code": "population-indicators-Population density",
+    "": null,
+    "minXDomainNumb": 1991,
+    "maxXDomainNumb": 2024,
+    "metadata": {
+      "code": "population-indicators-Population density",
+      "slug": "population-density",
+      "label": "Population density",
+      "prefix": "",
+      "suffix": "",
+      "subText": "persons per square kilometre",
+      "decimalPlaces": 0,
+      "howToMeasureChange": null,
+      "subtitle": "Number of people resident per square kilometre",
+      "zeroBaseline": "F",
+      "canBeNegative": "F",
+      "experimentalStatistic": "F",
+      "sourceDate": "30/07/2025",
+      "sourceURL": "https://www.nomisweb.co.uk/datasets/pestsyoala",
+      "sourceOrg": "Office for National Statistics",
+      "longDescription": "This indicator shows the number of usual residents per square kilometre, calculated based on total land area excluding inland water, in the United Kingdom, for 1991 to 2024.",
+      "standardised": "T",
+      "caveats": "[Standard Area Measurements for Administrative Areas (December 2023) in the UK](https://geoportal.statistics.gov.uk/datasets/da8590c5f55f4664b32ad4339f43419c/about) was used to calculate population density by dividing the total population by the area in square kilometres.\n\nPopulation estimates in Explore Local Statistics (ELS) are informed by those available on Nomis at the time of publication on ELS.\n\nFor Northern Ireland, estimates for mid-2024 are not yet available and are planned for publication on Nomis in September 2025. For Scotland, Nomis does not yet include estimates for mid-2024 or reflect revisions for mid-2023 published in August 2025. These are also planned for publication on Nomis in September 2025 and will be updated in ELS in October 2025.\n\nMid-2011 to mid-2022 revisions for Scotland published in January 2025 are available in Nomis and ELS. These are due to be updated in the Office for National Statistics UK population estimates in September 2025.",
+      "confidenceIntervals": "F",
+      "initialGeographyLevel": "ltla",
+      "beeswarmRowUseMinMax": "F"
+    },
+    "inferredGeos": {
+      "ctrys": ["E", "N", "S", "W"],
+      "types": [
+        "E06",
+        "E07",
+        "E08",
+        "E09",
+        "E10",
+        "E12",
+        "E92",
+        "K02",
+        "N09",
+        "N92",
+        "S12",
+        "S92",
+        "W06",
+        "W92"
+      ],
+      "groups": [
+        { "key": "uk", "codes": ["K02"], "label": "United Kingdom" },
+        {
+          "key": "ctry",
+          "codes": ["E92", "S92", "N92", "W92"],
+          "label": "Countries"
+        },
+        {
+          "key": "rgn",
+          "codes": ["E12", "S92", "N92", "W92"],
+          "label": "Countries and regions"
+        },
+        {
+          "key": "utla",
+          "codes": ["E06", "E08", "E09", "E10", "N09", "S12", "W06"],
+          "label": "Upper-tier/unitary authorities"
+        },
+        {
+          "key": "ltla",
+          "codes": ["E06", "E07", "E08", "E09", "N09", "S12", "W06"],
+          "label": "Lower-tier/unitary authorities"
+        }
+      ],
+      "year": 2023
+    },
+    "years": [
+      1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
+      2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014,
+      2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024
+    ]
+  },
+  "population-indicators-Median age": {
+    "id": 106,
+    "topic": "population",
+    "subTopic": "population",
+    "code": "population-indicators-Median age",
+    "": null,
+    "minXDomainNumb": 1991,
+    "maxXDomainNumb": 2024,
+    "metadata": {
+      "code": "population-indicators-Median age",
+      "slug": "median-age",
+      "label": "Median age",
+      "prefix": "",
+      "suffix": "",
+      "subText": "years",
+      "decimalPlaces": 0,
+      "howToMeasureChange": null,
+      "subtitle": "Median age of people",
+      "zeroBaseline": "F",
+      "canBeNegative": "F",
+      "experimentalStatistic": "F",
+      "sourceDate": "30/07/2025",
+      "sourceURL": "https://www.nomisweb.co.uk/datasets/pestsyoala",
+      "sourceOrg": "Office for National Statistics",
+      "longDescription": "This indicator shows the median age of people, in the United Kingdom, for 1991 to 2024.",
+      "standardised": "T",
+      "caveats": "Median age is calculated as the age category in which the mid-point of the population distribution falls. There may be slight differences when compared with other sources, as these may reflect where the mid-point falls within the given age category. These reflect differences in precision, not accuracy.\n\nPopulation estimates in Explore Local Statistics (ELS) are informed by those available on Nomis at the time of publication on ELS.\n\nFor Northern Ireland, estimates for mid-2024 are not yet available and are planned for publication on Nomis in September 2025. For Scotland, Nomis does not yet include estimates for mid-2024 or reflect revisions for mid-2023 published in August 2025. These are also planned for publication on Nomis in September 2025 and will be updated in ELS in October 2025.\n\nMid-2011 to mid-2022 revisions for Scotland published in January 2025 are available in Nomis and ELS. These are due to be updated in the Office for National Statistics UK population estimates in September 2025.",
+      "confidenceIntervals": "F",
+      "initialGeographyLevel": "ltla",
+      "beeswarmRowUseMinMax": "F"
+    },
+    "inferredGeos": {
+      "ctrys": ["E", "N", "S", "W"],
+      "types": [
+        "E06",
+        "E07",
+        "E08",
+        "E09",
+        "E10",
+        "E12",
+        "E47",
+        "E92",
+        "K02",
+        "K03",
+        "K04",
+        "N09",
+        "N92",
+        "S12",
+        "S92",
+        "W06",
+        "W92"
+      ],
+      "groups": [
+        { "key": "uk", "codes": ["K02"], "label": "United Kingdom" },
+        {
+          "key": "ctry",
+          "codes": ["E92", "S92", "N92", "W92"],
+          "label": "Countries"
+        },
+        {
+          "key": "rgn",
+          "codes": ["E12", "S92", "N92", "W92"],
+          "label": "Countries and regions"
+        },
+        { "key": "cauth", "codes": ["E47"], "label": "Combined authorities" },
+        {
+          "key": "utla",
+          "codes": ["E06", "E08", "E09", "E10", "N09", "S12", "W06"],
+          "label": "Upper-tier/unitary authorities"
+        },
+        {
+          "key": "ltla",
+          "codes": ["E06", "E07", "E08", "E09", "N09", "S12", "W06"],
+          "label": "Lower-tier/unitary authorities"
+        }
+      ],
+      "year": 2023
+    },
+    "years": [
+      1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
+      2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014,
+      2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024
+    ]
+  },
+  "population-indicators-Percentage of the population aged 0 to 15": {
+    "id": 109,
+    "topic": "population",
+    "subTopic": "population",
+    "code": "population-indicators-Percentage of the population aged 0 to 15",
+    "": null,
+    "minXDomainNumb": 1991,
+    "maxXDomainNumb": 2024,
+    "metadata": {
+      "code": "population-indicators-Percentage of the population aged 0 to 15",
+      "slug": "percentage-of-the-population-aged-0-to-15",
+      "label": "Population aged 0 to 15",
+      "prefix": "",
+      "suffix": "%",
+      "subText": null,
+      "decimalPlaces": 1,
+      "howToMeasureChange": null,
+      "subtitle": "Percentage of the population aged 0 to 15",
+      "zeroBaseline": "F",
+      "canBeNegative": "F",
+      "experimentalStatistic": "F",
+      "sourceDate": "30/07/2025",
+      "sourceURL": "https://www.nomisweb.co.uk/datasets/pestsyoala",
+      "sourceOrg": "Office for National Statistics",
+      "longDescription": "This indicator shows the percentage of the population aged 0 to 15, in the United Kingdom, for 1991 to 2024.",
+      "standardised": "T",
+      "caveats": "Population estimates in Explore Local Statistics (ELS) are informed by those available on Nomis at the time of publication on ELS.\n\nFor Northern Ireland, estimates for mid-2024 are not yet available and are planned for publication on Nomis in September 2025. For Scotland, Nomis does not yet include estimates for mid-2024 or reflect revisions for mid-2023 published in August 2025. These are also planned for publication on Nomis in September 2025 and will be updated in ELS in October 2025.\n\nMid-2011 to mid-2022 revisions for Scotland published in January 2025 are available in Nomis and ELS. These are due to be updated in the Office for National Statistics UK population estimates in September 2025.",
+      "confidenceIntervals": "F",
+      "initialGeographyLevel": "ltla",
+      "beeswarmRowUseMinMax": "F"
+    },
+    "inferredGeos": {
+      "ctrys": ["E", "N", "S", "W"],
+      "types": [
+        "E06",
+        "E07",
+        "E08",
+        "E09",
+        "E10",
+        "E12",
+        "E47",
+        "E92",
+        "K02",
+        "K03",
+        "K04",
+        "N09",
+        "N92",
+        "S12",
+        "S92",
+        "W06",
+        "W92"
+      ],
+      "groups": [
+        { "key": "uk", "codes": ["K02"], "label": "United Kingdom" },
+        {
+          "key": "ctry",
+          "codes": ["E92", "S92", "N92", "W92"],
+          "label": "Countries"
+        },
+        {
+          "key": "rgn",
+          "codes": ["E12", "S92", "N92", "W92"],
+          "label": "Countries and regions"
+        },
+        { "key": "cauth", "codes": ["E47"], "label": "Combined authorities" },
+        {
+          "key": "utla",
+          "codes": ["E06", "E08", "E09", "E10", "N09", "S12", "W06"],
+          "label": "Upper-tier/unitary authorities"
+        },
+        {
+          "key": "ltla",
+          "codes": ["E06", "E07", "E08", "E09", "N09", "S12", "W06"],
+          "label": "Lower-tier/unitary authorities"
+        }
+      ],
+      "year": 2023
+    },
+    "years": [
+      1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
+      2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014,
+      2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024
+    ]
+  },
+  "population-indicators-Percentage of the population aged 16 to 64": {
+    "id": 112,
+    "topic": "population",
+    "subTopic": "population",
+    "code": "population-indicators-Percentage of the population aged 16 to 64",
+    "": null,
+    "minXDomainNumb": 1991,
+    "maxXDomainNumb": 2024,
+    "metadata": {
+      "code": "population-indicators-Percentage of the population aged 16 to 64",
+      "slug": "percentage-of-the-population-aged-16-to-64",
+      "label": "Population aged 16 to 64",
+      "prefix": "",
+      "suffix": "%",
+      "subText": null,
+      "decimalPlaces": 1,
+      "howToMeasureChange": null,
+      "subtitle": "Percentage of the population aged 16 to 64",
+      "zeroBaseline": "F",
+      "canBeNegative": "F",
+      "experimentalStatistic": "F",
+      "sourceDate": "30/07/2025",
+      "sourceURL": "https://www.nomisweb.co.uk/datasets/pestsyoala",
+      "sourceOrg": "Office for National Statistics",
+      "longDescription": "This indicator shows the percentage of the population aged 16 to 64, in the United Kingdom, for 1991 to 2024.",
+      "standardised": "T",
+      "caveats": "Population estimates in Explore Local Statistics (ELS) are informed by those available on Nomis at the time of publication on ELS.\n\nFor Northern Ireland, estimates for mid-2024 are not yet available and are planned for publication on Nomis in September 2025. For Scotland, Nomis does not yet include estimates for mid-2024 or reflect revisions for mid-2023 published in August 2025. These are also planned for publication on Nomis in September 2025 and will be updated in ELS in October 2025.\n\nMid-2011 to mid-2022 revisions for Scotland published in January 2025 are available in Nomis and ELS. These are due to be updated in the Office for National Statistics UK population estimates in September 2025.",
+      "confidenceIntervals": "F",
+      "initialGeographyLevel": "ltla",
+      "beeswarmRowUseMinMax": "F"
+    },
+    "inferredGeos": {
+      "ctrys": ["E", "N", "S", "W"],
+      "types": [
+        "E06",
+        "E07",
+        "E08",
+        "E09",
+        "E10",
+        "E12",
+        "E47",
+        "E92",
+        "K02",
+        "K03",
+        "K04",
+        "N09",
+        "N92",
+        "S12",
+        "S92",
+        "W06",
+        "W92"
+      ],
+      "groups": [
+        { "key": "uk", "codes": ["K02"], "label": "United Kingdom" },
+        {
+          "key": "ctry",
+          "codes": ["E92", "S92", "N92", "W92"],
+          "label": "Countries"
+        },
+        {
+          "key": "rgn",
+          "codes": ["E12", "S92", "N92", "W92"],
+          "label": "Countries and regions"
+        },
+        { "key": "cauth", "codes": ["E47"], "label": "Combined authorities" },
+        {
+          "key": "utla",
+          "codes": ["E06", "E08", "E09", "E10", "N09", "S12", "W06"],
+          "label": "Upper-tier/unitary authorities"
+        },
+        {
+          "key": "ltla",
+          "codes": ["E06", "E07", "E08", "E09", "N09", "S12", "W06"],
+          "label": "Lower-tier/unitary authorities"
+        }
+      ],
+      "year": 2023
+    },
+    "years": [
+      1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
+      2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014,
+      2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024
+    ]
+  },
+  "population-indicators-Percentage of the population aged 65+": {
+    "id": 115,
+    "topic": "population",
+    "subTopic": "population",
+    "code": "population-indicators-Percentage of the population aged 65+",
+    "": null,
+    "minXDomainNumb": 1991,
+    "maxXDomainNumb": 2024,
+    "metadata": {
+      "code": "population-indicators-Percentage of the population aged 65+",
+      "slug": "percentage-of-the-population-aged-65-plus",
+      "label": "Population aged 65 and over",
+      "prefix": "",
+      "suffix": "%",
+      "subText": null,
+      "decimalPlaces": 1,
+      "howToMeasureChange": null,
+      "subtitle": "Percentage of the population aged 65 and over",
+      "zeroBaseline": "F",
+      "canBeNegative": "F",
+      "experimentalStatistic": "F",
+      "sourceDate": "30/07/2025",
+      "sourceURL": "https://www.nomisweb.co.uk/datasets/pestsyoala",
+      "sourceOrg": "Office for National Statistics",
+      "longDescription": "This indicator shows the percentage of the population aged 65 and over, in the United Kingdom, for 1991 to 2024.",
+      "standardised": "T",
+      "caveats": "Population estimates in Explore Local Statistics (ELS) are informed by those available on Nomis at the time of publication on ELS.\n\nFor Northern Ireland, estimates for mid-2024 are not yet available and are planned for publication on Nomis in September 2025. For Scotland, Nomis does not yet include estimates for mid-2024 or reflect revisions for mid-2023 published in August 2025. These are also planned for publication on Nomis in September 2025 and will be updated in ELS in October 2025.\n\nMid-2011 to mid-2022 revisions for Scotland published in January 2025 are available in Nomis and ELS. These are due to be updated in the Office for National Statistics UK population estimates in September 2025.",
+      "confidenceIntervals": "F",
+      "initialGeographyLevel": "ltla",
+      "beeswarmRowUseMinMax": "F"
+    },
+    "inferredGeos": {
+      "ctrys": ["E", "N", "S", "W"],
+      "types": [
+        "E06",
+        "E07",
+        "E08",
+        "E09",
+        "E10",
+        "E12",
+        "E47",
+        "E92",
+        "K02",
+        "K03",
+        "K04",
+        "N09",
+        "N92",
+        "S12",
+        "S92",
+        "W06",
+        "W92"
+      ],
+      "groups": [
+        { "key": "uk", "codes": ["K02"], "label": "United Kingdom" },
+        {
+          "key": "ctry",
+          "codes": ["E92", "S92", "N92", "W92"],
+          "label": "Countries"
+        },
+        {
+          "key": "rgn",
+          "codes": ["E12", "S92", "N92", "W92"],
+          "label": "Countries and regions"
+        },
+        { "key": "cauth", "codes": ["E47"], "label": "Combined authorities" },
+        {
+          "key": "utla",
+          "codes": ["E06", "E08", "E09", "E10", "N09", "S12", "W06"],
+          "label": "Upper-tier/unitary authorities"
+        },
+        {
+          "key": "ltla",
+          "codes": ["E06", "E07", "E08", "E09", "N09", "S12", "W06"],
+          "label": "Lower-tier/unitary authorities"
+        }
+      ],
+      "year": 2023
+    },
+    "years": [
+      1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
+      2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014,
+      2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024
+    ]
+  },
   "employment-rate-Economic Inactivity Rate": {
     "id": 13,
     "topic": "economy",
@@ -1306,7 +1806,7 @@
       "decimalPlaces": 0,
       "howToMeasureChange": "abs",
       "subtitle": "Net additions to the stock of dwellings per 1,000 dwellings",
-      "zeroBaseline": "T",
+      "zeroBaseline": "F",
       "canBeNegative": "T",
       "experimentalStatistic": "F",
       "sourceDate": "04/06/2025",
@@ -1495,7 +1995,7 @@
     },
     "inferredGeos": {
       "ctrys": ["E"],
-      "types": ["E06", "E07", "E08", "E09", "E12", "E47", "E92"],
+      "types": ["E06", "E07", "E08", "E09", "E10", "E12", "E47", "E92"],
       "groups": [
         {
           "key": "ctry",
@@ -1508,6 +2008,11 @@
           "label": "Countries and regions"
         },
         { "key": "cauth", "codes": ["E47"], "label": "Combined authorities" },
+        {
+          "key": "utla",
+          "codes": ["E06", "E08", "E09", "E10", "N09", "S12", "W06"],
+          "label": "Upper-tier/unitary authorities"
+        },
         {
           "key": "ltla",
           "codes": ["E06", "E07", "E08", "E09", "N09", "S12", "W06"],
@@ -3926,7 +4431,7 @@
     "code": "greenhouse-gas-emissions",
     "": null,
     "minXDomainNumb": 2005,
-    "maxXDomainNumb": 2022,
+    "maxXDomainNumb": 2023,
     "metadata": {
       "code": "greenhouse-gas-emissions",
       "slug": "greenhouse-gas-emissions",
@@ -3940,10 +4445,10 @@
       "zeroBaseline": "F",
       "canBeNegative": "F",
       "experimentalStatistic": "F",
-      "sourceDate": "27/06/2024",
+      "sourceDate": "03/07/2025",
       "sourceURL": "https://www.gov.uk/government/collections/uk-local-authority-and-regional-greenhouse-gas-emissions-national-statistics",
       "sourceOrg": "Department for Energy Security and Net Zero",
-      "longDescription": "This indicator shows greenhouse gas emissions (tCO2e) per capita, in the UK, for 2005 to 2022.",
+      "longDescription": "This indicator shows greenhouse gas emissions (tCO2e) per capita, in the UK, for 2005 to 2023.",
       "standardised": "T",
       "caveats": "Greenhouse gas emissions (tCO2e) per capita refers to the average amount of greenhouse gas emissions produced by each person in a specific area over a year. This metric is calculated by dividing the total greenhouse gas emissions of an area by its population. The result is expressed in tonnes of CO2 equivalent (tCO2e) per person.\n\nGreenhouse gas emissions here include territorial emissions of carbon dioxide (CO2), methane (CH4) and nitrous oxide (N2O).\n\nEmissions are reported against the areas where they occurred except for emissions associated with energy supply that are distributed to the areas based on where the 'end-use' of the energy occurred and emissions from waste that have been distributed based on the waste arising in each area.\n\nEmissions data is from UK local authority greenhouse gas emissions estimates where some emissions can't be fully allocated to individual local authorities for technical or disclosure reasons.\n\nSome of this data has been aggregated and may show differences to other published figures.\n\nEmissions data is also visualised on [Local Authority Greenhouse Gas Map.](https://naei.energysecurity.gov.uk/laghgapp/)",
       "confidenceIntervals": "F",
@@ -3999,7 +4504,7 @@
     },
     "years": [
       2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016,
-      2017, 2018, 2019, 2020, 2021, 2022
+      2017, 2018, 2019, 2020, 2021, 2022, 2023
     ]
   },
   "gigabit-capable-broadband": {
@@ -4249,7 +4754,7 @@
     "code": "electric-vehicle-public-charging-devices",
     "": null,
     "minXDomainNumb": 2019.75,
-    "maxXDomainNumb": 2025.25,
+    "maxXDomainNumb": 2025.5,
     "metadata": {
       "code": "electric-vehicle-public-charging-devices",
       "slug": "electric-vehicle-public-charging-devices",
@@ -4263,10 +4768,10 @@
       "zeroBaseline": "F",
       "canBeNegative": "F",
       "experimentalStatistic": "T",
-      "sourceDate": "30/04/2025",
+      "sourceDate": "24/07/2025",
       "sourceURL": "https://www.gov.uk/government/collections/electric-vehicle-charging-infrastructure-statistics",
       "sourceOrg": "Department for Transport, sourced from Zapmap",
-      "longDescription": "This indicator shows publicly available electric vehicle charging devices at all speeds per 100,000 population (official statistics in development), in the UK, as of 00:00 on the first day of each quarter from October 2019 to April 2025.",
+      "longDescription": "This indicator shows publicly available electric vehicle charging devices at all speeds per 100,000 population (official statistics in development), in the UK, as of 00:00 on the first day of each quarter from October 2019 to July 2025.",
       "standardised": "T",
       "caveats": "Data is provided by the electric vehicle and charging point platform [Zapmap](https://www.zapmap.com/) and represents devices reported as operational at 00:00 on the first day of each quarter.\n\n‘Total devices’ represent publicly available charging devices at all speeds. A device can have a number of connectors of varying speeds.\n\nThere may be large increases or reductions seen at local authority level in these statistics when comparing to a previous quarter and these should be considered in the context of longer-term trends. This can be caused by a number of factors, including a large group of devices being added to or decommissioned from source Zapmap data at a time. This can in turn be caused by delays between chargepoint operator activity and this information filtering through to Zapmap data.\n\nA specific example of this is Hammersmith and Fulham, which shows a sharp increase in mid-2023. This was due to the completion of a large On-Street Residential Chargepoint Scheme (ORCS) project, which significantly boosted the number of devices recorded in that area during that period.\n\nThe most recent population figures by Local Authority are sourced from the Office for National Statistics Population estimates for mid-year 2022. For quarters from July 2020 (2020-07) to April 2021 (2021-04), the population figures were sourced from 2019 estimates. Prior to July 2020 (2020-07), the population figures were sourced from the 2018 estimates.",
       "confidenceIntervals": "F",
@@ -4320,7 +4825,7 @@
     "years": [
       2019.75, 2020, 2020.25, 2020.5, 2020.75, 2021, 2021.25, 2021.5, 2021.75,
       2022, 2022.25, 2022.5, 2022.75, 2023, 2023.25, 2023.5, 2023.75, 2024,
-      2024.25, 2024.5, 2024.75, 2025, 2025.25
+      2024.25, 2024.5, 2024.75, 2025, 2025.25, 2025.5
     ]
   },
   "average-travel-time-cycling": {
@@ -5233,6 +5738,312 @@
       1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
       2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021,
       2022, 2023
+    ]
+  },
+  "engagement-with-culture-and-heritage-Engaged with the arts": {
+    "id": 94,
+    "topic": "connectivity",
+    "subTopic": "culture and heritage",
+    "code": "engagement-with-culture-and-heritage-Engaged with the arts",
+    "": null,
+    "minXDomainNumb": 2023,
+    "maxXDomainNumb": 2023,
+    "metadata": {
+      "code": "engagement-with-culture-and-heritage-Engaged with the arts",
+      "slug": "engaged-with-the-arts",
+      "label": "Engaged with the arts",
+      "prefix": "",
+      "suffix": "%",
+      "subText": null,
+      "decimalPlaces": 0,
+      "howToMeasureChange": null,
+      "subtitle": "Percentage of adults who reported engaging with the arts physically in the last 12 months",
+      "zeroBaseline": "F",
+      "canBeNegative": "F",
+      "experimentalStatistic": "F",
+      "sourceDate": "24/07/2024",
+      "sourceURL": "https://www.gov.uk/government/collections/participation-survey-statistical-releases",
+      "sourceOrg": "Department for Culture, Media and Sport",
+      "longDescription": "This indicator shows the percentage of adults who reported engaging with the arts physically (attended an event or participated in an activity in person) in the last 12 months, in England, for the financial year ending 2024.",
+      "standardised": "T",
+      "caveats": "Examples of physical arts engagement include reading, performing music, or going to a comedy event.  The full list of qualifying activities and events asked of respondents can be found in [Annex 3](https://www.gov.uk/government/statistics/participation-survey-2023-24-annual-publication/main-report-for-the-participation-survey-may-2023-to-march-2024#Arts) of the data source.\n\nConfidence intervals can be displayed on the bar chart by selecting the ‘Options’ button. These help show that differences between similarly ranked geographies may not be statistically significant.\n\nThe Participation Survey is asked of adults (16+) in England and the data has been weighted to compensate for differences in both sampling probability and response probability. Please see the [weighting methodology](https://www.gov.uk/government/statistics/participation-survey-2023-24-annual-publication/participation-survey-2023-to-2024-annual-technical-report#weighting) for further details.",
+      "confidenceIntervals": "T",
+      "initialGeographyLevel": "ltla",
+      "beeswarmRowUseMinMax": "F"
+    },
+    "inferredGeos": {
+      "ctrys": ["E"],
+      "types": ["E06", "E07", "E08", "E09", "E12", "E47", "E92"],
+      "groups": [
+        {
+          "key": "ctry",
+          "codes": ["E92", "S92", "N92", "W92"],
+          "label": "Countries"
+        },
+        {
+          "key": "rgn",
+          "codes": ["E12", "S92", "N92", "W92"],
+          "label": "Countries and regions"
+        },
+        { "key": "cauth", "codes": ["E47"], "label": "Combined authorities" },
+        {
+          "key": "ltla",
+          "codes": ["E06", "E07", "E08", "E09", "N09", "S12", "W06"],
+          "label": "Lower-tier/unitary authorities"
+        }
+      ],
+      "year": 2023
+    },
+    "years": [2023]
+  },
+  "engagement-with-culture-and-heritage-Visited a heritage site": {
+    "id": 95,
+    "topic": "connectivity",
+    "subTopic": "culture and heritage",
+    "code": "engagement-with-culture-and-heritage-Visited a heritage site",
+    "": null,
+    "minXDomainNumb": 2023,
+    "maxXDomainNumb": 2023,
+    "metadata": {
+      "code": "engagement-with-culture-and-heritage-Visited a heritage site",
+      "slug": "visited-a-heritage-site",
+      "label": "Visited a heritage site",
+      "prefix": "",
+      "suffix": "%",
+      "subText": null,
+      "decimalPlaces": 0,
+      "howToMeasureChange": null,
+      "subtitle": "Percentage of adults who reported visiting a heritage site in person in the last 12 months",
+      "zeroBaseline": "F",
+      "canBeNegative": "F",
+      "experimentalStatistic": "F",
+      "sourceDate": "24/07/2024",
+      "sourceURL": "https://www.gov.uk/government/collections/participation-survey-statistical-releases",
+      "sourceOrg": "Department for Culture, Media and Sport",
+      "longDescription": "This indicator shows the percentage of adults who reported visiting a heritage site in person  in the last 12 months, in England, for the financial year ending 2024.",
+      "standardised": "T",
+      "caveats": "Physical engagement with the heritage sector is defined as visiting one of a variety of places with celebrated histories, such as those connected with industrial history, or ancient monuments, or archaeological sites.\n\nConfidence intervals can be displayed on the bar chart by selecting the ‘Options’ button. These help show that differences between similarly ranked geographies may not be statistically significant.\n\nThe Participation Survey is asked of adults (16+) in England and the data has been weighted to compensate for differences in both sampling probability and response probability. Please see the [weighting methodology](https://www.gov.uk/government/statistics/participation-survey-2023-24-annual-publication/participation-survey-2023-to-2024-annual-technical-report#weighting) for further details.",
+      "confidenceIntervals": "T",
+      "initialGeographyLevel": "ltla",
+      "beeswarmRowUseMinMax": "F"
+    },
+    "inferredGeos": {
+      "ctrys": ["E"],
+      "types": ["E06", "E07", "E08", "E09", "E12", "E47", "E92"],
+      "groups": [
+        {
+          "key": "ctry",
+          "codes": ["E92", "S92", "N92", "W92"],
+          "label": "Countries"
+        },
+        {
+          "key": "rgn",
+          "codes": ["E12", "S92", "N92", "W92"],
+          "label": "Countries and regions"
+        },
+        { "key": "cauth", "codes": ["E47"], "label": "Combined authorities" },
+        {
+          "key": "ltla",
+          "codes": ["E06", "E07", "E08", "E09", "N09", "S12", "W06"],
+          "label": "Lower-tier/unitary authorities"
+        }
+      ],
+      "year": 2023
+    },
+    "years": [2023]
+  },
+  "engagement-with-culture-and-heritage-Visited a museum or gallery": {
+    "id": 96,
+    "topic": "connectivity",
+    "subTopic": "culture and heritage",
+    "code": "engagement-with-culture-and-heritage-Visited a museum or gallery",
+    "": null,
+    "minXDomainNumb": 2023,
+    "maxXDomainNumb": 2023,
+    "metadata": {
+      "code": "engagement-with-culture-and-heritage-Visited a museum or gallery",
+      "slug": "visited-a-museum-or-gallery",
+      "label": "Visited a museum or gallery",
+      "prefix": "",
+      "suffix": "%",
+      "subText": null,
+      "decimalPlaces": 0,
+      "howToMeasureChange": null,
+      "subtitle": "Percentage of adults who reported visiting a museum or gallery in person in the last 12 months",
+      "zeroBaseline": "F",
+      "canBeNegative": "F",
+      "experimentalStatistic": "F",
+      "sourceDate": "24/07/2024",
+      "sourceURL": "https://www.gov.uk/government/collections/participation-survey-statistical-releases",
+      "sourceOrg": "Department for Culture, Media and Sport",
+      "longDescription": "This indicator shows the percentage of adults who reported visiting a museum or gallery in person in the last 12 months, in England, for the financial year ending 2024.",
+      "standardised": "T",
+      "caveats": "Respondents were asked about their visits to museums and galleries in the 12 months prior to completing the survey.\n\nConfidence intervals can be displayed on the bar chart by selecting the ‘Options’ button. These help show that differences between similarly ranked geographies may not be statistically significant.\n\nThe Participation Survey is asked of adults (16+) in England and the data has been weighted to compensate for differences in both sampling probability and response probability. Please see the [weighting methodology](https://www.gov.uk/government/statistics/participation-survey-2023-24-annual-publication/participation-survey-2023-to-2024-annual-technical-report#weighting) for further details.",
+      "confidenceIntervals": "T",
+      "initialGeographyLevel": "ltla",
+      "beeswarmRowUseMinMax": "F"
+    },
+    "inferredGeos": {
+      "ctrys": ["E"],
+      "types": ["E06", "E07", "E08", "E09", "E12", "E47", "E92"],
+      "groups": [
+        {
+          "key": "ctry",
+          "codes": ["E92", "S92", "N92", "W92"],
+          "label": "Countries"
+        },
+        {
+          "key": "rgn",
+          "codes": ["E12", "S92", "N92", "W92"],
+          "label": "Countries and regions"
+        },
+        { "key": "cauth", "codes": ["E47"], "label": "Combined authorities" },
+        {
+          "key": "ltla",
+          "codes": ["E06", "E07", "E08", "E09", "N09", "S12", "W06"],
+          "label": "Lower-tier/unitary authorities"
+        }
+      ],
+      "year": 2023
+    },
+    "years": [2023]
+  },
+  "engagement-with-culture-and-heritage-Visited a public library": {
+    "id": 97,
+    "topic": "connectivity",
+    "subTopic": "culture and heritage",
+    "code": "engagement-with-culture-and-heritage-Visited a public library",
+    "": null,
+    "minXDomainNumb": 2023,
+    "maxXDomainNumb": 2023,
+    "metadata": {
+      "code": "engagement-with-culture-and-heritage-Visited a public library",
+      "slug": "visited-a-public-library",
+      "label": "Visited a public library",
+      "prefix": "",
+      "suffix": "%",
+      "subText": null,
+      "decimalPlaces": 0,
+      "howToMeasureChange": null,
+      "subtitle": "Percentage of adults who reported visiting a public library building or mobile library in person in the last 12 months",
+      "zeroBaseline": "F",
+      "canBeNegative": "F",
+      "experimentalStatistic": "F",
+      "sourceDate": "24/07/2024",
+      "sourceURL": "https://www.gov.uk/government/collections/participation-survey-statistical-releases",
+      "sourceOrg": "Department for Culture, Media and Sport",
+      "longDescription": "This indicator shows the percentage of adults who reported visiting a public library building or mobile library in person in the last 12 months, in England, for the financial year ending 2024.",
+      "standardised": "T",
+      "caveats": "Physical library engagement includes visiting a public library building or mobile library in-person during leisure time, being visited by a home library service and using another library outreach service (for example attending a community event where the library staff or volunteers were present).\n\nConfidence intervals can be displayed on the bar chart by selecting the ‘Options’ button. These help show that differences between similarly ranked geographies may not be statistically significant.\n\nThe Participation Survey is asked of adults (16+) in England and the data has been weighted to compensate for differences in both sampling probability and response probability. Please see the [weighting methodology](https://www.gov.uk/government/statistics/participation-survey-2023-24-annual-publication/participation-survey-2023-to-2024-annual-technical-report#weighting) for further details.",
+      "confidenceIntervals": "T",
+      "initialGeographyLevel": "ltla",
+      "beeswarmRowUseMinMax": "F"
+    },
+    "inferredGeos": {
+      "ctrys": ["E"],
+      "types": ["E06", "E07", "E08", "E09", "E12", "E47", "E92"],
+      "groups": [
+        {
+          "key": "ctry",
+          "codes": ["E92", "S92", "N92", "W92"],
+          "label": "Countries"
+        },
+        {
+          "key": "rgn",
+          "codes": ["E12", "S92", "N92", "W92"],
+          "label": "Countries and regions"
+        },
+        { "key": "cauth", "codes": ["E47"], "label": "Combined authorities" },
+        {
+          "key": "ltla",
+          "codes": ["E06", "E07", "E08", "E09", "N09", "S12", "W06"],
+          "label": "Lower-tier/unitary authorities"
+        }
+      ],
+      "year": 2023
+    },
+    "years": [2023]
+  },
+  "first-time-buyer-mortgage-sales": {
+    "id": 98,
+    "topic": "housing",
+    "subTopic": "housing",
+    "code": "first-time-buyer-mortgage-sales",
+    "": null,
+    "minXDomainNumb": 2013,
+    "maxXDomainNumb": 2024,
+    "metadata": {
+      "code": "first-time-buyer-mortgage-sales",
+      "slug": "first-time-buyer-mortgage-sales",
+      "label": "First-time buyer mortgage sales",
+      "prefix": "",
+      "suffix": "",
+      "subText": "per 1,000 stock",
+      "decimalPlaces": 1,
+      "howToMeasureChange": null,
+      "subtitle": "First-time buyer mortgage sales per 1,000 dwellings",
+      "zeroBaseline": "F",
+      "canBeNegative": "F",
+      "experimentalStatistic": "F",
+      "sourceDate": "11/06/2025",
+      "sourceURL": "https://www.ons.gov.uk/peoplepopulationandcommunity/housing/datasets/firsttimebuyermortgagesalesbylocalauthorityuk2006to2023",
+      "sourceOrg": "Office for National Statistics",
+      "longDescription": "This indicator shows first-time buyer mortgage sales per 1,000 dwellings, in the United Kingdom, for 2013 to 2024.",
+      "standardised": "T",
+      "caveats": "Mortgage Product Sales Data (PSD001) is regulatory data reported to the Financial Conduct Authority (FCA) by regulated mortgage lenders.\n\nThis data reflects the number of mortgages taken out by first-time buyers, either individually or jointly, but does not include first-time buyers who purchased a property without a mortgage.\n\nThe first-time buyer indicator in the FCA data is reported by the mortgage providers and its definition may vary across firms. For example, for individuals who are not remortgaging but have previously owned a property may or may not be counted as first-time buyers. Additionally, if a mortgage is taken out jointly by one first-time buyer and one non-first-time buyer, it may or may not be counted as a first-time buyer.\n\nThe dwelling stock estimates used are published by MHCLG, Welsh Government, Scottish Government and the Northern Ireland Department of Finance.\n\nSome of this data has been aggregated and may differ from other published figures. Data for the Isles of Scilly is unavailable for all years due to low counts. Mortgage sales for Isles of Scilly have been excluded from aggregated areas that would normally include data from this area.",
+      "confidenceIntervals": "F",
+      "initialGeographyLevel": "ltla",
+      "beeswarmRowUseMinMax": "F"
+    },
+    "inferredGeos": {
+      "ctrys": ["E", "N", "S", "W"],
+      "types": [
+        "E06",
+        "E07",
+        "E08",
+        "E09",
+        "E10",
+        "E12",
+        "E47",
+        "E92",
+        "K02",
+        "K03",
+        "K04",
+        "N09",
+        "N92",
+        "S12",
+        "S92",
+        "W06",
+        "W92"
+      ],
+      "groups": [
+        { "key": "uk", "codes": ["K02"], "label": "United Kingdom" },
+        {
+          "key": "ctry",
+          "codes": ["E92", "S92", "N92", "W92"],
+          "label": "Countries"
+        },
+        {
+          "key": "rgn",
+          "codes": ["E12", "S92", "N92", "W92"],
+          "label": "Countries and regions"
+        },
+        { "key": "cauth", "codes": ["E47"], "label": "Combined authorities" },
+        {
+          "key": "utla",
+          "codes": ["E06", "E08", "E09", "E10", "N09", "S12", "W06"],
+          "label": "Upper-tier/unitary authorities"
+        },
+        {
+          "key": "ltla",
+          "codes": ["E06", "E07", "E08", "E09", "N09", "S12", "W06"],
+          "label": "Lower-tier/unitary authorities"
+        }
+      ],
+      "year": 2023
+    },
+    "years": [
+      2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024
     ]
   }
 }
