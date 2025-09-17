@@ -51,12 +51,17 @@ const test_data_file = file_paths.column("filePath")[3].replace(`${CSV_PREPROCES
 const test = test_data_file.replace('.csv', '')
 let testmeta = JSON.parse(fs.readFileSync(`${CSV_PREPROCESS_DIR}${test}.csv-metadata.json`));
 const testdata = loadCsvWithoutBom(`${CSV_PREPROCESS_DIR}${test_data_file}`)
-const transformations = testmeta.tables[0].transformations
+// const transformations = testmeta.tables[0].transformations
 const tableSchema = testmeta.tables[0].tableSchema.columns
+// get the column titles of those columns we want to suppress
+const supressedCols = tableSchema
+    .filter(d => d.supressOutput)
+    .map(d => d.titles[0])
 
-//  rename the columns in data using the information in transformations (key is the target title)
+//  rename the columns in data using the information in tableschema 
+// (name is the target title, the first value of titles is the existing column name in the csv)
 const varNames = Object.fromEntries(
-    transformations.map(d => [d.titles, d.key])
+    tableSchema.map(d => [d.titles[0], d.name])
 )
 var testdata_transformed = testdata
     .rename(varNames)
@@ -78,23 +83,26 @@ const indicatorTables = Object.fromEntries(
             d => d.indicator === ind))])
 );
 
-console.log(Object.keys(indicatorTables))
+console.log('Indicators present in data file: ', Object.keys(indicatorTables))
+console.log(tableSchema)
 
 // loop through each indicator (when more than one)
 for (const [indicator, t] of Object.entries(indicatorTables)) {
 
-    let indicatorTable = t.
-        // drop unused columns
-        select(transformations.map(d => d.key))
-        // drop indicator because we don't need it as a column
+    let indicatorTable = t
+        // drop unused columns using metadata suppressOutput:
+        .select(aq.not(supressedCols))
+        // drop indicator because we don't need it as a column:
         .select(aq.not('indicator'))
 
     console.log(indicator)
+    indicatorTable.print()
 
-    // identify columns of type measure using transformations metadata:
-    let measures = transformations
+    // identify columns of type measure using metadata:
+    let measures = tableSchema
         .filter(d => d.type === 'measure')
-        .map(d => d.key)
+        .map(d => d.name)
+    console.log('measures: ', measures)
     // pivot longer - measures to single column, values etc. to values - retain status
     let indicatorTableLong = indicatorTable.fold(
         measures,
@@ -103,12 +111,13 @@ for (const [indicator, t] of Object.entries(indicatorTables)) {
         { 'value-temp': 'value' }
     )
 
-    // identify columns of type dimension using transformations metadata
+    // identify columns of type dimension using tableschema metadata
     // and exclude areacd and period as we want to ensure those are specified first
-    let otherDimensions = transformations
+    let otherDimensions = tableSchema
         .filter(d => d.type === 'dimension')
-        .map(d => d.key)
+        .map(d => d.name)
         .filter(d => !['areacd', 'period'].includes(d))
+    console.log('There are ', otherDimensions.length, 'other dimensions additional to areacd and period: ', otherDimensions)
 
     // sort by each dimension (including the newly made measure, which is a dimension)
     // age is numbers as strings, so needs sorting properly. could also use Intl.collator for this
@@ -140,71 +149,53 @@ for (const [indicator, t] of Object.entries(indicatorTables)) {
     const role = {};
     const dimension = {};
 
-    // join required metadata together to make lookup - including adding measures to transformations
-    const transformations_measure = [
-        ...transformations,
-        {
-            titles: 'Measure',
-            key: 'measure',
-            type: 'dimension'
-        }
-    ];
-
-    const metaLookup = aq.from(tableSchema).
-        join_left(aq.from(transformations_measure), 'titles')
+    const metaLookup = aq.from(tableSchema)
     metaLookup.print(11)
 
     for (const k of keys) {
-        const row = metaLookup.filter(aq.escape(d => d.key === k)).objects()[0]
+        const row = metaLookup.filter(aq.escape(d => d.name === k)).objects()[0]
         const values = columnValues[k]
         const entries = values.map((d, i) => [d, i]);
         id.push(k);
         size.push(values.length);
 
         dimension[k] = {
-            label: row.name,
+            label: row.titles[0],
             category: { index: Object.fromEntries(entries) }
 
         };
-        // add slugified labels fro age and sex
-        if (k==='age') {
+        // add slugified labels for age and sex
+        if (k === 'age') {
             dimension[k].category.label = Object.fromEntries(
-            columnValues['age'].map(d => [
-                d.replace(/(?<=\d)\sto\s(?=\d)/g, "-"),
-                d
-            ])
-        )}
+                columnValues['age'].map(d => [
+                    d.replace(/(?<=\d)\sto\s(?=\d)/g, "-"),
+                    d
+                ])
+            )
+        }
 
-        if (k==='sex'){
+        if (k === 'sex') {
             dimension[k].category.label = Object.fromEntries(
-            columnValues['sex'].map(d => [
-                d.toLowerCase(),
-                d
-            ])
-        )}
+                columnValues['sex'].map(d => [
+                    d.toLowerCase(),
+                    d
+                ])
+            )
+        }
 
-        // if the key is 'measure' get the names for measure from the metadata
+        // if it is 'measure' get the names for measure from the metadata
         if (k === 'measure') {
-            const lookup = new Map(metaLookup.objects().map(d => [d.key, d.name]))
+            const lookup = new Map(metaLookup.objects().map(d => [d.name, d.titles[0]]))
             dimension[k].category.label = Object.fromEntries(
                 values.map(d => [d, lookup.get(d)])
             )
         }
-        // if (col.role) {
-        //   if (!role[col.role]) role[col.role] = [];
-        //   role[col.role].push(key);
-        // }
+        if (row.role) {
+          if (!role[row.role]) role[row.role] = [];
+          role[row.role].push(k);
+        }
     }
-    //   console.log(id)
-    //   console.log(size)
-      console.log(dimension.age)
-      console.log(dimension.sex)
-
-
-
 }
-
-// construct the jsonstat collection easy peasy - check make-json-stat script
 
 // get shared metadata from testmeta.metadata for all arrays except the one called indicators
 // get individual indicator metadata from testmeta.metadata.indicators where indicators == testdata_transformed.indicator

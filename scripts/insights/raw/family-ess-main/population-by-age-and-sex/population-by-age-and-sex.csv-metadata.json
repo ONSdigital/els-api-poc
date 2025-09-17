@@ -12,99 +12,103 @@
       "tableSchema": {
         "columns": [
           {
-            "titles": "AREACD",
-            "name": "Area code",
-            "datatype": "string"
+            "name": "areacd",
+            "titles": [
+              "AREACD",
+              "Area code"
+            ],
+            "datatype": "string",
+            "type": "dimension",
+            "role": "geo"
           },
           {
-            "titles": "AREANM",
-            "name": "Area name",
-            "datatype": "string"
+            "titles": [
+              "AREANM",
+              "Area name"
+            ],
+            "datatype": "string",
+            "supressOutput": true
           },
           {
-            "titles": "Geography",
-            "name": "Geography type",
-            "datatype": "string"
+            "titles": [
+              "Geography",
+              "Geography type"
+            ],
+            "datatype": "string",
+            "supressOutput": true
           },
           {
-            "titles": "Indicator",
-            "name": "Indicator",
-            "datatype": "string"
+            "name": "indicator",
+            "titles": [
+              "Indicator"
+            ],
+            "datatype": "string",
+            "type": "indicator"
           },
           {
-            "titles": "Period",
-            "name": "Time period",
-            "datatype": "string"
+            "name": "period",
+            "titles": [
+              "Period",
+              "Time period"
+            ],
+            "datatype": "string",
+            "type": "dimension",
+            "role": "time"
           },
           {
-            "titles": "Age band",
-            "name": "Age band",
-            "datatype": "string"
+            "name": "age",
+            "titles": [
+              "Age band"
+            ],
+            "datatype": "string",
+            "type": "dimension"
           },
           {
-            "titles": "Sex",
-            "name": "Sex",
-            "datatype": "string"
+            "name": "sex",
+            "titles": [
+              "Sex"
+            ],
+            "datatype": "string",
+            "type": "dimension"
           },
           {
-            "titles": "Value",
-            "name": "Observation value",
-            "datatype": "number"
+            "name": "value",
+            "titles": [
+              "Value",
+              "Observation value"
+            ],
+            "datatype": "number",
+            "type": "measure"
           },
           {
-            "titles": "Measure",
-            "name": "Measure",
-            "datatype": "string"
+            "name": "measure",
+            "titles": [
+              "Measure"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "supressOutput": true
           },
           {
-            "titles": "Unit",
-            "name": "Unit",
-            "datatype": "string"
+            "name": "unit",
+            "titles": [
+              "Unit"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "supressOutput": true
           },
           {
-            "titles": "Observation Status",
-            "name": "Observation status",
-            "datatype": "string"
+            "name": "status",
+            "titles": [
+              "Observation Status",
+              "Observation status"
+            ],
+            "datatype": "string",
+            "type": "status"
           }
         ]
-      },
-      "transformations": [
-        {
-          "titles": "AREACD",
-          "key": "areacd",
-          "type": "dimension"
-        },
-        {
-          "titles": "Indicator",
-          "key": "indicator",
-          "type": "indicator"
-        },
-        {
-          "titles": "Period",
-          "key": "period",
-          "type": "dimension"
-        },
-        {
-          "titles": "Age band",
-          "key": "age",
-          "type": "dimension"
-        },
-        {
-          "titles": "Sex",
-          "key": "sex",
-          "type": "dimension"
-        },
-        {
-          "titles": "Value",
-          "key": "value",
-          "type": "measure"
-        },
-        {
-          "titles": "Observation Status",
-          "key": "status",
-          "type": "status"
-        }
-      ]
+      }
     }
   ],
   "metadata": {
@@ -155,6 +159,7 @@
       {
         "code": "population-by-age-and-sex",
         "slug": "population-by-age-and-sex",
+        "dataset": "population-by-age-and-sex",
         "label": "Population by age and sex",
         "prefix": null,
         "suffix": "%",
