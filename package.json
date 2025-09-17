@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. .",
     "format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. .",
-    "make-json-stat": "node ./scripts/make-json-stat.js"
+    "make-json-stat": "node ./scripts/make-json-stat.js",
+    "test-arquero": "npx ts-node ./scripts/arquero-processing.ts"
   },
   "author": "Ahmad Barclay",
   "license": "MIT",
@@ -30,9 +31,12 @@
     "svelte": "^5.0.0",
     "svelteplot": "^0.3.7",
     "topojson-client": "^3.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2",
     "vite": "^5.4.4"
   },
   "dependencies": {
+    "arquero": "^8.0.3",
     "sirv-cli": "^1.0.0"
   },
   "type": "module"

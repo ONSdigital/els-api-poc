@@ -1,0 +1,5 @@
+filePath,include,multiIndicatorCategory,valueField
+scripts/insights/raw/family-ess-main/gdp-per-head/gdp-per-head.csv,N,,
+scripts/insights/raw/family-ess-main/adult-obesity-prevalence-aged-18-years-and-over/adult-obesity-prevalence-aged-18-years-and-over.csv,Y,,
+scripts/insights/raw/family-ess-main/population-indicators/population-indicators.csv,Y,indicator,
+scripts/insights/raw/family-ess-main/population-by-age-and-sex/population-by-age-and-sex.csv,Y,Indicator
