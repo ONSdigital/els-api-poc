@@ -2,7 +2,8 @@ import { readFileSync, writeFileSync } from "fs";
 
 const data_path = "./src/lib/data.json";
 const config_path = "./src/lib/config.json";
-const output = "./src/lib/json-stat.json";
+const output_data = "./src/lib/json-stat.json";
+const output_meta = "./src/lib/json-stat-metadata.json";
 
 const columns = [
   {key: "areacd", label: "Area code", role: "geo"},
@@ -182,5 +183,14 @@ for (const key of keys) {
   cube.link.item.push(toCube(rows, meta));
 }
 
-writeFileSync(output, JSON.stringify(cube));
-console.log(`Wrote ${output}`);
+writeFileSync(output_data, JSON.stringify(cube));
+console.log(`Wrote ${output_data}`);
+
+// Strip data to write metadata only
+cube.link.item = cube.link.item.map(ds => {
+  ds.value = [];
+  return ds;
+});
+
+writeFileSync(output_meta, JSON.stringify(cube));
+console.log(`Wrote ${output_meta}`);
