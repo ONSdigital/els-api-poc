@@ -54,7 +54,7 @@ export function GET({ params, url }) {
   if (indicatorSlug) {
     const indicator = rawMetadata.link.item.find(ds => ds.extension.slug === indicatorSlug);
     if (!indicator) error(400, "Invalid indicator code");
-    json(formatMetadata(indicator, includeDims));
+    return json(formatMetadata(indicator, includeDims));
   }
 
   const filter = makeFilter(topic, geo, time);
