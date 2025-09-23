@@ -45,7 +45,7 @@ function formatMetadata(ds, includeDims = false) {
 }
 
 export function GET({ params, url }) {
-  const indicatorSlug = params.slug || null;
+  const indicatorSlug = params.indicator || null;
   const topic = getParam(url, "topic", "all");
   const geo = getParam(url, "geo", "all");
   const time = getParam(url, "time", "all");
