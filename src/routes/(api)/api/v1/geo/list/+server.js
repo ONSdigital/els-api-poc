@@ -34,7 +34,6 @@ function makeFilter(geo, year) {
   if (geo === "all" && year === "all") return null;
   const yFilter = year === "all" ? () => true : yearFilter;
   const gFilter = geo === "all" ? () => true : makeGeoFilter([geo].flat());
-  console.log(yearFilter({end: 2020}, year), year, latestYear);
   return (d) => yFilter(d, year) && gFilter(d);
 }
 
