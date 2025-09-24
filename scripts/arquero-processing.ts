@@ -10,6 +10,7 @@ import {
     abortIfNewFilesExist
 } from './data-processing-warnings.ts';
 import { table } from 'console';
+import { parse } from 'path';
 
 // config.ts
 const RAW_DIR = 'scripts/insights/raw';
@@ -18,6 +19,7 @@ const MANIFEST = `${CONFIG_DIR}/data-files-manifest.csv` // equivalent to FILE_N
 const AREAS_GEOG_LEVEL_FILENAME = `${CONFIG_DIR}/geography/areas-geog-level.csv`;
 const EXCLUDED_INDICATORS_PATH = `${CONFIG_DIR}/excluded-indicators.json`;
 const CSV_PREPROCESS_DIR = `${RAW_DIR}/family-ess-main`
+const EXISTING_PERIODS_FILENAME = `${CONFIG_DIR}/periods/unique-periods-lookup.csv`;
 
 
 export default async function main() {
@@ -32,6 +34,14 @@ export default async function main() {
 
 }
 
+function parsePeriod(str, isQuarterly = false) {
+    str = str.replace("T00:00:00", "");
+    if (str.match(/\d{4}-\d{4}/)) str = str.replace("-", "/");
+    const parts = str.split("/").map(p => p.slice(0, 10));
+    if (isQuarterly && parts.length === 1) parts.push("P3M");
+    return parts.join("/");
+}
+
 const manifest = loadCsvWithoutBom(MANIFEST); // equivalent to previous_file_paths
 // const areas_geog_level = loadCsvWithoutBom(AREAS_GEOG_LEVEL_FILENAME);
 const excludedIndicators = readJsonSync(EXCLUDED_INDICATORS_PATH);
@@ -40,54 +50,149 @@ const excludedIndicators = readJsonSync(EXCLUDED_INDICATORS_PATH);
 await abortIfNewFilesExist(manifest, CSV_PREPROCESS_DIR)
 
 // remove indicator files based on boolean in manifest (separate process to those in excluded-indicators.json)
-const file_paths = manifest.filter((f) => f.include === 'Y');
-// console.log(file_paths.objects())
-// file_paths.print()
+const file_paths = manifest.filter((f) => f.include === 'Y')
+    .array('filePath');
 
-//////////////// single-indicator testing //////////////////////
+// read in existing periods
+// later use this to check for new indicator time periods that need adding
+const periods = aq.from(loadCsvWithoutBom(EXISTING_PERIODS_FILENAME, {
+    stringColumns: ['period', 'label', 'labelShort']
+}).objects());
 
-const test_data_file = file_paths.column("filePath")[3].replace(`${CSV_PREPROCESS_DIR}`, '')
-// double check that this ^ is definitely excluding those files marked N in the manifest
-const test = test_data_file.replace('.csv', '')
-let testmeta = JSON.parse(fs.readFileSync(`${CSV_PREPROCESS_DIR}${test}.csv-metadata.json`));
-const testdata = loadCsvWithoutBom(`${CSV_PREPROCESS_DIR}${test_data_file}`)
-// const transformations = testmeta.tables[0].transformations
-const tableSchema = testmeta.tables[0].tableSchema.columns
-// get the column titles of those columns we want to suppress
-const supressedCols = tableSchema
-    .filter(d => d.supressOutput)
-    .map(d => d.titles[0])
 
-//  rename the columns in data using the information in tableschema 
-// (name is the target title, the first value of titles is the existing column name in the csv)
-const varNames = Object.fromEntries(
-    tableSchema.map(d => [d.titles[0], d.name])
-)
-var testdata_transformed = testdata
-    .rename(varNames)
+function toCube(file) {
 
-//  filter out excludedIndicators - checks whether the excluded indicator matches the full indicator name
-//  entire files are excluded using the manifest
-if (excludedIndicators.length) {
-    testdata_transformed = testdata_transformed.filter(aq.escape(
-        row =>
-            !excludedIndicators.includes(row.indicator))
-    );
+    const data_file = file.replace(`${CSV_PREPROCESS_DIR}`, '')
+    let indicator_data = loadCsvWithoutBom(`${CSV_PREPROCESS_DIR}${data_file}`)
+    const meta_data = JSON.parse(fs.readFileSync(`${CSV_PREPROCESS_DIR}${data_file.replace('.csv', '.csv-metadata.json')}`))
+    const tableSchema = meta_data.tables[0].tableSchema.columns
+
+    // get the column titles of those columns we want to suppress
+    const supressedCols = tableSchema
+        .filter(d => d.supressOutput)
+        .map(d => d.titles[0])
+
+    //  rename the columns in data using the information in tableschema 
+    // (name is the target title, the first value of titles is the existing column name in the csv)
+    const varNames = Object.fromEntries(
+        tableSchema.map(d => [d.titles[0], d.name])
+    )
+    indicator_data = indicator_data
+        .rename(varNames)
+
+    //  filter out excludedIndicators - checks whether the excluded indicator matches the full indicator name
+    //  entire files are excluded using the manifest
+    if (excludedIndicators.length) {
+        indicator_data = indicator_data.filter(aq.escape(
+            row =>
+                !excludedIndicators.includes(row.indicator))
+        );
+    }
+
+    // split table into one table per indicator
+    const indicatorTables =
+            Object.fromEntries(
+                [...new Set(indicator_data.array('indicator'))]
+                    .map(ind => [ind, indicator_data.filter(aq.escape(
+                        d => d.indicator === ind))])
+            );
+
+    console.log('Indicators present in data file: ', Object.keys(indicatorTables))
+    // define new array
+    const indicatorDatasets = []
+    // loop through each indicator (when more than one)
+    for (const [indicator, t] of Object.entries(indicatorTables)) {
+        indicatorDatasets.push(processIndicators(indicator, t, meta_data, supressedCols, tableSchema))
+    }
+    return indicatorDatasets
+
+}
+function getIndex(row, id, size, dimension) {
+    const coords = [];
+    for (const key of id) {
+        coords.push(dimension[key].category.index[row[key]]);
+    }
+    let index = 0;
+    for (let i = 0; i < coords.length; i++) {
+        index = (index * size[i]) + coords[i];
+    }
+    return index;
+
+}
+function processIndicatorColumns(k, metaLookup, columnValues, id, size, role, dimension) {
+    const row = metaLookup.filter(aq.escape(d => d.name === k)).objects()[0]
+    const values = columnValues[k]
+    const entries = values.map((d, i) => [d, i]);
+    id.push(k);
+    size.push(values.length);
+
+    dimension[k] = {
+        label: row.titles[0],
+        category: { index: Object.fromEntries(entries) }
+
+    };
+    // add slugified labels for age and sex
+    if (k === 'age') {
+        dimension[k].category.label = Object.fromEntries(
+            columnValues['age'].map(d => [
+                d.replace(/(?<=\d)\sto\s(?=\d)/g, "-"),
+                d
+            ])
+        )
+    }
+
+    if (k === 'sex') {
+        dimension[k].category.label = Object.fromEntries(
+            columnValues['sex'].map(d => [
+                d.toLowerCase(),
+                d
+            ])
+        )
+    }
+    // if it is 'measure' get the names for measure from the metadata
+    if (k === 'measure') {
+        const lookup = new Map(metaLookup.objects().map(d => [d.name, d.titles[0]]))
+        dimension[k].category.label = Object.fromEntries(
+            values.map(d => [d, lookup.get(d)])
+        )
+    }
+    // if role metadata exists (currently just areacd and period), add it
+    if (row.role) {
+        if (!role[row.role]) role[row.role] = [];
+        role[row.role].push(k);
+    }
+    return { id, size, role, dimension }
 }
 
-// split table into one table per indicator
+function processIndicators(indicator, t, meta_data, supressedCols, tableSchema) {
 
-const indicatorTables = Object.fromEntries(
-    [...new Set(testdata_transformed.array('indicator'))]
-        .map(ind => [ind, testdata_transformed.filter(aq.escape(
-            d => d.indicator === ind))])
-);
+    // filter file-level metadata to be indicator level
+    const meta_indicator = meta_data.metadata.indicators.find(d => d.code === indicator)
+    // deconstruct meta_indicator:
+    const { label, caveats, longDescription, ...restOfMetadata } = meta_indicator
 
-console.log('Indicators present in data file: ', Object.keys(indicatorTables))
-console.log(tableSchema)
-
-// loop through each indicator (when more than one)
-for (const [indicator, t] of Object.entries(indicatorTables)) {
+    const dataset = {
+        version: "2.0",
+        class: "dataset",
+        label: label,
+        note: [caveats].filter(n => n),
+        source: meta_data.metadata.source,
+        // updated: meta_data.metadata.sourceDate,
+        extension: {
+            //   id: meta.id,
+            //   topic: meta.topic,
+            //   subTopic: meta.subTopic,
+            description: longDescription,
+            source: meta_data.metadata.source,
+            ...restOfMetadata,
+            geography: {
+                countries: meta_data.metadata.geographyCountries,
+                groups: meta_data.metadata.geographyGroups,
+                types: meta_data.metadata.geographyTypes,
+                year: meta_data.metadata.geographyYear
+            }
+        }
+    }
 
     let indicatorTable = t
         // drop unused columns using metadata suppressOutput:
@@ -95,14 +200,12 @@ for (const [indicator, t] of Object.entries(indicatorTables)) {
         // drop indicator because we don't need it as a column:
         .select(aq.not('indicator'))
 
-    console.log(indicator)
-    indicatorTable.print()
-
     // identify columns of type measure using metadata:
     let measures = tableSchema
         .filter(d => d.type === 'measure')
         .map(d => d.name)
     console.log('measures: ', measures)
+
     // pivot longer - measures to single column, values etc. to values - retain status
     let indicatorTableLong = indicatorTable.fold(
         measures,
@@ -110,6 +213,35 @@ for (const [indicator, t] of Object.entries(indicatorTables)) {
     ).rename(
         { 'value-temp': 'value' }
     )
+
+    // join unqiue periods lookup to indicator data (ensure indicator period is a string)
+    let indicatorTableLong_periods = indicatorTableLong
+        .derive({ period: aq.escape(d => String(d.period)) })
+        .join_left(periods, ['period'])
+
+    // check for annoying quarterly data decimal years...
+    const isQuarterly = indicatorTableLong_periods
+        .array('xDomainNumb')
+        .some(n => n % 1 !== 0)
+    console.log('Indicator contains quarterly data represented by decimals:', isQuarterly)
+
+    ///////////// if needed later?? ///////////////////
+    // // create table of all period labels for the indicator
+    // const unique_periods_for_each_indicator = indicatorTableLong_periods
+    //     .derive({
+    //         indicator: aq.escape(() => indicator),
+    //         xDomainNumb: d => parsePeriod(d.period, isQuarterly)
+    //     })
+    //     .dedupe('period', 'xDomainNumb', 'label', 'labelShort', 'labelVeryShort')
+    //     .select('indicator','period', 'xDomainNumb', 'label', 'labelShort', 'labelVeryShort')
+
+    // replace the period values with period run through the parsePeriod() function, remove xDomainNumb etc.
+    indicatorTableLong_periods = indicatorTableLong_periods
+        .derive({
+            period: aq.escape(d => parsePeriod(d.period, isQuarterly))
+        })
+        .select(aq.not('xDomainNumb', 'label', 'labelShort', 'labelVeryShort'))
+    // indicatorTableLong_periods.print()
 
     // identify columns of type dimension using tableschema metadata
     // and exclude areacd and period as we want to ensure those are specified first
@@ -121,82 +253,58 @@ for (const [indicator, t] of Object.entries(indicatorTables)) {
 
     // sort by each dimension (including the newly made measure, which is a dimension)
     // age is numbers as strings, so needs sorting properly. could also use Intl.collator for this
-    indicatorTableLong = indicatorTableLong
+    indicatorTableLong_periods = indicatorTableLong_periods
         .derive({ age_sorting: aq.escape(d => parseInt(d.age)) }) // make fake age column that is numeric
         .orderby('areacd', 'period',
             ...otherDimensions.map(col => col === 'age' ? 'age_sorting' : col), // sort age using fake age column
             'measure')
         .select(aq.not('age_sorting'))
 
-    // indicatorTableLong.print()
+    // indicatorTableLong_periods.print()
 
     // get unique values of all columns in order they appear
     const columnValues = Object.fromEntries(
-        indicatorTableLong.columnNames()
+        indicatorTableLong_periods.columnNames()
             .map(c => [
                 c,
-                [...new Set(indicatorTableLong.array(c))]
+                [...new Set(indicatorTableLong_periods.array(c))]
             ])
     )
 
-    const keys = Object.keys(columnValues).filter(k => k !== "value")
-    console.log(columnValues)
-
     // use to construct id, size, role + dimension 
-
     const id = [];
     const size = [];
     const role = {};
     const dimension = {};
 
     const metaLookup = aq.from(tableSchema)
-    metaLookup.print(11)
 
+    const keys = Object.keys(columnValues).filter(k => k !== "value")
     for (const k of keys) {
-        const row = metaLookup.filter(aq.escape(d => d.name === k)).objects()[0]
-        const values = columnValues[k]
-        const entries = values.map((d, i) => [d, i]);
-        id.push(k);
-        size.push(values.length);
-
-        dimension[k] = {
-            label: row.titles[0],
-            category: { index: Object.fromEntries(entries) }
-
-        };
-        // add slugified labels for age and sex
-        if (k === 'age') {
-            dimension[k].category.label = Object.fromEntries(
-                columnValues['age'].map(d => [
-                    d.replace(/(?<=\d)\sto\s(?=\d)/g, "-"),
-                    d
-                ])
-            )
-        }
-
-        if (k === 'sex') {
-            dimension[k].category.label = Object.fromEntries(
-                columnValues['sex'].map(d => [
-                    d.toLowerCase(),
-                    d
-                ])
-            )
-        }
-
-        // if it is 'measure' get the names for measure from the metadata
-        if (k === 'measure') {
-            const lookup = new Map(metaLookup.objects().map(d => [d.name, d.titles[0]]))
-            dimension[k].category.label = Object.fromEntries(
-                values.map(d => [d, lookup.get(d)])
-            )
-        }
-        if (row.role) {
-          if (!role[row.role]) role[row.role] = [];
-          role[row.role].push(k);
-        }
+        processIndicatorColumns(k, metaLookup, columnValues, id, size, role, dimension)
     }
+
+    const valuesLength = size.reduce((a, b) => a * b, 1);
+    const value = new Array(valuesLength).fill(null);
+
+    for (const row of indicatorTableLong_periods) {
+        const i = getIndex(row, id, size, dimension);
+        value[i] = row.value;
+    }
+    return { ...dataset, id, size, role, dimension, value };
 }
 
-// get shared metadata from testmeta.metadata for all arrays except the one called indicators
-// get individual indicator metadata from testmeta.metadata.indicators where indicators == testdata_transformed.indicator
+const cube = {
+    version: "2.0",
+    class: "collection",
+    label: "ELS datasets",
+    updated: (new Date()).toISOString().slice(0, 10),
+    link: { item: [] }
+};
 
+for (const file of file_paths) {
+    // cube.link.item.push(toCube(file));
+    cube.link.item = [...cube.link.item, ...toCube(file)]
+}
+
+// console.log(cube.link.item)

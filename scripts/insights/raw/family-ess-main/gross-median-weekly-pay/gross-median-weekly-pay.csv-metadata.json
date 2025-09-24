@@ -5,10 +5,10 @@
       "@language": "en"
     }
   ],
-  "dc:title": "Adult obesity prevalence",
+  "dc:title": "Gross median weekly pay",
   "tables": [
     {
-      "url": "adult-obesity-prevalence-aged-18-years-and-over.csv",
+      "url": "gross-median-weekly-pay.csv",
       "tableSchema": {
         "columns": [
           {
@@ -140,19 +140,27 @@
   "metadata": {
     "source": [
       {
-        "name": "Office for Health Improvement and Disparities",
-        "href": "https://fingertips.phe.org.uk/profile/obesity-physical-activity-nutrition/data#page/1/gid/1938133368/pat/159/par/K02000001/ati/15/are/E92000001/yrr/1/cid/4/tbm/1",
-        "date": "2025-05-07"
+        "name": "Office for National Statistics",
+        "href": "https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/annualsurveyofhoursandearnings/previousReleases",
+        "date": "2024-10-29"
+      },
+      {
+        "name": "Northern Ireland Statistics and Research Agency",
+        "href": "https://www.nisra.gov.uk/statistics/labour-market-and-social-welfare/annual-survey-hours-and-earnings",
+        "date": "2024-10-29"
       }
     ],
     "experimentalStatistic": false,
     "geographyCountries": [
-      "E"
+      "E",
+      "N",
+      "S",
+      "W"
     ],
     "geographyGroups": [
+      "uk",
       "ctry",
       "rgn",
-      "cauth",
       "utla",
       "ltla"
     ],
@@ -163,31 +171,39 @@
       "E09",
       "E10",
       "E12",
-      "E47",
-      "E92"
+      "E92",
+      "K02",
+      "K03",
+      "K04",
+      "N09",
+      "N92",
+      "S12",
+      "S92",
+      "W06",
+      "W92"
     ],
-    "geographyYear": 2022,
+    "geographyYear": 2024,
     "geographyInitialLevel": "ltla",
     "indicators": [
       {
-        "code": "Adult (18+) obesity prevalence",
-        "slug": "adult-obesity-prevalence-aged-18-years-and-over",
-        "dataset": "adult-obesity-prevalence-aged-18-years-and-over",
-        "label": "Adult obesity prevalence",
-        "prefix": null,
-        "suffix": "%",
+        "code": "Gross median weekly pay",
+        "slug": "gross-median-weekly-pay",
+        "dataset": "gross-median-weekly-pay",
+        "label": "Gross median weekly pay",
+        "prefix": "GBPSign",
+        "suffix": null,
         "subText": null,
-        "decimalPlaces": 1,
+        "decimalPlaces": 0,
         "standardised": true,
-        "subtitle": "Percentage of adults aged 18 and over classified as living with obesity",
-        "longDescription": "This indicator shows the percentage of adults aged 18 and over classified as living with obesity, in England, for 16/11/2015-15/11/2016 to 16/11/2023-15/11/2024.",
-        "caveats": "Adults are defined as living with obesity if their body mass index (BMI) is greater than or equal to 30kg/m².",
+        "subtitle": "Average weekly pay based on where people live",
+        "longDescription": "This indicator shows the average (median) weekly pay based on where people live, in the UK, for a pay period in April 2008 to April 2024.",
+        "caveats": "For Great Britain data, 2024 estimates are provisional and relate to the pay period that includes 17 April 2024. Estimates for 2023 have been revised and relate to the pay period that includes 19 April 2023.\n\nThe country level figure for Northern Ireland has been sourced from Nomis rather than NISRA. This is to allow for confidence intervals.",
         "confidenceIntervals": true,
         "canBeNegative": false,
         "zeroBaseline": true,
-        "measure": "Percentage",
-        "unit": "%",
-        "polarity": -1
+        "measure": "Pounds",
+        "unit": "£",
+        "polarity": 1
       }
     ]
   }
