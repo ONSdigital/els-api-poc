@@ -16,7 +16,7 @@ export function GET({ params }) {
   for (const key of clusterKeys) {
     const obj = {
       key,
-      label: key[0].toUpperCase() + key.slice(1),
+      label: `${key === "global" ? "All" : key[0].toUpperCase() + key.slice(1)} indicators`,
       similar: similar[key]
     };
     if (isLTLA) {
