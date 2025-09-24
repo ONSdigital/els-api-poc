@@ -286,12 +286,15 @@ function processIndicators(indicator, t, meta_data, supressedCols, tableSchema) 
 
     const valuesLength = size.reduce((a, b) => a * b, 1);
     const value = new Array(valuesLength).fill(null);
+    const status = new Array(valuesLength).fill(null)
 
     for (const row of indicatorTableLong_periods) {
         const i = getIndex(row, id, size, dimension);
         value[i] = row.value;
+        status[i] = row.status;
     }
-    return { ...dataset, id, size, role, dimension, value };
+
+    return { ...dataset, id, size, role, dimension, value, status };
 }
 
 const cube = {
@@ -308,3 +311,5 @@ for (const file of file_paths) {
 }
 
 // console.log(cube.link.item)
+const output = "./src/lib/json-stat-TEST.json";
+writeFileSync(output, JSON.stringify(cube));
