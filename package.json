@@ -12,7 +12,8 @@
     "format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. .",
     "make-json-stat": "node ./scripts/make-json-stat.js",
     "make-geo-data": "node ./scripts/make-geo-data.js",
-    "make-taxonomy": "node ./scripts/make-taxonomy.js"
+    "make-taxonomy": "node ./scripts/make-taxonomy.js",
+    "make-clusters": "node ./scripts/make-clusters.js"
   },
   "author": "Ahmad Barclay",
   "license": "MIT",
