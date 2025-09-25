@@ -41,72 +41,6 @@ function parsePeriod(str, isQuarterly = false) {
     if (isQuarterly && parts.length === 1) parts.push("P3M");
     return parts.join("/");
 }
-
-const manifest = loadCsvWithoutBom(MANIFEST); // equivalent to previous_file_paths
-// const areas_geog_level = loadCsvWithoutBom(AREAS_GEOG_LEVEL_FILENAME);
-const excludedIndicators = readJsonSync(EXCLUDED_INDICATORS_PATH);
-
-// Throw error if new indicator files have been downloaded and need to be added to the manifest
-await abortIfNewFilesExist(manifest, CSV_PREPROCESS_DIR)
-
-// remove indicator files based on boolean in manifest (separate process to those in excluded-indicators.json)
-const file_paths = manifest.filter((f) => f.include === 'Y')
-    .array('filePath');
-
-// read in existing periods
-// later use this to check for new indicator time periods that need adding
-const periods = aq.from(loadCsvWithoutBom(EXISTING_PERIODS_FILENAME, {
-    stringColumns: ['period', 'label', 'labelShort']
-}).objects());
-
-
-function toCube(file) {
-
-    const data_file = file.replace(`${CSV_PREPROCESS_DIR}`, '')
-    let indicator_data = loadCsvWithoutBom(`${CSV_PREPROCESS_DIR}${data_file}`)
-    const meta_data = JSON.parse(fs.readFileSync(`${CSV_PREPROCESS_DIR}${data_file.replace('.csv', '.csv-metadata.json')}`))
-    const tableSchema = meta_data.tables[0].tableSchema.columns
-
-    // get the column titles of those columns we want to suppress
-    const supressedCols = tableSchema
-        .filter(d => d.supressOutput)
-        .map(d => d.titles[0])
-
-    //  rename the columns in data using the information in tableschema 
-    // (name is the target title, the first value of titles is the existing column name in the csv)
-    const varNames = Object.fromEntries(
-        tableSchema.map(d => [d.titles[0], d.name])
-    )
-    indicator_data = indicator_data
-        .rename(varNames)
-
-    //  filter out excludedIndicators - checks whether the excluded indicator matches the full indicator name
-    //  entire files are excluded using the manifest
-    if (excludedIndicators.length) {
-        indicator_data = indicator_data.filter(aq.escape(
-            row =>
-                !excludedIndicators.includes(row.indicator))
-        );
-    }
-
-    // split table into one table per indicator
-    const indicatorTables =
-            Object.fromEntries(
-                [...new Set(indicator_data.array('indicator'))]
-                    .map(ind => [ind, indicator_data.filter(aq.escape(
-                        d => d.indicator === ind))])
-            );
-
-    console.log('Indicators present in data file: ', Object.keys(indicatorTables))
-    // define new array
-    const indicatorDatasets = []
-    // loop through each indicator (when more than one)
-    for (const [indicator, t] of Object.entries(indicatorTables)) {
-        indicatorDatasets.push(processIndicators(indicator, t, meta_data, supressedCols, tableSchema))
-    }
-    return indicatorDatasets
-
-}
 function getIndex(row, id, size, dimension) {
     const coords = [];
     for (const key of id) {
@@ -163,8 +97,7 @@ function processIndicatorColumns(k, metaLookup, columnValues, id, size, role, di
     }
     return { id, size, role, dimension }
 }
-
-function processIndicators(indicator, t, meta_data, supressedCols, tableSchema) {
+function processIndicators(indicator, t, meta_data, tableSchema) {
 
     // filter file-level metadata to be indicator level
     const meta_indicator = meta_data.metadata.indicators.find(d => d.code === indicator)
@@ -195,8 +128,6 @@ function processIndicators(indicator, t, meta_data, supressedCols, tableSchema) 
     }
 
     let indicatorTable = t
-        // drop unused columns using metadata suppressOutput:
-        .select(aq.not(supressedCols))
         // drop indicator because we don't need it as a column:
         .select(aq.not('indicator'))
 
@@ -286,16 +217,85 @@ function processIndicators(indicator, t, meta_data, supressedCols, tableSchema) 
 
     const valuesLength = size.reduce((a, b) => a * b, 1);
     const value = new Array(valuesLength).fill(null);
-    const status = new Array(valuesLength).fill(null)
+    const status = {}
 
     for (const row of indicatorTableLong_periods) {
         const i = getIndex(row, id, size, dimension);
         value[i] = row.value;
-        status[i] = row.status;
+        if (row.status) { status[i] = row.status };
     }
 
     return { ...dataset, id, size, role, dimension, value, status };
 }
+function toCube(file) {
+
+    const data_file = file.replace(`${CSV_PREPROCESS_DIR}`, '')
+    let indicator_data = loadCsvWithoutBom(`${CSV_PREPROCESS_DIR}${data_file}`)
+    const meta_data = JSON.parse(fs.readFileSync(`${CSV_PREPROCESS_DIR}${data_file.replace('.csv', '.csv-metadata.json')}`))
+    const tableSchema = meta_data.tables[0].tableSchema.columns
+
+    // get the column titles of those columns we want to suppress
+    const suppressedCols = tableSchema
+        .filter(d => d.suppressOutput)
+        .map(d => d.titles[0])
+
+    //  rename the columns in data using the information in tableschema 
+    // (name is the target title, the first value of titles is the existing column name in the csv)
+    const varNames = Object.fromEntries(
+        tableSchema
+        .filter(d => !suppressedCols.includes(d.titles[0])) // remove columns we are deselecting from this
+        .map(d => [d.titles[0], d.name])
+    )
+
+    indicator_data = indicator_data
+        // drop unused columns using metadata suppressOutput:
+        .select(aq.not(suppressedCols))
+        .rename(varNames)
+
+    //  filter out excludedIndicators - checks whether the excluded indicator matches the full indicator name
+    //  entire files are excluded using the manifest
+    if (excludedIndicators.length) {
+        indicator_data = indicator_data.filter(aq.escape(
+            row =>
+                !excludedIndicators.includes(row.indicator))
+        );
+    }
+
+    // split table into one table per indicator
+    const indicatorTables =
+            Object.fromEntries(
+                [...new Set(indicator_data.array('indicator'))]
+                    .map(ind => [ind, indicator_data.filter(aq.escape(
+                        d => d.indicator === ind))])
+            );
+
+    console.log('Indicators present in data file: ', Object.keys(indicatorTables))
+    // define new array
+    const indicatorDatasets = []
+    // loop through each indicator (when more than one)
+    for (const [indicator, t] of Object.entries(indicatorTables)) {
+        indicatorDatasets.push(processIndicators(indicator, t, meta_data, tableSchema))
+    }
+    return indicatorDatasets
+
+}
+
+const manifest = loadCsvWithoutBom(MANIFEST); // equivalent to previous_file_paths
+// const areas_geog_level = loadCsvWithoutBom(AREAS_GEOG_LEVEL_FILENAME);
+const excludedIndicators = readJsonSync(EXCLUDED_INDICATORS_PATH);
+
+// Throw error if new indicator files have been downloaded and need to be added to the manifest
+await abortIfNewFilesExist(manifest, CSV_PREPROCESS_DIR)
+
+// remove indicator files based on boolean in manifest (separate process to those in excluded-indicators.json)
+const file_paths = manifest.filter((f) => f.include === 'Y')
+    .array('filePath');
+
+// read in existing periods
+// later use this to check for new indicator time periods that need adding
+const periods = aq.from(loadCsvWithoutBom(EXISTING_PERIODS_FILENAME, {
+    stringColumns: ['period', 'label', 'labelShort']
+}).objects());
 
 const cube = {
     version: "2.0",
@@ -306,7 +306,6 @@ const cube = {
 };
 
 for (const file of file_paths) {
-    // cube.link.item.push(toCube(file));
     cube.link.item = [...cube.link.item, ...toCube(file)]
 }
 

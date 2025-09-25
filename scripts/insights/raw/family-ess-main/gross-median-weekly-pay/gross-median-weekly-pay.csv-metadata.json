@@ -6,6 +6,9 @@
     }
   ],
   "dc:title": "Gross median weekly pay",
+  "dc:publisher": "Office for National Statistics, Northern Ireland Statistics and Research Agency",
+  "dc:issued": "2024-10-29",
+  "dc:modified": "2025-08-13",
   "tables": [
     {
       "url": "gross-median-weekly-pay.csv",
@@ -27,7 +30,7 @@
               "Area name"
             ],
             "datatype": "string",
-            "supressOutput": true
+            "suppressOutput": true
           },
           {
             "titles": [
@@ -35,7 +38,7 @@
               "Geography type"
             ],
             "datatype": "string",
-            "supressOutput": true
+            "suppressOutput": true
           },
           {
             "titles": [
@@ -43,7 +46,7 @@
               "Variable name"
             ],
             "datatype": "string",
-            "supressOutput": true
+            "suppressOutput": true
           },
           {
             "name": "indicator",
@@ -59,7 +62,7 @@
               "Period",
               "Time period"
             ],
-            "datatype": "string",
+            "datatype": "date",
             "type": "dimension",
             "role": "time"
           },
@@ -79,7 +82,7 @@
             ],
             "datatype": "string",
             "type": "metadata",
-            "supressOutput": true
+            "suppressOutput": true
           },
           {
             "name": "unit",
@@ -88,7 +91,7 @@
             ],
             "datatype": "string",
             "type": "metadata",
-            "supressOutput": true
+            "suppressOutput": true
           },
           {
             "name": "lci",
@@ -124,14 +127,14 @@
             ],
             "datatype": "number",
             "type": "metadata",
-            "supressOutput": true
+            "suppressOutput": true
           },
           {
             "titles": [
               "Notes"
             ],
             "datatype": "string",
-            "supressOutput": true
+            "suppressOutput": true
           }
         ]
       }

@@ -6,6 +6,9 @@
     }
   ],
   "dc:title": "Gross domestic product per head",
+  "dc:publisher": "Office for National Statistics",
+  "dc:issued": "2025-04-17",
+  "dc:modified": "2025-05-07",
   "tables": [
     {
       "url": "gdp-per-head.csv",
@@ -27,7 +30,7 @@
               "Area name"
             ],
             "datatype": "string",
-            "supressOutput": true
+            "suppressOutput": true
           },
           {
             "titles": [
@@ -35,7 +38,7 @@
               "Geography type"
             ],
             "datatype": "string",
-            "supressOutput": true
+            "suppressOutput": true
           },
           {
             "name": "indicator",
@@ -61,7 +64,7 @@
             ],
             "datatype": "string",
             "type": "metadata",
-            "supressOutput": true
+            "suppressOutput": true
           },
           {
             "name": "measure",
@@ -70,7 +73,7 @@
             ],
             "datatype": "string",
             "type": "metadata",
-            "supressOutput": true
+            "suppressOutput": true
           },
           {
             "name": "period",
@@ -78,7 +81,7 @@
               "Period",
               "Time period"
             ],
-            "datatype": "string",
+            "datatype": "date",
             "type": "dimension",
             "role": "time"
           },
