@@ -1,5 +1,5 @@
 import { json } from "@sveltejs/kit";
-import { getParam } from "$lib/server-utils.js";
+import { getParam } from "$lib/api/utils.js";
 import geoMetadata from "$lib/geo-metadata.json";
 import geoGroups from "$lib/geo-groups.js";
 

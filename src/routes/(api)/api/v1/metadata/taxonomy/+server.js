@@ -1,5 +1,5 @@
 import { json } from "@sveltejs/kit";
-import { getParam } from "$lib/server-utils.js";
+import { getParam } from "$lib/api/utils.js";
 import taxonomy from "$lib/taxonomy.json";
 
 export function GET({url}) {

@@ -1,5 +1,5 @@
 import { json, error } from "@sveltejs/kit";
-import { getParam } from "$lib/server-utils.js";
+import { getParam } from "$lib/api/utils.js";
 import rawMetadata from "$lib/json-stat-metadata.json";
 import geoGroups from "$lib/geo-groups";
 
