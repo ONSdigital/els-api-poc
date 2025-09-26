@@ -3,7 +3,7 @@ import { geoLevels } from "$lib/geo-levels.js";
 
 const geoArray = Object.values(geoMetadata);
 
-export default function getChildren(params = {}) {
+export default function getChildAreas(params = {}) {
   const area = geoMetadata[params.code];
   if (!area) return { error: 400, message: `Children not found for ${params.code}` };
 

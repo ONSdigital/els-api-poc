@@ -2,7 +2,7 @@ import geoMetadata from "$lib/geo-metadata.json";
 import { geoLevels, geoLevelsLookup } from "$lib/geo-levels.js";
 import getChildren from "./getChildren.js";
 
-export default function getSiblings(params = {}) {
+export default function getSiblingAreas(params = {}) {
   const area = geoMetadata[params.code];
   if (!area)
     return { error: 400, message: `Siblings not found for ${params.code}` };
