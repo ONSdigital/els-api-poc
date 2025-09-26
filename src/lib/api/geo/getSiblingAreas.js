@@ -1,6 +1,6 @@
 import geoMetadata from "$lib/data/geo-metadata.json";
 import { geoLevels, geoLevelsLookup } from "$lib/config/geo-levels.js";
-import getChildren from "./getChildren.js";
+import getChildAreas from "./getChildAreas.js";
 
 export default function getSiblingAreas(params = {}) {
   const area = geoMetadata[params.code];
@@ -21,6 +21,6 @@ export default function getSiblingAreas(params = {}) {
 
   return {
     parent: parentCode,
-    siblings: getChildren({ code: parentCode, geoLevel }),
+    siblings: getChildAreas({ code: parentCode, geoLevel }),
   };
 }
