@@ -9,12 +9,18 @@ export default function getSiblings(params = {}) {
 
   const geoLevel = geoLevelsLookup[params.code.slice(0, 3)].key;
   if (params.parentLevel && !geoLevels[params.parentLevel])
-    return { error: 400, message: `Parent level ${params.parentLevel} not found` };
+    return {
+      error: 400,
+      message: `Parent level ${params.parentLevel} not found`,
+    };
   const parentCode = params.parentLevel
-    ? area.parents.find((p) => geoLevels[params.parentLevel].codes.includes(p.slice(0, 3)))
+    ? area.parents.find((p) =>
+        geoLevels[params.parentLevel].codes.includes(p.slice(0, 3))
+      )
     : area.parents[0];
 
-  console.log({geoLevel, parentCode})
-
-  return {parent: parentCode, siblings: getChildren({ code: parentCode, geoLevel })};
+  return {
+    parent: parentCode,
+    siblings: getChildren({ code: parentCode, geoLevel }),
+  };
 }
