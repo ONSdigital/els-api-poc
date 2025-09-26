@@ -1,0 +1,20 @@
+import geoMetadata from "$lib/geo-metadata.json";
+import { geoLevels, geoLevelsLookup } from "$lib/geo-levels.js";
+import getChildren from "./getChildren.js";
+
+export default function getSiblings(params = {}) {
+  const area = geoMetadata[params.code];
+  if (!area)
+    return { error: 400, message: `Siblings not found for ${params.code}` };
+
+  const geoLevel = geoLevelsLookup[params.code.slice(0, 3)].key;
+  if (params.parentLevel && !geoLevels[params.parentLevel])
+    return { error: 400, message: `Parent level ${params.parentLevel} not found` };
+  const parentCode = params.parentLevel
+    ? area.parents.find((p) => geoLevels[params.parentLevel].codes.includes(p.slice(0, 3)))
+    : area.parents[0];
+
+  console.log({geoLevel, parentCode})
+
+  return {parent: parentCode, siblings: getChildren({ code: parentCode, geoLevel })};
+}
