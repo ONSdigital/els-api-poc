@@ -82,7 +82,7 @@ Whereas, the following URL requests all data available for Hartlepool (E06000001
 The **query-based URL pattern** envisages a more flexible way to make requests, taking inspiration from the [Eurostat Statistics API](https://ec.europa.eu/eurostat/web/user-guides/data-browser/api-data-access/api-detailed-guidelines/api-statistics) and [Nomis API](https://www.nomisweb.co.uk/api/v01/help) in particular.* This structure more easily accommodates things like date ranges and arbitrary lists of geographic areas (which better reflect the way selections are made within the ELS app). The basic structure of requests from this endpoint is as follows (see [query builder demo]([https://els-api-poc.netlify.app/path/](https://els-api-poc.netlify.app/query/)):
 
 ```
-/api.{format}?{query_parameters}
+/api/v1/data.{format}?{query_parameters}
 ```
 
 *Unlike the case of the Eurostat and Nomis APIs, queries can be made across multiple datasets at once.
@@ -91,15 +91,15 @@ In the demo, ```{format}``` can be "json" (for column-oriented data arrays), "cs
 
 For example, the following URL will return region-level data for all economic indicators in a CSV format, from 2018 to the latest value, including all measures:
 
-[/api.csv?topic=economy&geography=rgn&time=latest](https://els-api-poc.netlify.app/api.csv?topic=economy&geography=rgn&time=latest)
+[/api/v1/data.csv?topic=economy&geography=rgn&time=latest](https://els-api-poc.netlify.app/api/v1/data.csv?topic=economy&geography=rgn&time=latest)
 
 And this request would return an accompanying CSVW metadata file for the above request:
 
-[/api.csvw?topic=economy&geography=rgn&time=latest](https://els-api-poc.netlify.app/api.csvw?topic=economy&geography=rgn&time=latest)
+[/api/v1/data.csvw?topic=economy&geography=rgn&time=latest](https://els-api-poc.netlify.app/api/v1/data.csvw?topic=economy&geography=rgn&time=latest)
 
 The original request could also be extended to include data for England (E92000001) and the United Kingdom (K02000001) by modifying the **geography** parameter, and to include observations covering a time period from 2018 to the latest available by modifying the **time** parameter:
 
-[/api.csv?topic=economy&geography=rgn,E92000001,K02000001&time=2018,latest](https://els-api-poc.netlify.app/api.csv?topic=economy&geography=rgn,E92000001,K02000001&time=2018,latest)
+[/api/v1/data.csv?topic=economy&geography=rgn,E92000001,K02000001&time=2018,latest](https://els-api-poc.netlify.app/api/v1/data.csv?topic=economy&geography=rgn,E92000001,K02000001&time=2018,latest)
 
 #### Server-side filtering logic
 

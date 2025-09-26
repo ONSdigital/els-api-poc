@@ -74,7 +74,7 @@
     return parsedData;
   }
 
-  $: permalink = (format = "json") => `${page.url.origin}${base}/api.${format}?${
+  $: permalink = (format = "json") => `${page.url.origin}${base}/api/v1/data.${format}?${
       indicator.id === "topic" ? `topic=${topic.id}` : `indicator=${indicator.id}`
     }&geography=${
       geography.id === "code" ? gssCode : geography.id

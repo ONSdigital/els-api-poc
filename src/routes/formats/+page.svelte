@@ -36,7 +36,7 @@
   }
 
   async function fetchData() {
-    const url = `${base}/api.json?geography=E92000001&time=latest&measure=value`;
+    const url = `${base}/api/v1/data.json?geography=E92000001&time=latest&measure=value`;
     const data = await (await fetch(url)).json();
     return data;
   }
