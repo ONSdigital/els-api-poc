@@ -18,7 +18,7 @@
     Divider
   } from "@onsvisual/svelte-components";
   import metadata from "$lib/metadata.json";
-  import geoLevels from "$lib/geo-levels.js";
+  import { geoLevels } from "$lib/geo-levels.js";
   import measures from "$lib/measures.js";
   import topics from "$lib/topics.js";
 
