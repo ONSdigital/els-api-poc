@@ -7,3 +7,7 @@ export function getParam(url, key, fallback = null) {
     param.match(/^\d+$/) ? +param :
     param;
 }
+
+export function isValidAreaCode(code) {
+  return !!code.match(/^[EKNSW]\d{8}$/);
+}
