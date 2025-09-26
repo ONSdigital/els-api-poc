@@ -1,12 +1,13 @@
 import { readFileSync, writeFileSync } from "fs";
 
-const data_path = "./src/lib/data.json";
-const config_path = "./src/lib/config.json";
-const output = "./src/lib/json-stat.json";
+const data_path = "./src/lib/data/data.json";
+const config_path = "./src/lib/data/config.json";
+const output_data = "./src/lib/data/json-stat.json";
+const output_meta = "./src/lib/data/json-stat-metadata.json";
 
 const columns = [
   {key: "areacd", label: "Area code", role: "geo"},
-  {key: "date", label: "Time period", role: "time"},
+  {key: "period", label: "Time period", role: "time"},
   {key: "value", label: "Value", group: "measure"},
   {key: "lci", label: "Lower confidence interval", group: "measure"},
   {key: "uci", label: "Upper confidence interval", group: "measure"}
@@ -32,8 +33,8 @@ function makeSource(meta) {
   const dates = meta.sourceDate.split("|").map(d => parseSourceDate(d));
 
   return orgs.map((d, i) => ({
-    org: d,
-    url: urls[i],
+    name: d,
+    href: urls[i],
     date: dates[i]
   }));
 }
@@ -69,7 +70,7 @@ function toRows(data, periods) {
       const row = {};
       for (const col of cols) {
         if (col === "xDomainNumb") {
-          row.date = periodsLookup[data[col][i]];
+          row.period = periodsLookup[data[col][i]];
         }
         else row[col] = data[col][i];
       }
@@ -182,5 +183,14 @@ for (const key of keys) {
   cube.link.item.push(toCube(rows, meta));
 }
 
-writeFileSync(output, JSON.stringify(cube));
-console.log(`Wrote ${output}`);
+writeFileSync(output_data, JSON.stringify(cube));
+console.log(`Wrote ${output_data}`);
+
+// Strip data to write metadata only
+cube.link.item = cube.link.item.map(ds => {
+  ds.value = [];
+  return ds;
+});
+
+writeFileSync(output_meta, JSON.stringify(cube));
+console.log(`Wrote ${output_meta}`);

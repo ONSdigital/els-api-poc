@@ -19,10 +19,7 @@
   </p>
 </Section>
 
-<Grid colWidth="medium">
-  <Card title="Path-based API" mode="featured" href="{base}/path">
-    Request data based on a URL path.
-  </Card>
+<Grid title="Active demos" colWidth="medium">
   <Card title="Query-based API" mode="featured" href="{base}/query">
     Request data based on URL query parameters.
   </Card>
@@ -37,6 +34,12 @@
   </Card>
   <Card title="Formats and units" mode="featured" href="{base}/formats">
     Adding automatic units, dates and descriptions to data.
+  </Card>
+</Grid>
+
+<Grid title="Redundant demos" colWidth="medium">
+  <Card title="Path-based API" mode="featured" href="{base}/path">
+    Request data based on a URL path.
   </Card>
 </Grid>
 

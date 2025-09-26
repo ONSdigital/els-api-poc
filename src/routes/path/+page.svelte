@@ -17,10 +17,10 @@
     NavSection,
     Divider,
   } from "@onsvisual/svelte-components";
-  import metadata from "$lib/metadata.json";
-  import geoGroups from "$lib/geo-groups.js";
-  import measures from "$lib/measures.js";
-  import topics from "$lib/topics.js";
+  import metadata from "$lib/data/metadata.json";
+  import { geoLevels } from "$lib/config/geo-levels.js";
+  import measures from "$lib/config/measures.js";
+  import topics from "$lib/config/topics.js";
 
   const indicators = Object.values(metadata);
   const indicatorsList = [
@@ -35,7 +35,7 @@
   const geographyList = [
     {id: "all", label: "All geographies"},
     {id: "code", label: "Enter a GSS code"},
-    ...Object.keys(geoGroups).map(key => ({id: key, label: geoGroups[key].label}))
+    ...Object.keys(geoLevels).map(key => ({id: key, label: geoLevels[key].label}))
   ];
   let geography = geographyList[0];
   let gssCode = "K02000001";

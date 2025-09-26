@@ -1,5 +1,5 @@
 import { base } from "$app/paths";
-import metadata from "$lib/metadata.json";
+import metadata from "$lib/data/metadata.json";
 
 export function parseData(data) {
   const cols = Object.keys(data);
@@ -14,14 +14,14 @@ export function parseData(data) {
 }
 
 export async function fetchChartData(indicator, geography = "ltla", time = "latest") {
-  const url = `${base}/api.json?indicator=${indicator}&geography=${geography}&time=${time}`;
+  const url = `${base}/api/v1/data.json?indicator=${indicator}&geography=${geography}&time=${time}`;
   const data = await (await fetch(url)).json();
   console.log({data})
   return parseData(data[indicator]);
 }
 
 export async function fetchTopicsData(selected, geography = "ltla", time = "latest") {
-  const url = `${base}/api.json?geography=${geography}&time=${time}`;
+  const url = `${base}/api/v1/data.json?geography=${geography}&time=${time}`;
   let data = await (await fetch(url)).json();
 
   // Filter out empty datasets

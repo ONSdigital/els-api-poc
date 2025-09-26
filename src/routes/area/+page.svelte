@@ -14,7 +14,7 @@
     LazyLoad
   } from "@onsvisual/svelte-components";
   import Beeswarm from "$lib/viz/Beeswarm.svelte";
-  import areas from "$lib/areas.json";
+  import areas from "$lib/data/areas.json";
   import { fetchTopicsData } from "$lib/utils.js";
 
   let selected;
