@@ -1,6 +1,6 @@
 import { json, error } from "@sveltejs/kit";
 import getSimilarAreas from "$lib/api/geo/getSimilarAreas.js";
-import { isValidAreaCode } from "../../../../../../../lib/api/utils";
+import { isValidAreaCode } from "$lib/api/utils";
 
 export function GET({ params }) {
   const code = params.code;

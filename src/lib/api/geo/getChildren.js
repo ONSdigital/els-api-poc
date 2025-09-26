@@ -5,7 +5,7 @@ const geoArray = Object.values(geoMetadata);
 
 export default function getChildren(params = {}) {
   const area = geoMetadata[params.code];
-  if (!area) return { error: 400, message: `Area ${code} not found` };
+  if (!area) return { error: 400, message: `Children not found for ${params.code}` };
 
   const geoGroup = geoGroups[params.geoLevel];
   if (!geoGroup) return area.children;
