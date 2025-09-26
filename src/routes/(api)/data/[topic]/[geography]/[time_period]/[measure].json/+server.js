@@ -1,7 +1,7 @@
 import { json, error } from "@sveltejs/kit";
 import raw_data from "$lib/data.json";
 import metadata from "$lib/metadata.json";
-import geoGroups from "$lib/geo-groups.js";
+import { geoLevels } from "$lib/geo-levels.js";
 import topics from "$lib/topics.js";
 
 const keys = ["areacd", "date", "value", "lci", "uci"];
@@ -82,8 +82,8 @@ export function GET({ params }) {
 	if (params.geography !== "all") {
 		if (params.geography.match(/[EKNSW]\d{8}/)) {
 			data = filterAll(data, filterData("areacd", params.geography));
-		} else if (params.geography.match(/[EKNSW]\d{2}/) || geoGroups[params.geography]) {
-			const codes = geoGroups[params.geography].codes || [params.geography];
+		} else if (params.geography.match(/[EKNSW]\d{2}/) || geoLevels[params.geography]) {
+			const codes = geoLevels[params.geography].codes || [params.geography];
 			data = filterAll(data, filterPrefixes("areacd", codes));
 		} else data = null;
 	}

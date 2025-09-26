@@ -1,5 +1,5 @@
 // Functions to filter JSON-Stat at a dataset level
-import geoGroups from "$lib/geo-groups";
+import { geoLevels } from "$lib/geo-levels.js";
 
 export function makeTopicFilter(topic) {
   return (ds) =>
@@ -19,10 +19,10 @@ export function makeTimeFilter(time) {
 export function makeGeoFilter(geo) {
   if (geo.match(/[EKNSW]\d{8}/))
     return (ds) => !!ds.dimension.areacd.category.index[geo];
-  const geoGroup = geoGroups[geo];
-  if (geoGroup)
+  const geoLevel = geoLevels[geo];
+  if (geoLevel)
     return (ds) => {
-      return geoGroup.codes.every((cd) =>
+      return geoLevel.codes.every((cd) =>
         ds.extension.geography.types.includes(cd)
       );
     };

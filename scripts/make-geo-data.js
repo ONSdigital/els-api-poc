@@ -1,16 +1,16 @@
 import { writeFileSync } from "fs";
 import { csvParse, autoType } from "d3-dsv";
-import geoGroups from "../src/lib/geo-groups.js";
+import { geoLevels } from "../src/lib/geo-levels.js";
 
 const topoUrl = "https://raw.githubusercontent.com/ONSdigital/uk-topojson/refs/heads/main/output/topo.json";
 const metaUrl = "https://raw.githubusercontent.com/ONSdigital/geo-scripts/refs/heads/main/input/lookups/lookup.csv";
 const outputDir = "./src/lib";
 
-const geoCodes = new Set(Object.values(geoGroups).map(g => g.codes).flat());
+const geoCodes = new Set(Object.values(geoLevels).map(g => g.codes).flat());
 
 function getLevels(cd) {
-  return Object.keys(geoGroups)
-    .filter(key => geoGroups[key].codes.includes(cd.slice(0, 3)));
+  return Object.keys(geoLevels)
+    .filter(key => geoLevels[key].codes.includes(cd.slice(0, 3)));
 }
 
 function getChildren(cd, rows) {

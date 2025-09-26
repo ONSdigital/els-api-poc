@@ -1,5 +1,5 @@
 // Functions to filter geography metadata
-import geoGroups from "$lib/geo-groups.js";
+import { geoLevels } from "$lib/geo-levels.js";
 
 export function yearFilter(item, year) {
   if (!item.start && !item.end) return true;
@@ -14,8 +14,8 @@ export function makeGeoFilter(param) {
   const types = new Set();
   for (const geo of param) {
     if (geo.match(/^[EKNSW]\d{2}$/)) types.add(geo);
-    else if (geoGroups[geo]) {
-      for (const code of geoGroups[geo].codes) types.add(code);
+    else if (geoLevels[geo]) {
+      for (const code of geoLevels[geo].codes) types.add(code);
     }
     else if (geo.match(/^[EKNSW]\d{8}$/) && !types.has(geo.slice(0, 3))) codes.add(geo);
   }

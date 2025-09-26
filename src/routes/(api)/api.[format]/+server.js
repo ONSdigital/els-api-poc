@@ -1,7 +1,7 @@
 import { json, text } from "@sveltejs/kit";
 import { csvFormat } from "d3-dsv";
 import cube from "$lib/json-stat.json";
-import geoGroups from "$lib/geo-groups.js";
+import { geoLevels } from "$lib/geo-levels.js";
 
 function ascending(a, b) {
   return a == null || b == null ? NaN : a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
@@ -186,8 +186,8 @@ function makeGeoFilter(param) {
 	const types = new Set();
 	for (const geo of [param].flat()) {
 		if (geo.match(/^[EKNSW]\d{2}$/)) types.add(geo);
-		else if (geoGroups[geo]) {
-			for (const code of geoGroups[geo].codes) types.add(code);
+		else if (geoLevels[geo]) {
+			for (const code of geoLevels[geo].codes) types.add(code);
 		}
 		else if (geo.match(/^[EKNSW]\d{8}$/) && !types.has(geo.slice(0, 3))) codes.add(geo);
 	}
