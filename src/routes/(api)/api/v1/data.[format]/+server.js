@@ -162,7 +162,7 @@ function toCSVW(datasets, measure, url) {
 			},
 			{
 				titles: "Time period",
-				name: "date",
+				name: "period",
 				datatype: "date"
 			},
 			{
@@ -255,7 +255,7 @@ function filterCube(cube, filters, format) {
 			values: Object.entries(dimension.category.index)
 		};
 		const filter = filters[key];
-		if (filter && dim.key === "date") {
+		if (filter && dim.key === "period") {
 			dim.values = filterTime(dim.values, filter);
 		}
 		else if (filter) dim.values = dim.values.filter(filter);
@@ -323,7 +323,7 @@ export function GET({ params, url }) {
 	// Create filters for data cube dimensions
 	const filters = {};
 	if (geography !== "all") filters.areacd = makeGeoFilter(geography);
-	if (time !== "all") filters.date = time;
+	if (time !== "all") filters.period = time;
 	if (measure !== "all") filters.measure = makeFilter(measure);
 
 	// Apply filters to datasets and generate output for selected format

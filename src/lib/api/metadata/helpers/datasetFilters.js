@@ -11,7 +11,7 @@ export function makeTimeFilter(time) {
   if (!timeString.match(/^\d{4}$/))
     return {error: "Invalid 'time' parameter. Must be YYYY or 'all'."};
   return (ds) =>
-    Object.keys(ds.dimension.date.category.index)
+    Object.keys(ds.dimension.period.category.index)
       .map((d) => d.slice(0, 4))
       .includes(timeString);
 }

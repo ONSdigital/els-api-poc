@@ -7,7 +7,7 @@ const output_meta = "./src/lib/data/json-stat-metadata.json";
 
 const columns = [
   {key: "areacd", label: "Area code", role: "geo"},
-  {key: "date", label: "Time period", role: "time"},
+  {key: "period", label: "Time period", role: "time"},
   {key: "value", label: "Value", group: "measure"},
   {key: "lci", label: "Lower confidence interval", group: "measure"},
   {key: "uci", label: "Upper confidence interval", group: "measure"}
@@ -33,8 +33,8 @@ function makeSource(meta) {
   const dates = meta.sourceDate.split("|").map(d => parseSourceDate(d));
 
   return orgs.map((d, i) => ({
-    org: d,
-    url: urls[i],
+    name: d,
+    href: urls[i],
     date: dates[i]
   }));
 }
@@ -70,7 +70,7 @@ function toRows(data, periods) {
       const row = {};
       for (const col of cols) {
         if (col === "xDomainNumb") {
-          row.date = periodsLookup[data[col][i]];
+          row.period = periodsLookup[data[col][i]];
         }
         else row[col] = data[col][i];
       }

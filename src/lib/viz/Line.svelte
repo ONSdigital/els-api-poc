@@ -6,7 +6,7 @@
 
 <Plot x={{grid: true}}>
   <Line
-    data={data.map(d => ({...d, time: new Date(d.date.split("/")[0])}))}
+    data={data.map(d => ({...d, time: new Date(d.period.split("/")[0])}))}
     x={xKey}
     y={yKey}
     z={zKey}
