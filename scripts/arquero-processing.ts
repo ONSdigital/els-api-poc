@@ -16,7 +16,6 @@ import { parse } from 'path';
 const RAW_DIR = 'scripts/insights/raw';
 const CONFIG_DIR = `${RAW_DIR}/config-data`;
 const MANIFEST = `${CONFIG_DIR}/data-files-manifest.csv` // equivalent to FILE_NAMES_LOG
-const AREAS_GEOG_LEVEL_FILENAME = `${CONFIG_DIR}/geography/areas-geog-level.csv`;
 const EXCLUDED_INDICATORS_PATH = `${CONFIG_DIR}/excluded-indicators.json`;
 const CSV_PREPROCESS_DIR = `${RAW_DIR}/family-ess-main`
 const EXISTING_PERIODS_FILENAME = `${CONFIG_DIR}/periods/unique-periods-lookup.csv`;
@@ -53,7 +52,7 @@ function getIndex(row, id, size, dimension) {
     return index;
 
 }
-function processIndicatorColumns(k, metaLookup, columnValues, id, size, role, dimension) {
+function processColumns(k, metaLookup, columnValues, id, size, role, dimension) {
     const row = metaLookup.filter(aq.escape(d => d.name === k)).objects()[0]
     const values = columnValues[k]
     const entries = values.map((d, i) => [d, i]);
@@ -61,7 +60,7 @@ function processIndicatorColumns(k, metaLookup, columnValues, id, size, role, di
     size.push(values.length);
 
     dimension[k] = {
-        label: row.titles[0],
+        label: row.titles[1],
         category: { index: Object.fromEntries(entries) }
 
     };
@@ -97,8 +96,8 @@ function processIndicatorColumns(k, metaLookup, columnValues, id, size, role, di
     }
     return { id, size, role, dimension }
 }
-function processIndicators(indicator, t, meta_data, tableSchema) {
-
+function indicatorToCube(indicator, t, meta_data, tableSchema) {
+    console.log('Processing', indicator, '........')
     // filter file-level metadata to be indicator level
     const meta_indicator = meta_data.metadata.indicators.find(d => d.code === indicator)
     // deconstruct meta_indicator:
@@ -109,21 +108,16 @@ function processIndicators(indicator, t, meta_data, tableSchema) {
         class: "dataset",
         label: label,
         note: [caveats].filter(n => n),
-        source: meta_data.metadata.source,
-        // updated: meta_data.metadata.sourceDate,
+        source: meta_data["dc:publisher"],
+        updated: meta_data["dc:modified"],
         extension: {
-            //   id: meta.id,
             //   topic: meta.topic,
             //   subTopic: meta.subTopic,
             description: longDescription,
             source: meta_data.metadata.source,
             ...restOfMetadata,
-            geography: {
-                countries: meta_data.metadata.geographyCountries,
-                groups: meta_data.metadata.geographyGroups,
-                types: meta_data.metadata.geographyTypes,
-                year: meta_data.metadata.geographyYear
-            }
+            experimentalStatistic: meta_data.experimentalStatistic,
+            geography: meta_data.metadata.geography
         }
     }
 
@@ -135,15 +129,20 @@ function processIndicators(indicator, t, meta_data, tableSchema) {
     let measures = tableSchema
         .filter(d => d.type === 'measure')
         .map(d => d.name)
-    console.log('measures: ', measures)
 
-    // pivot longer - measures to single column, values etc. to values - retain status
-    let indicatorTableLong = indicatorTable.fold(
-        measures,
-        { as: ['measure', 'value-temp'] }
-    ).rename(
-        { 'value-temp': 'value' }
-    )
+    // identify empty measures to remove (e.g. if lci and uci columns are present but all empty):
+    let emptyMeasures = measures.filter(d =>
+                indicatorTable.array(d).every(v => v == null || Number.isNaN(v)));
+
+    let indicatorTableLong = indicatorTable
+        .select(aq.not(emptyMeasures))
+        // pivot longer - measures to single column, values etc. to values - retain status:
+        .fold(
+            measures.filter(d => !emptyMeasures.includes(d)),
+            { as: ['measure', 'value-temp'] }
+        ).rename(
+            { 'value-temp': 'value' }
+        )
 
     // join unqiue periods lookup to indicator data (ensure indicator period is a string)
     let indicatorTableLong_periods = indicatorTableLong
@@ -180,7 +179,6 @@ function processIndicators(indicator, t, meta_data, tableSchema) {
         .filter(d => d.type === 'dimension')
         .map(d => d.name)
         .filter(d => !['areacd', 'period'].includes(d))
-    console.log('There are ', otherDimensions.length, 'other dimensions additional to areacd and period: ', otherDimensions)
 
     // sort by each dimension (including the newly made measure, which is a dimension)
     // age is numbers as strings, so needs sorting properly. could also use Intl.collator for this
@@ -210,9 +208,9 @@ function processIndicators(indicator, t, meta_data, tableSchema) {
 
     const metaLookup = aq.from(tableSchema)
 
-    const keys = Object.keys(columnValues).filter(k => k !== "value")
+    const keys = Object.keys(columnValues).filter(k => k !== "value" && k !== "status")
     for (const k of keys) {
-        processIndicatorColumns(k, metaLookup, columnValues, id, size, role, dimension)
+        processColumns(k, metaLookup, columnValues, id, size, role, dimension)
     }
 
     const valuesLength = size.reduce((a, b) => a * b, 1);
@@ -227,7 +225,7 @@ function processIndicators(indicator, t, meta_data, tableSchema) {
 
     return { ...dataset, id, size, role, dimension, value, status };
 }
-function toCube(file) {
+function processFile(file) {
 
     const data_file = file.replace(`${CSV_PREPROCESS_DIR}`, '')
     let indicator_data = loadCsvWithoutBom(`${CSV_PREPROCESS_DIR}${data_file}`)
@@ -243,8 +241,8 @@ function toCube(file) {
     // (name is the target title, the first value of titles is the existing column name in the csv)
     const varNames = Object.fromEntries(
         tableSchema
-        .filter(d => !suppressedCols.includes(d.titles[0])) // remove columns we are deselecting from this
-        .map(d => [d.titles[0], d.name])
+            .filter(d => !suppressedCols.includes(d.titles[0])) // remove columns we are deselecting from this
+            .map(d => [d.titles[0], d.name])
     )
 
     indicator_data = indicator_data
@@ -263,18 +261,18 @@ function toCube(file) {
 
     // split table into one table per indicator
     const indicatorTables =
-            Object.fromEntries(
-                [...new Set(indicator_data.array('indicator'))]
-                    .map(ind => [ind, indicator_data.filter(aq.escape(
-                        d => d.indicator === ind))])
-            );
+        Object.fromEntries(
+            [...new Set(indicator_data.array('indicator'))]
+                .map(ind => [ind, indicator_data.filter(aq.escape(
+                    d => d.indicator === ind))])
+        );
 
-    console.log('Indicators present in data file: ', Object.keys(indicatorTables))
+    console.log('There are ', Object.keys(indicatorTables).length, 'indicator(s) present in data file: ', Object.keys(indicatorTables))
     // define new array
     const indicatorDatasets = []
     // loop through each indicator (when more than one)
     for (const [indicator, t] of Object.entries(indicatorTables)) {
-        indicatorDatasets.push(processIndicators(indicator, t, meta_data, tableSchema))
+        indicatorDatasets.push(indicatorToCube(indicator, t, meta_data, tableSchema))
     }
     return indicatorDatasets
 
@@ -306,7 +304,7 @@ const cube = {
 };
 
 for (const file of file_paths) {
-    cube.link.item = [...cube.link.item, ...toCube(file)]
+    cube.link.item = [...cube.link.item, ...processFile(file)]
 }
 
 // console.log(cube.link.item)
