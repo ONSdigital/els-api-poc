@@ -1,7 +1,7 @@
 <script>
   import { feature } from "topojson-client";
   import { Plot, Geo } from "svelteplot";
-  import topo from "./topo.json";
+  import topo from "$lib/data/topo.json";
 
   const oldGeoCodesLookup = {
     E06000048: 'E06000057',

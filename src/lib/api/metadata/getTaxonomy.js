@@ -1,4 +1,4 @@
-import taxonomy from "$lib/taxonomy.json";
+import taxonomy from "$lib/data/taxonomy.json";
 
 function flattenTaxonomy(taxonomy) {
   return taxonomy

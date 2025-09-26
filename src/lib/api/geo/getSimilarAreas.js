@@ -1,5 +1,5 @@
-import areasClusters from "$lib/areas-clusters.json";
-import areasSimilar from "$lib/areas-similar.json";
+import areasClusters from "$lib/data/areas-clusters.json";
+import areasSimilar from "$lib/data/areas-similar.json";
 
 export default function getSimilarAreas(code) {
   const similar = areasSimilar[code];

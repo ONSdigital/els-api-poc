@@ -17,10 +17,10 @@
     NavSection,
     Divider
   } from "@onsvisual/svelte-components";
-  import metadata from "$lib/metadata.json";
-  import { geoLevels } from "$lib/geo-levels.js";
-  import measures from "$lib/measures.js";
-  import topics from "$lib/topics.js";
+  import metadata from "$lib/data/metadata.json";
+  import { geoLevels } from "$lib/config/geo-levels.js";
+  import measures from "$lib/config/measures.js";
+  import topics from "$lib/config/topics.js";
 
   const indicators = Object.values(metadata);
   const indicatorsList = [

@@ -1,6 +1,6 @@
 import { writeFileSync } from "fs";
 import { csvParse, autoType } from "d3-dsv";
-import { geoLevels } from "../src/lib/geo-levels.js";
+import { geoLevels } from "../src/lib/config/geo-levels.js";
 
 const topoUrl = "https://raw.githubusercontent.com/ONSdigital/uk-topojson/refs/heads/main/output/topo.json";
 const metaUrl = "https://raw.githubusercontent.com/ONSdigital/geo-scripts/refs/heads/main/input/lookups/lookup.csv";
@@ -26,7 +26,7 @@ function getParents(cds, rows) {
 
 // Fetch topoJSON
 const topo = await(await fetch(topoUrl)).json();
-const topoPath = `${outputDir}/topo.json`;
+const topoPath = `${outputDir}/data/topo.json`;
 writeFileSync(topoPath, JSON.stringify(topo));
 console.log(`Wrote ${topoPath}`);
 
@@ -46,6 +46,6 @@ for (const row of rows) {
   lookup[row.areacd] = obj;
 }
 
-const geoPath = `${outputDir}/geo-metadata.json`;
+const geoPath = `${outputDir}/data/geo-metadata.json`;
 writeFileSync(geoPath, JSON.stringify(lookup));
 console.log(`Wrote ${geoPath}`);

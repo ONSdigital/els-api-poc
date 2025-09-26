@@ -1,8 +1,8 @@
 import { json, error } from "@sveltejs/kit";
-import raw_data from "$lib/data.json";
-import metadata from "$lib/metadata.json";
-import { geoLevels } from "$lib/geo-levels.js";
-import topics from "$lib/topics.js";
+import raw_data from "$lib/data/data.json";
+import metadata from "$lib/data/metadata.json";
+import { geoLevels } from "$lib/config/geo-levels.js";
+import topics from "$lib/config/topics.js";
 
 const keys = ["areacd", "date", "value", "lci", "uci"];
 

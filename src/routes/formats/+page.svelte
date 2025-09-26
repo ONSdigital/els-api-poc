@@ -12,7 +12,7 @@
   import { format } from "d3-format";
   import { utcFormat } from "d3-time-format";
   import { utcYear, utcDay } from "d3-time";
-  import metadata from "$lib/metadata.json";
+  import metadata from "$lib/data/metadata.json";
 
   function formatDate(str) {
     const parts = str.split("/");

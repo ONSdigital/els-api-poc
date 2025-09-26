@@ -1,5 +1,5 @@
 import { makeAreaListFilter } from "./helpers/geoFilters.js";
-import geoMetadata from "$lib/geo-metadata.json";
+import geoMetadata from "$lib/data/geo-metadata.json";
 
 const geoArray = Object.values(geoMetadata);
 const latestYear = Math.max(...geoArray.map(d => d.start || 0));

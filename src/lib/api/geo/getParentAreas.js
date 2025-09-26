@@ -1,4 +1,4 @@
-import geoMetadata from "$lib/geo-metadata.json";
+import geoMetadata from "$lib/data/geo-metadata.json";
 
 export default function getParentAreas(code) {
   const area = geoMetadata[code];

@@ -1,9 +1,9 @@
 import { readFileSync, writeFileSync } from "fs";
 
-const data_path = "./src/lib/data.json";
-const config_path = "./src/lib/config.json";
-const output_data = "./src/lib/json-stat.json";
-const output_meta = "./src/lib/json-stat-metadata.json";
+const data_path = "./src/lib/data/data.json";
+const config_path = "./src/lib/data/config.json";
+const output_data = "./src/lib/data/json-stat.json";
+const output_meta = "./src/lib/data/json-stat-metadata.json";
 
 const columns = [
   {key: "areacd", label: "Area code", role: "geo"},

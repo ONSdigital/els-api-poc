@@ -1,4 +1,4 @@
-import rawMetadata from "$lib/json-stat-metadata.json";
+import rawMetadata from "$lib/data/json-stat-metadata.json";
 import { formatDimension } from "./helpers/formatMetadata";
 
 export default function getDimensions(params = {}) {

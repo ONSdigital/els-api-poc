@@ -1,5 +1,5 @@
-import geoMetadata from "$lib/geo-metadata.json";
-import { geoLevels, geoLevelsLookup } from "$lib/geo-levels.js";
+import geoMetadata from "$lib/data/geo-metadata.json";
+import { geoLevels, geoLevelsLookup } from "$lib/config/geo-levels.js";
 import getChildren from "./getChildren.js";
 
 export default function getSiblingAreas(params = {}) {

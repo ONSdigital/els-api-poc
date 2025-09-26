@@ -1,7 +1,7 @@
 import { json, text } from "@sveltejs/kit";
 import { csvFormat } from "d3-dsv";
-import cube from "$lib/json-stat.json";
-import { geoLevels } from "$lib/geo-levels.js";
+import cube from "$lib/data/json-stat.json";
+import { geoLevels } from "$lib/config/geo-levels.js";
 
 function ascending(a, b) {
   return a == null || b == null ? NaN : a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;

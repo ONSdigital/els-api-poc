@@ -1,4 +1,4 @@
-import rawMetadata from "$lib/json-stat-metadata.json";
+import rawMetadata from "$lib/data/json-stat-metadata.json";
 import { makeDatasetFilter } from "./helpers/datasetFilters.js";
 
 function formatMetadata(ds, includeDims = false) {

@@ -1,5 +1,5 @@
 // Functions to filter geography metadata
-import { geoLevels } from "$lib/geo-levels.js";
+import { geoLevels } from "$lib/config/geo-levels.js";
 
 export function yearFilter(item, year) {
   if (!item.start && !item.end) return true;

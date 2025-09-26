@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from "fs";
 
-const input_path = "./src/lib/metadata.json";
-const output_path = "./src/lib/taxonomy.json";
+const input_path = "./src/lib/data/metadata.json";
+const output_path = "./src/lib/data/taxonomy.json";
 
 const metadata = JSON.parse(readFileSync(input_path));
 const indicators = Object.values(metadata).map(ind => ({

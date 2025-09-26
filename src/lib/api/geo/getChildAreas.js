@@ -1,5 +1,5 @@
-import geoMetadata from "$lib/geo-metadata.json";
-import { geoLevels } from "$lib/geo-levels.js";
+import geoMetadata from "$lib/data/geo-metadata.json";
+import { geoLevels } from "$lib/config/geo-levels.js";
 
 const geoArray = Object.values(geoMetadata);
 

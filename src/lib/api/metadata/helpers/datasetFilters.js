@@ -1,5 +1,5 @@
 // Functions to filter JSON-Stat at a dataset level
-import { geoLevels } from "$lib/geo-levels.js";
+import { geoLevels } from "$lib/config/geo-levels.js";
 
 export function makeTopicFilter(topic) {
   return (ds) =>

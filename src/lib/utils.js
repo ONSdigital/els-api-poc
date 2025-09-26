@@ -1,5 +1,5 @@
 import { base } from "$app/paths";
-import metadata from "$lib/metadata.json";
+import metadata from "$lib/data/metadata.json";
 
 export function parseData(data) {
   const cols = Object.keys(data);

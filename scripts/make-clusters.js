@@ -1,8 +1,8 @@
 import { readFileSync, writeFileSync } from "fs";
 
-const config_path = "./src/lib/config.json";
-const output_clusters = "./src/lib/areas-clusters.json";
-const output_similar = "./src/lib/areas-similar.json";
+const config_path = "./src/lib/data/config.json";
+const output_clusters = "./src/lib/data/areas-clusters.json";
+const output_similar = "./src/lib/data/areas-similar.json";
 
 const config = JSON.parse(readFileSync(config_path));
 
