@@ -1,10 +1,9 @@
+import { postcodeLookupBase } from "../config.js";
+
 export default async function getPostcodeList(code) {
   const cdUpper = code.toUpperCase();
   const cdTrimmed = cdUpper.match(/[A-Z0-9]/g).join("");
-  const url = `https://ons-dp-prod-cdn.s3.eu-west-2.amazonaws.com/maptiles/postcode-lookup/v1/${cdTrimmed.slice(
-    0,
-    4
-  )}.json`;
+  const url = `${postcodeLookupBase}/${cdTrimmed.slice(0, 4)}.json`;
   const noCodesError = { error: 400, message: `Postcodes found for ${code}` };
 
   let postcodes;

@@ -4,7 +4,7 @@ export function getParam(url, key, fallback = null) {
   return param === "true" ? true :
     param === "false" ? false :
     param.includes(",") ? param.split(",") :
-    param.match(/^\d+$/) ? +param :
+    param.match(/^-?\d+(.\d+)?$/) ? +param :
     param;
 }
 
