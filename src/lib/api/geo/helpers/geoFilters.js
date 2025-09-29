@@ -1,7 +1,7 @@
 // Functions to filter geography metadata
 import { geoLevels } from "$lib/config/geo-levels.js";
 
-export function yearFilter(item, year) {
+export function geoYearFilter(item, year) {
   if (!item.start && !item.end) return true;
   if (!item.end && item.start <= year) return true;
   if (!item.start && item.end >= year) return true;
@@ -27,7 +27,7 @@ export function makeGeoFilter(param) {
 
 export function makeAreaListFilter(geo, year) {
   if (geo === "all" && year === "all") return null;
-  const yFilter = year === "all" ? () => true : yearFilter;
+  const yFilter = year === "all" ? () => true : geoYearFilter;
   const gFilter = geo === "all" ? () => true : makeGeoFilter([geo].flat());
   return (d) => yFilter(d, year) && gFilter(d);
 }
