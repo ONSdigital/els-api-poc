@@ -9,7 +9,6 @@ export default async function getAreasByLngLat(lng, lat) {
 
   try {
     const geojson = await (await fetch(url)).json();
-    console.log(geojson);
     const features = geojson.features.filter(f => pointInPolygon(point, f));
 		return features.map(f => f.properties);
   } catch {
