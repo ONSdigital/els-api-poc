@@ -1,5 +1,9 @@
 import { postcodeLookupBase } from "../config.js";
 
+function makePostcodeRow(json, i) {
+  return { areacd: json.cd[i], lng: json.lng[i], lat: json.lat[i] };
+}
+
 export default async function getPostcodesList(code) {
   const cdUpper = code.toUpperCase();
   const cdTrimmed = cdUpper.match(/[A-Z0-9]/g).join("");
@@ -7,10 +11,6 @@ export default async function getPostcodesList(code) {
   const noCodesError = { error: 400, message: `Postcodes found for ${code}` };
 
   let postcodes;
-
-  function makePostcodeRow(json, i) {
-    return { cd: json.cd[i], lng: json.lng[i], lat: json.lat[i] };
-  }
 
   try {
     const json = await (await fetch(url)).json();
