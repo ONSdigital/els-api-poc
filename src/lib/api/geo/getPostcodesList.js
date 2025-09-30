@@ -1,6 +1,6 @@
 import { postcodeLookupBase } from "../config.js";
 
-export default async function getPostcodeList(code) {
+export default async function getPostcodesList(code) {
   const cdUpper = code.toUpperCase();
   const cdTrimmed = cdUpper.match(/[A-Z0-9]/g).join("");
   const url = `${postcodeLookupBase}/${cdTrimmed.slice(0, 4)}.json`;
