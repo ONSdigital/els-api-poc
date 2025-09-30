@@ -62,3 +62,8 @@ for (const row of listRaw) {
 const listPath = `${outputDir}/data/areas-list.json`;
 writeFileSync(listPath, JSON.stringify(list));
 console.log(`Wrote ${listPath}`);
+
+const latestYear = Math.max(...rows.map(row => row.start));
+const latestYearPath = `${outputDir}/data/geo-latest-year.json`;
+writeFileSync(latestYearPath, JSON.stringify(latestYear));
+console.log(`Wrote ${latestYearPath}`);

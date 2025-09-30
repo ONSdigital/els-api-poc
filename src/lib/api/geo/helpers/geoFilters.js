@@ -33,6 +33,11 @@ export function makeGeoLevelFilter(levels) {
   return (cd) => codes.has(cd.slice(0, 3));
 }
 
+export function makeCountryFilter(countries) {
+  const codes = new Set([countries].flat());
+  return (cd) => codes.has(cd[0]);
+}
+
 export function makeAreaListFilter(geo, year) {
   if (geo === "all" && year === "all") return null;
   const yFilter = year === "all" ? () => true : geoYearFilter;
