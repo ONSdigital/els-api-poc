@@ -4,6 +4,7 @@ import { geoLevels } from "../src/lib/config/geo-levels.js";
 
 const topoUrl = "https://raw.githubusercontent.com/ONSdigital/uk-topojson/refs/heads/main/output/topo.json";
 const metaUrl = "https://raw.githubusercontent.com/ONSdigital/geo-scripts/refs/heads/main/input/lookups/lookup.csv";
+const listUrl = "https://raw.githubusercontent.com/ONSdigital/geo-scripts/refs/heads/main/output/lists/ap_places.csv";
 const outputDir = "./src/lib";
 
 const geoCodes = new Set(Object.values(geoLevels).map(g => g.codes).flat());
@@ -49,3 +50,15 @@ for (const row of rows) {
 const geoPath = `${outputDir}/data/geo-metadata.json`;
 writeFileSync(geoPath, JSON.stringify(lookup));
 console.log(`Wrote ${geoPath}`);
+
+// Make areas list
+const cols = ["areacd", "areanm", "parentcd"];
+const listRaw = csvParse(await(await fetch(listUrl)).text());
+const list = Object.fromEntries(cols.map(c => [c, []]));
+
+for (const row of listRaw) {
+  for (const col of cols) list[col].push(row[col]);
+}
+const listPath = `${outputDir}/data/areas-list.json`;
+writeFileSync(listPath, JSON.stringify(list));
+console.log(`Wrote ${listPath}`);
