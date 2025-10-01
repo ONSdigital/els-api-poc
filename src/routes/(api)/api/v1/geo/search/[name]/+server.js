@@ -1,13 +1,18 @@
 import { json } from "@sveltejs/kit";
 import { getParam } from "$lib/api/utils.js";
 import getAreasByName from "$lib/api/geo/getAreasByName.js";
+import getPostcodesList from "$lib/api/geo/getPostcodesList.js";
 
-export function GET({ url, params }) {
+export async function GET({ url, params }) {
   const name = params.name || null;
-  const geoLevel = getParam(url, "geoLevel", null);
+  const searchPostcodes = getParam(url, "searchPostcodes", false);
+  const groupByLevel = getParam(url, "groupByLevel", false);
+  const geoLevel = getParam(url, "geoLevel", "all");
 
-  const areasList = getAreasByName({name, geoLevel});
+  let areasList = getAreasByName({name, geoLevel, groupByLevel});
   if (areasList.error) error(areasList.error, areasList.message);
+
+  if (searchPostcodes && areasList.length === 0) areasList = await getPostcodesList(name);
 
   return json(areasList);
 }

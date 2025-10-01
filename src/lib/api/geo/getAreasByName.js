@@ -1,5 +1,6 @@
 import areasList from "$lib/data/areas-list.json";
 import { makeGeoLevelFilter } from "./helpers/geoFilters";
+import groupAreasByLevel from "./helpers/groupAreasByLevel";
 
 function makeAreaRow(json, i) {
   const row = { areacd: json.areacd[i], areanm: json.areanm[i] };
@@ -22,7 +23,7 @@ export default function getAreasByName(params = {}) {
   const regexStart = new RegExp(`^${str}`, "i");
   const regexWord = new RegExp(`\b${str}`, "i");
 
-  const geoLevelFilter = params.geoLevel
+  const geoLevelFilter = params.geoLevel !== "all"
     ? makeGeoLevelFilter(params.geoLevel)
     : null;
   const startFilter = geoLevelFilter
@@ -38,8 +39,10 @@ export default function getAreasByName(params = {}) {
     } else if (wordFilter(areasList.areanm[i], areasList.areacd[i])) {
       matchesWord.push(makeAreaRow(areasList, i));
     }
-    if (matchesStart.length === 10) return matchesStart;
+    if (matchesStart.length === 10) return params.groupByLevel ? groupAreasByLevel(matchesStart) : matchesStart;
   }
 
-  return [...matchesStart, ...matchesWord].slice(0, 10);
+  const matches = [...matchesStart, ...matchesWord].slice(0, 10);
+
+  return params.groupByLevel ? groupAreasByLevel(matches) : matches;
 }
