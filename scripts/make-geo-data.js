@@ -1,44 +1,50 @@
 import { writeFileSync } from "fs";
-import { csvParse, autoType } from "d3-dsv";
-import { geoLevels } from "../src/lib/config/geo-levels.js";
+import { csvParse, csvFormat, autoType } from "d3-dsv";
+import { geoLevels, geoLevelsNamed } from "../src/lib/config/geo-levels.js";
 
-const topoUrl = "https://raw.githubusercontent.com/ONSdigital/uk-topojson/refs/heads/main/output/topo.json";
-const metaUrl = "https://raw.githubusercontent.com/ONSdigital/geo-scripts/refs/heads/main/input/lookups/lookup.csv";
-const listUrl = "https://raw.githubusercontent.com/ONSdigital/geo-scripts/refs/heads/main/output/lists/ap_places.csv";
+const topoUrl =
+  "https://raw.githubusercontent.com/ONSdigital/uk-topojson/refs/heads/main/output/topo.json";
+const metaUrl =
+  "https://raw.githubusercontent.com/ONSdigital/geo-scripts/refs/heads/main/input/lookups/lookup.csv";
 const outputDir = "./src/lib";
 
-const geoCodes = new Set(Object.values(geoLevels).map(g => g.codes).flat());
+const geoCodes = new Set(
+  Object.values(geoLevels)
+    .map((g) => g.codes)
+    .flat()
+);
 
 function getLevels(cd) {
-  return Object.keys(geoLevels)
-    .filter(key => geoLevels[key].codes.includes(cd.slice(0, 3)));
+  return Object.keys(geoLevels).filter((key) =>
+    geoLevels[key].codes.includes(cd.slice(0, 3))
+  );
 }
 
 function getChildren(cd, rows) {
-  return rows.filter(row => row.parentcd === cd).map(row => row.areacd);
+  return rows.filter((row) => row.parentcd === cd).map((row) => row.areacd);
 }
 
 function getParents(cds, rows) {
   const cd = cds[cds.length - 1];
-  const row = rows.find(row => row.areacd === cd);
+  const row = rows.find((row) => row.areacd === cd);
   if (row.parentcd) return getParents([...cds, row.parentcd], rows);
   return cds;
 }
 
 // Fetch topoJSON
-const topo = await(await fetch(topoUrl)).json();
+const topo = await (await fetch(topoUrl)).json();
 const topoPath = `${outputDir}/data/topo.json`;
 writeFileSync(topoPath, JSON.stringify(topo));
 console.log(`Wrote ${topoPath}`);
 
 // Make geography lookup
-const rows = csvParse(await(await fetch(metaUrl)).text(), autoType)
-  .filter(row => geoCodes.has(row.areacd.slice(0, 3)));
+const lookupRows = csvParse(await (await fetch(metaUrl)).text(), autoType);
+const rows = lookupRows.filter((row) => geoCodes.has(row.areacd.slice(0, 3)));
 
 const lookup = {};
 for (const row of rows) {
   const obj = {};
-  for (const key of ["areacd", "areanm", "start" , "end"]) {
+  for (const key of ["areacd", "areanm", "start", "end"]) {
     if (row[key]) obj[key] = row[key];
   }
   obj.level = getLevels(row.areacd);
@@ -52,18 +58,39 @@ writeFileSync(geoPath, JSON.stringify(lookup));
 console.log(`Wrote ${geoPath}`);
 
 // Make areas list
-const cols = ["areacd", "areanm", "parentcd"];
-const listRaw = csvParse(await(await fetch(listUrl)).text());
-const list = Object.fromEntries(cols.map(c => [c, []]));
+const filterCodes = new Set(
+  Object.values(geoLevelsNamed)
+    .map((l) => l.codes)
+    .flat()
+);
+const includeParent = new Set(Object.keys(geoLevelsNamed)).difference(
+  new Set(Object.keys(geoLevels))
+);
+const arrayKeys = ["areacd", "areanm", "parentcd"];
+const objectKeys = ["start", "end"];
+const listRaw = lookupRows.filter((row) =>
+  filterCodes.has(row.areacd.slice(0, 3))
+);
+const list = {};
+for (const key of arrayKeys) list[key] = [];
+for (const key of objectKeys) list[key] = {};
 
-for (const row of listRaw) {
-  for (const col of cols) list[col].push(row[col]);
+for (let i = 0; i < listRaw.length; i++) {
+  const row = listRaw[i];
+  for (const key of arrayKeys) {
+    if (key !== "parentcd" || includeParent.has(row.areacd.slice(0, 3)))
+      list[key].push(row[key]);
+    else list[key].push(null);
+  }
+  for (const key of objectKeys) {
+    if (row[key]) list[key][i] = row[key];
+  }
 }
 const listPath = `${outputDir}/data/areas-list.json`;
 writeFileSync(listPath, JSON.stringify(list));
 console.log(`Wrote ${listPath}`);
 
-const latestYear = Math.max(...rows.map(row => row.start));
+const latestYear = Math.max(...rows.map((row) => row.start));
 const latestYearPath = `${outputDir}/data/geo-latest-year.json`;
 writeFileSync(latestYearPath, JSON.stringify(latestYear));
 console.log(`Wrote ${latestYearPath}`);

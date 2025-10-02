@@ -1,11 +1,19 @@
 import areasList from "$lib/data/areas-list.json";
-import { makeGeoLevelFilter } from "./helpers/geoFilters";
+import { makeGeoLevelFilter, geoYearFilter } from "./helpers/geoFilters";
 import groupAreasByLevel from "./helpers/groupAreasByLevel";
+import geoLatestYear from "$lib/data/geo-latest-year.json";
 
 function makeAreaRow(json, i) {
   const row = { areacd: json.areacd[i], areanm: json.areanm[i] };
   if (json.parentcd[i]) row.parentcd = json.parentcd[i];
   return row;
+}
+
+function makeCombinedFilter(name, geo, year) {
+  if (!geo && !year) return (d, i) => name(d.areanm[i]);
+  if (!geo && year) return (d, i) => name(d.areanm[i]) && year({start: d.start[i], end: d.end[i]});
+  if (geo && !year) return (d, i) => name(d.areanm[i]) && geo(d.areacd[i]);
+  return (d, i) => name(d.areanm[i]) && geo(d.areacd[i]) && year({start: d.start[i], end: d.end[i]});
 }
 
 export default function getAreasByName(params = {}) {
@@ -19,6 +27,7 @@ export default function getAreasByName(params = {}) {
     .join(""); // Strip out special characters
 
   const limit = params.limit || 10;
+  const year = params.year === "latest" ? geoLatestYear : params.year === "all" ? null : params.year;
   const matchesStart = [];
   const matchesWord = [];
   const regexStart = new RegExp(`^${str}`, "i");
@@ -27,17 +36,14 @@ export default function getAreasByName(params = {}) {
   const geoLevelFilter = params.geoLevel !== "all"
     ? makeGeoLevelFilter(params.geoLevel)
     : null;
-  const startFilter = geoLevelFilter
-    ? (nm, cd) => nm.match(regexStart) && geoLevelFilter(cd)
-    : (nm) => nm.match(regexStart);
-  const wordFilter = geoLevelFilter
-    ? (nm, cd) => nm.match(regexWord) && geoLevelFilter(cd)
-    : (nm) => nm.match(regexWord);
+  const yearFilter = year ? (area) => geoYearFilter(area, year) : null;
+  const startFilter = makeCombinedFilter((nm) => nm.match(regexStart), geoLevelFilter, yearFilter);
+  const wordFilter = makeCombinedFilter((nm) => nm.match(regexWord), geoLevelFilter, yearFilter);
 
   for (let i = 0; i < areasList.areanm.length; i++) {
-    if (startFilter(areasList.areanm[i], areasList.areacd[i])) {
+    if (startFilter(areasList, i)) {
       matchesStart.push(makeAreaRow(areasList, i));
-    } else if (wordFilter(areasList.areanm[i], areasList.areacd[i])) {
+    } else if (wordFilter(areasList, i)) {
       matchesWord.push(makeAreaRow(areasList, i));
     }
     if (matchesStart.length === limit) return params.groupByLevel ? groupAreasByLevel(matchesStart) : matchesStart;

@@ -4,6 +4,7 @@ export async function getAreasByPostcode(params = {}) {
   const areas = await getAreasByLngLat({
     lng: params.postcode.lng,
     lat: params.postcode.lat,
+    year: params.year,
     groupByLevel: params.groupByLevel
   });
 
