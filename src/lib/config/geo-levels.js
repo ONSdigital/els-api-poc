@@ -31,7 +31,7 @@ export const geoLevelsOtherNamed = {
     codes: ["E05", "W05"]
   },
   par: {
-    label: "Civil parish",
+    label: "Parishes/communities",
 		codes: ["E04", "W04"]
   },
   sener: {

@@ -4,16 +4,21 @@ function makePostcodeRow(json, i) {
   return { areacd: json.cd[i], lng: json.lng[i], lat: json.lat[i] };
 }
 
-export default async function getPostcodesList(code) {
-  const cdUpper = code.toUpperCase();
+export default async function getPostcodesList(params = {}) {
+  const cdUpper = params.code.toUpperCase();
   const cdTrimmed = cdUpper.match(/[A-Z0-9]/g).join("");
   const url = `${postcodeLookupBase}/${cdTrimmed.slice(0, 4)}.json`;
-  const noCodesError = { error: 400, message: `Postcodes found for ${code}` };
+  const noCodesError = {
+    error: 400,
+    message: `Postcodes found for ${params.code}`,
+  };
 
   let postcodes;
 
   try {
     const json = await (await fetch(url)).json();
+
+    const limit = params.limit || 10;
     const matches = [];
     const partialMatches = [];
 
@@ -25,9 +30,9 @@ export default async function getPostcodesList(code) {
       ) {
         partialMatches.push(makePostcodeRow(json, i));
       }
-      if (matches.length === 10) return matches;
+      if (matches.length === limit) return matches;
     }
-    postcodes = [...matches, ...partialMatches].slice(0, 10);
+    postcodes = [...matches, ...partialMatches].slice(0, limit);
   } catch {
     return noCodesError;
   }

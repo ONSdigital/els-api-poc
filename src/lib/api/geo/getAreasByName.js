@@ -18,6 +18,7 @@ export default function getAreasByName(params = {}) {
     .match(/[a-z'\.\-\s]/g)
     .join(""); // Strip out special characters
 
+  const limit = params.limit || 10;
   const matchesStart = [];
   const matchesWord = [];
   const regexStart = new RegExp(`^${str}`, "i");
@@ -39,10 +40,10 @@ export default function getAreasByName(params = {}) {
     } else if (wordFilter(areasList.areanm[i], areasList.areacd[i])) {
       matchesWord.push(makeAreaRow(areasList, i));
     }
-    if (matchesStart.length === 10) return params.groupByLevel ? groupAreasByLevel(matchesStart) : matchesStart;
+    if (matchesStart.length === limit) return params.groupByLevel ? groupAreasByLevel(matchesStart) : matchesStart;
   }
 
-  const matches = [...matchesStart, ...matchesWord].slice(0, 10);
+  const matches = [...matchesStart, ...matchesWord].slice(0, limit);
 
   return params.groupByLevel ? groupAreasByLevel(matches) : matches;
 }
