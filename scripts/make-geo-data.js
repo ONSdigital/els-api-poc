@@ -63,8 +63,10 @@ const filterCodes = new Set(
     .map((l) => l.codes)
     .flat()
 );
-const includeParent = new Set(Object.keys(geoLevelsNamed)).difference(
-  new Set(Object.keys(geoLevels))
+const includeParent = new Set(
+  ["wd", "par"].map(key => geoLevelsNamed[key])
+    .map((l) => l.codes)
+    .flat()
 );
 const arrayKeys = ["areacd", "areanm", "parentcd"];
 const objectKeys = ["start", "end"];

@@ -2,10 +2,11 @@ import areasList from "$lib/data/areas-list.json";
 import { makeGeoLevelFilter, geoYearFilter } from "./helpers/geoFilters";
 import groupAreasByLevel from "./helpers/groupAreasByLevel";
 import geoLatestYear from "$lib/data/geo-latest-year.json";
+import geoMetadata from "$lib/data/geo-metadata.json";
 
 function makeAreaRow(json, i) {
   const row = { areacd: json.areacd[i], areanm: json.areanm[i] };
-  if (json.parentcd[i]) row.parentcd = json.parentcd[i];
+  if (json.parentcd[i]) row.parentnm = geoMetadata?.[json.parentcd[i]]?.areanm;
   return row;
 }
 
