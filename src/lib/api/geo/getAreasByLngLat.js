@@ -2,7 +2,7 @@ import { pointToTile } from "@mapbox/tilebelt";
 import pointInPolygon from "@turf/boolean-point-in-polygon";
 import { areaTilesBase } from "../config.js";
 import groupAreasByLevel from "./helpers/groupAreasByLevel.js";
-import { geoYearFilter } from "./helpers/geoFilters.js";
+import { geoYearFilter, makeGeoLevelFilter } from "./helpers/geoFilters.js";
 import geoLatestYear from "$lib/data/geo-latest-year.json";
 
 function makeArea(props) {
@@ -16,10 +16,11 @@ export default async function getAreasByLngLat(params = {}) {
 
   const year = params.year === "latest" ? geoLatestYear : params.year === "all" ? null : params.year;
   const yearFilter = year ? (area) => geoYearFilter(area, year) : () => true;
+  const geoFilter = params.geoLevel !== "all" ? makeGeoLevelFilter(params.geoLevel) : () => true;
 
   try {
     const geojson = await (await fetch(url)).json();
-    const features = geojson.features.filter(f => pointInPolygon(point, f) && yearFilter(f.properties));
+    const features = geojson.features.filter(f => pointInPolygon(point, f) && yearFilter(f.properties) && geoFilter(f.properties.areacd));
 		const areas = features.map(f => makeArea(f.properties));
     return params.groupByLevel ? groupAreasByLevel(areas) : areas;
   } catch {

@@ -5,6 +5,7 @@ export async function getAreasByPostcode(params = {}) {
     lng: params.postcode.lng,
     lat: params.postcode.lat,
     year: params.year,
+    geoLevel: params.geoLevel,
     groupByLevel: params.groupByLevel
   });
 
