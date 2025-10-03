@@ -1,3 +1,4 @@
+import { isValidPartialPostcode } from "$lib/api/utils.js";
 import { postcodeLookupBase } from "../config.js";
 
 function makePostcodeRow(json, i) {
@@ -5,12 +6,15 @@ function makePostcodeRow(json, i) {
 }
 
 export default async function getPostcodesList(params = {}) {
-  const cdUpper = params.code.toUpperCase();
+  const cdUpper = params?.code?.toUpperCase();
+  if (!isValidPartialPostcode(cdUpper))
+    return { error: 400, message: `${params.code} is not a valid partial postcode.` };
+
   const cdTrimmed = cdUpper.match(/[A-Z0-9]/g).join("");
   const url = `${postcodeLookupBase}/${cdTrimmed.slice(0, 4)}.json`;
   const noCodesError = {
     error: 400,
-    message: `Postcodes found for ${params.code}`,
+    message: `No postcodes found for ${params.code}`,
   };
 
   let postcodes;

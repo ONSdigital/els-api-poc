@@ -21,7 +21,7 @@ export function isValidPostcode(code) {
 }
 
 export function isValidPartialPostcode(code) {
-  return !!code.match(/^[A-Z]{1,2}\d{0,2}/);
+  return code.match(/^[A-Z0-9\s]*$/) && code.match(/^[A-Z]{1,2}\d{0,2}/);
 }
 
 export function isValidLngLat(lng, lat) {

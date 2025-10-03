@@ -1,7 +1,12 @@
 import { postcodeLookupBase } from "../config.js";
+import { isValidPostcode } from "../utils.js";
 
 export default async function getPostcode(code) {
-  const cdBare = code.toUpperCase().match(/[A-Z0-9]/g).join("");
+  const cdUpper = code.toUpperCase();
+  if (!isValidPostcode(cdUpper))
+      return {error: 400, message: `${code} is not a valid postcode`};
+
+  const cdBare = cdUpper.match(/[A-Z0-9]/g).join("");
   const url = `${postcodeLookupBase}/${cdBare.slice(0, 4)}.json`;
   const noCodesError = { error: 400, message: `Postcode ${code} not found` };
 

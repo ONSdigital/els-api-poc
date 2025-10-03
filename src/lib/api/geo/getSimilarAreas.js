@@ -1,13 +1,18 @@
 import areasClusters from "$lib/data/areas-clusters.json";
 import areasSimilar from "$lib/data/areas-similar.json";
+import { isValidAreaCode } from "../utils.js";
 
 export default function getSimilarAreas(code) {
-  const similar = areasSimilar[code];
-  if (!similar) return null;
+  const cdUpper = code?.toUpperCase();
+  if (!isValidAreaCode(cdUpper))
+    return { error: 400, message: `${code} is not a valid GSS code.` };
+
+  const similar = areasSimilar[cdUpper];
+  if (!similar) return { error: 400, message: `No similar areas for ${code}` };
 
   const clusters = [];
   const clusterTypes = areasClusters.types;
-  const clusterLookup = areasClusters.lookup[code];
+  const clusterLookup = areasClusters.lookup[cdUpper];
   
   for (const type of clusterTypes) {
     const obj = {
