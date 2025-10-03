@@ -3,8 +3,8 @@ import { getParam } from "$lib/api/utils.js";
 import getAreasByLngLat from "$lib/api/geo/getAreasByLngLat.js";
 
 export async function GET({ url }) {
-  const lng = getParam(url, "lng", null);
-  const lat = getParam(url, "lat", null);
+  const lng = getParam(url, "lng", undefined);
+  const lat = getParam(url, "lat", undefined);
   const year = getParam(url, "year", "latest");
   const geoLevel = getParam(url, "geoLevel", "all");
   const groupByLevel = getParam(url, "groupByLevel", false);

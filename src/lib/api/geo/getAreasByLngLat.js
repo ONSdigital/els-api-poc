@@ -1,6 +1,7 @@
 import { pointToTile } from "@mapbox/tilebelt";
 import pointInPolygon from "@turf/boolean-point-in-polygon";
 import { areaTilesBase } from "../config.js";
+import { isValidLngLat } from "../utils.js";
 import groupAreasByLevel from "./helpers/groupAreasByLevel.js";
 import { geoYearFilter, makeGeoLevelFilter } from "./helpers/geoFilters.js";
 import geoLatestYear from "$lib/data/geo-latest-year.json";
@@ -10,6 +11,8 @@ function makeArea(props) {
 }
 
 export default async function getAreasByLngLat(params = {}) {
+  if (!isValidLngLat(params.lng, params.lat)) return {error: 400, message: "Invalid lng/lat coordinates."}
+
   const tile = pointToTile(params.lng, params.lat, 12);
   const point = {type: "Point", coordinates: [params.lng, params.lat]};
   const url = `${areaTilesBase}/${tile[0]}/${tile[1]}.json`;
