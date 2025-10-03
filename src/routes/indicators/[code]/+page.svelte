@@ -6,7 +6,6 @@
     Breadcrumb,
     Section,
     Footer,
-    Divider,
     NavSections,
     NavSection,
     LazyLoad

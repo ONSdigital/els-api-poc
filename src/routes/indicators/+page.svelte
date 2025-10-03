@@ -7,6 +7,7 @@
     Section,
     NavSections,
     NavSection,
+    Divider,
     Footer,
   } from "@onsvisual/svelte-components";
 
@@ -30,7 +31,7 @@
   </p>
 {/snippet}
 
-<NavSections>
+<NavSections cls="nav-sections">
   {#each data.taxonomy as theme}
     <NavSection title={theme.label} id={theme.key}>
       {#each theme.children as child}
@@ -50,8 +51,9 @@
 <Footer compact />
 
 <style>
-  :global(.ons-input) {
-    color: #707070;
-    margin-bottom: 10px;
+  :global(.nav-sections section + section) {
+    border-top: 1px solid #ddd;
+    margin-top: 1.5em;
+    padding-top: 1em;
   }
 </style>
