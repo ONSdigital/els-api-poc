@@ -17,7 +17,7 @@ function formatMetadata(ds, includeDims = false) {
 
 export default function getIndicators(params = {}) {
   if (params.indicator) {
-    const indicator = rawMetadata.link.item.find(ds => ds.extension.slug === indicatorSlug);
+    const indicator = rawMetadata.link.item.find(ds => ds.extension.slug === params.indicator);
     if (!indicator) return {error: "Invalid indicator code"};
     return formatMetadata(indicator, params.includeDims);
   }
