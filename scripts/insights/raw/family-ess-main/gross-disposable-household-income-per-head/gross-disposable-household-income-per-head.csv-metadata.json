@@ -1,0 +1,216 @@
+{
+  "@context": [
+    "http://www.w3.org/ns/csvw",
+    {
+      "@language": "en"
+    }
+  ],
+  "dc:title": "Gross disposable household income per head",
+  "dc:publisher": "Office for National Statistics",
+  "dc:issued": "2024-09-04",
+  "dc:modified": "2025-06-17",
+  "tables": [
+    {
+      "url": "gross-disposable-household-income-per-head.csv",
+      "tableSchema": {
+        "columns": [
+          {
+            "name": "areacd",
+            "titles": [
+              "AREACD",
+              "Area code"
+            ],
+            "datatype": "string",
+            "type": "dimension",
+            "role": "geo"
+          },
+          {
+            "titles": [
+              "AREANM",
+              "Area name"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "Geography",
+              "Geography type"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "Variable Name",
+              "Variable name"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "name": "indicator",
+            "titles": [
+              "Indicator"
+            ],
+            "datatype": "string",
+            "type": "indicator"
+          },
+          {
+            "name": "period",
+            "titles": [
+              "Period",
+              "Time period"
+            ],
+            "datatype": "date",
+            "type": "dimension",
+            "role": "time"
+          },
+          {
+            "name": "value",
+            "titles": [
+              "Observation",
+              "Observation value"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "measure",
+            "titles": [
+              "Measure"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "name": "unit",
+            "titles": [
+              "Unit"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "name": "lci",
+            "titles": [
+              "Lower Confidence Interval (95%)",
+              "Lower confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "uci",
+            "titles": [
+              "Upper Confidence Interval (95%)",
+              "Upper confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "status",
+            "titles": [
+              "Observation Status",
+              "Observation status"
+            ],
+            "datatype": "string",
+            "type": "status"
+          },
+          {
+            "name": "polarity",
+            "titles": [
+              "Polarity"
+            ],
+            "datatype": "number",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "Notes"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "source": [
+      {
+        "name": "Office for National Statistics",
+        "href": "https://www.ons.gov.uk/economy/regionalaccounts/grossdisposablehouseholdincome/bulletins/regionalgrossdisposablehouseholdincomegdhi/previousReleases",
+        "date": "2024-09-04"
+      }
+    ],
+    "experimentalStatistic": false,
+    "geography": {
+      "countries": [
+        "E",
+        "N",
+        "S",
+        "W"
+      ],
+      "levels": [
+        "uk",
+        "ctry",
+        "rgn",
+        "cauth",
+        "utla",
+        "ltla"
+      ],
+      "types": [
+        "E06",
+        "E07",
+        "E08",
+        "E09",
+        "E10",
+        "E12",
+        "E13",
+        "E47",
+        "E61",
+        "E92",
+        "K02",
+        "K03",
+        "K04",
+        "N09",
+        "N34",
+        "N92",
+        "S12",
+        "S92",
+        "W06",
+        "W42",
+        "W92"
+      ],
+      "year": 2024,
+      "initialLevel": "ltla"
+    },
+    "indicators": [
+      {
+        "code": "Gross disposable household income",
+        "slug": "gross-disposable-household-income-per-head",
+        "dataset": "gross-disposable-household-income-per-head",
+        "label": "Gross disposable household income",
+        "prefix": "GBPSign",
+        "suffix": null,
+        "subText": null,
+        "decimalPlaces": 0,
+        "standardised": true,
+        "subtitle": "Average income per person (£) after taxes and direct benefits",
+        "longDescription": "This indicator shows an estimate of the amount of money each individual within a household has available for spending or saving after they have paid taxes and received any direct benefits, in pounds, in the UK, for 1997 to 2022.",
+        "caveats": "Figures for 2022 are provisional, as national estimates have not been through supply and use balancing at the time of the data source publication.",
+        "confidenceIntervals": true,
+        "canBeNegative": false,
+        "zeroBaseline": true,
+        "measure": "Pounds",
+        "unit": "£",
+        "polarity": 1
+      }
+    ]
+  }
+}

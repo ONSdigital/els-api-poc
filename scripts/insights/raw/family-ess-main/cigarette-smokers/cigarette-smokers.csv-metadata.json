@@ -1,0 +1,208 @@
+{
+  "@context": [
+    "http://www.w3.org/ns/csvw",
+    {
+      "@language": "en"
+    }
+  ],
+  "dc:title": "Cigarette smokers",
+  "dc:publisher": "Office for National Statistics",
+  "dc:issued": "2024-10-01",
+  "dc:modified": "2024-10-10",
+  "tables": [
+    {
+      "url": "cigarette-smokers.csv",
+      "tableSchema": {
+        "columns": [
+          {
+            "name": "areacd",
+            "titles": [
+              "AREACD",
+              "Area code"
+            ],
+            "datatype": "string",
+            "type": "dimension",
+            "role": "geo"
+          },
+          {
+            "titles": [
+              "AREANM",
+              "Area name"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "Geography",
+              "Geography type"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "Variable Name",
+              "Variable name"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "name": "indicator",
+            "titles": [
+              "Indicator"
+            ],
+            "datatype": "string",
+            "type": "indicator"
+          },
+          {
+            "name": "period",
+            "titles": [
+              "Period",
+              "Time period"
+            ],
+            "datatype": "date",
+            "type": "dimension",
+            "role": "time"
+          },
+          {
+            "name": "value",
+            "titles": [
+              "Observation",
+              "Observation value"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "measure",
+            "titles": [
+              "Measure"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "name": "unit",
+            "titles": [
+              "Unit"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "name": "lci",
+            "titles": [
+              "Lower Confidence Interval (95%)",
+              "Lower confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "uci",
+            "titles": [
+              "Upper Confidence Interval (95%)",
+              "Upper confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "status",
+            "titles": [
+              "Observation Status",
+              "Observation status"
+            ],
+            "datatype": "string",
+            "type": "status"
+          },
+          {
+            "name": "polarity",
+            "titles": [
+              "Polarity"
+            ],
+            "datatype": "number",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "Notes"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "source": [
+      {
+        "name": "Office for National Statistics",
+        "href": "https://www.ons.gov.uk/peoplepopulationandcommunity/healthandsocialcare/healthandlifeexpectancies/datasets/smokinghabitsintheukanditsconstituentcountries",
+        "date": "2024-10-01"
+      }
+    ],
+    "experimentalStatistic": false,
+    "geography": {
+      "countries": [
+        "E",
+        "N",
+        "S",
+        "W"
+      ],
+      "levels": [
+        "uk",
+        "ctry",
+        "rgn",
+        "utla",
+        "ltla"
+      ],
+      "types": [
+        "E06",
+        "E07",
+        "E08",
+        "E09",
+        "E10",
+        "E12",
+        "E92",
+        "K02",
+        "N09",
+        "N92",
+        "S12",
+        "S92",
+        "W06",
+        "W92"
+      ],
+      "year": 2019,
+      "initialLevel": "ltla"
+    },
+    "indicators": [
+      {
+        "code": "Cigarette smokers",
+        "slug": "cigarette-smokers",
+        "dataset": "cigarette-smokers",
+        "label": "Cigarette smokers",
+        "prefix": null,
+        "suffix": "%",
+        "subText": null,
+        "decimalPlaces": 1,
+        "standardised": true,
+        "subtitle": "Percentage of people aged 18 and over who state they currently smoke cigarettes (excluding e-cigarettes)",
+        "longDescription": "This indicator shows the percentage of adults (18+) who state they currently smoke cigarettes (excluding e-cigarettes), in the United Kingdom, for 2012 to 2023.",
+        "caveats": "To improve the comparability of smoking prevalence estimates for 2020 and subsequent years, the weighting methodology has been improved to remove the effect of the change in method of data collection between 2019 and 2020. For more information please refer to the [Adult smoking habits in the UK methodology page.](https://www.ons.gov.uk/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/methodologies/adultsmokinghabitsintheukmethodology)\n\nNorthern Ireland local authority smoking prevalence estimates are not available before 2015.",
+        "confidenceIntervals": true,
+        "canBeNegative": false,
+        "zeroBaseline": true,
+        "measure": "Percentage",
+        "unit": "%",
+        "polarity": -1
+      }
+    ]
+  }
+}

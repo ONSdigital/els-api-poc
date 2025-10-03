@@ -1,0 +1,197 @@
+{
+  "@context": [
+    "http://www.w3.org/ns/csvw",
+    {
+      "@language": "en"
+    }
+  ],
+  "dc:title": "Mortality rate from coronary heart disease or cerebrovascular disease (Scotland)",
+  "dc:publisher": "Public Health Scotland Cardiac Audit Programme, Public Health Scotland Stroke statistics",
+  "dc:issued": "2025-01-28",
+  "dc:modified": "2025-02-21",
+  "tables": [
+    {
+      "url": "mortality-rate-from-coronary-heart-disease-scotland.csv",
+      "tableSchema": {
+        "columns": [
+          {
+            "name": "areacd",
+            "titles": [
+              "AREACD",
+              "Area code"
+            ],
+            "datatype": "string",
+            "type": "dimension",
+            "role": "geo"
+          },
+          {
+            "titles": [
+              "AREANM",
+              "Area name"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "Geography",
+              "Geography type"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "Variable Name",
+              "Variable name"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "name": "indicator",
+            "titles": [
+              "Indicator"
+            ],
+            "datatype": "string",
+            "type": "indicator"
+          },
+          {
+            "name": "period",
+            "titles": [
+              "Period",
+              "Time period"
+            ],
+            "datatype": "date",
+            "type": "dimension",
+            "role": "time"
+          },
+          {
+            "name": "value",
+            "titles": [
+              "Observation",
+              "Observation value"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "measure",
+            "titles": [
+              "Measure"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "name": "unit",
+            "titles": [
+              "Unit"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "name": "lci",
+            "titles": [
+              "Lower Confidence Interval (95%)",
+              "Lower confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "uci",
+            "titles": [
+              "Upper Confidence Interval (95%)",
+              "Upper confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "status",
+            "titles": [
+              "Observation Status",
+              "Observation status"
+            ],
+            "datatype": "string",
+            "type": "status"
+          },
+          {
+            "name": "polarity",
+            "titles": [
+              "Polarity"
+            ],
+            "datatype": "number",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "Notes"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "source": [
+      {
+        "name": "Public Health Scotland Cardiac Audit Programme",
+        "href": "https://publichealthscotland.scot/publications/show-all-releases?id=114742",
+        "date": "2024-10-29"
+      },
+      {
+        "name": "Public Health Scotland Stroke statistics",
+        "href": "https://publichealthscotland.scot/publications/show-all-releases?id=20500",
+        "date": "2025-01-28"
+      }
+    ],
+    "experimentalStatistic": false,
+    "geography": {
+      "countries": [
+        "S"
+      ],
+      "levels": [
+        "ctry",
+        "rgn",
+        "utla",
+        "ltla"
+      ],
+      "types": [
+        "S12",
+        "S92"
+      ],
+      "year": 2025,
+      "initialLevel": "ltla"
+    },
+    "indicators": [
+      {
+        "code": "Under 75 mortality rate from coronary heart disease or cerebrovascular disease (per 100,000 population) (Scotland)",
+        "slug": "mortality-rate-from-coronary-heart-disease-scotland",
+        "dataset": "mortality-rate-from-coronary-heart-disease-scotland",
+        "label": "Mortality rate from coronary heart disease or cerebrovascular disease (Scotland)",
+        "prefix": null,
+        "suffix": null,
+        "subText": "per 100,000 population",
+        "decimalPlaces": 1,
+        "standardised": true,
+        "subtitle": "Age-standardised mortality rate from coronary heart disease or cerebrovascular disease for people aged under 75, per 100,000 people",
+        "longDescription": "This indicator shows the age-standardised mortality rate from coronary heart disease or cerebrovascular disease for those aged under 75 per 100,000 population, in Scotland, for 2001 to 2023.",
+        "caveats": "Data are based on year of death registration.\n\nData relate to all deaths that occurred in Scotland. This includes those who are resident outwith Scotland, those with no fixed abode and those with unknown residence.\n\nData includes underlying cause of death from coronary heart disease (ICD-10 code I20-I25) or cerebrovascular disease (ICD-10 code I60-I69).\n\nAge standardised rates calculated using the direct method, standardised to the 2013 European Standard Population (ESP2013). National Records of Scotland Population Estimates were used in the calculation of the crude and standardised rates.",
+        "confidenceIntervals": true,
+        "canBeNegative": false,
+        "zeroBaseline": true,
+        "measure": "Rate per 100,000 population",
+        "unit": "Rate per 100,000 population",
+        "polarity": -1
+      }
+    ]
+  }
+}

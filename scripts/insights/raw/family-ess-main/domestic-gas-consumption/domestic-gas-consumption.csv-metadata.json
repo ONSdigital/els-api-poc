@@ -1,0 +1,205 @@
+{
+  "@context": [
+    "http://www.w3.org/ns/csvw",
+    {
+      "@language": "en"
+    }
+  ],
+  "dc:title": "Domestic gas consumption",
+  "dc:publisher": "Department for Energy Security and Net Zero",
+  "dc:issued": "2024-12-19",
+  "dc:modified": "2025-04-03",
+  "tables": [
+    {
+      "url": "domestic-gas-consumption.csv",
+      "tableSchema": {
+        "columns": [
+          {
+            "name": "areacd",
+            "titles": [
+              "AREACD",
+              "Area code"
+            ],
+            "datatype": "string",
+            "type": "dimension",
+            "role": "geo"
+          },
+          {
+            "titles": [
+              "AREANM",
+              "Area name"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "Geography",
+              "Geography type"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "Variable Name",
+              "Variable name"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "name": "indicator",
+            "titles": [
+              "Indicator"
+            ],
+            "datatype": "string",
+            "type": "indicator"
+          },
+          {
+            "name": "period",
+            "titles": [
+              "Period",
+              "Time period"
+            ],
+            "datatype": "date",
+            "type": "dimension",
+            "role": "time"
+          },
+          {
+            "name": "value",
+            "titles": [
+              "Observation",
+              "Observation value"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "measure",
+            "titles": [
+              "Measure"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "name": "unit",
+            "titles": [
+              "Unit"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "name": "lci",
+            "titles": [
+              "Lower Confidence Interval (95%)",
+              "Lower confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "uci",
+            "titles": [
+              "Upper Confidence Interval (95%)",
+              "Upper confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "status",
+            "titles": [
+              "Observation Status",
+              "Observation status"
+            ],
+            "datatype": "string",
+            "type": "status"
+          },
+          {
+            "name": "polarity",
+            "titles": [
+              "Polarity"
+            ],
+            "datatype": "number",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "Notes"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "source": [
+      {
+        "name": "Department for Energy Security and Net Zero",
+        "href": "https://www.gov.uk/government/collections/sub-national-gas-consumption-data",
+        "date": "2024-12-19"
+      }
+    ],
+    "experimentalStatistic": false,
+    "geography": {
+      "countries": [
+        "E",
+        "S",
+        "W"
+      ],
+      "levels": [
+        "ctry",
+        "rgn",
+        "utla",
+        "ltla"
+      ],
+      "types": [
+        "E06",
+        "E07",
+        "E08",
+        "E09",
+        "E12",
+        "E13",
+        "E92",
+        "K03",
+        "K04",
+        "S12",
+        "S92",
+        "W06",
+        "W92"
+      ],
+      "year": 2017,
+      "initialLevel": "ltla"
+    },
+    "indicators": [
+      {
+        "code": "Gas consumption",
+        "slug": "domestic-gas-consumption",
+        "dataset": "domestic-gas-consumption",
+        "label": "Domestic gas consumption",
+        "prefix": null,
+        "suffix": null,
+        "subText": "kWh",
+        "decimalPlaces": 1,
+        "standardised": true,
+        "subtitle": "Median domestic gas consumption (kWh)",
+        "longDescription": "This indicator shows median domestic gas consumption (kWh), in Great Britain, for 2012 to 2023.",
+        "caveats": "These figures are based on meter level gas consumption data. Those meters with an annual consumption less than 73,200 kWh are classified as domestic meters. This means that some small industrial and commercial consumers will be classified as domestic.\n\nThese estimates are weather-corrected. This means that the effect of differences in weather conditions between years has been removed to provide more like for like comparisons over time.\n\nThe precise time periods covered by different years of data differ:\n- Prior to 2015: October – September (same period as 2015)\n- 2015: October 2014 – September 2015\n- 2016: mid-July 2016 – mid-July 2017\n- 2017: mid-June 2017 – mid-June 2018\n- 2018: mid-May 2018 – mid-May 2019\n- 2019 onwards: same pattern as 2018",
+        "confidenceIntervals": true,
+        "canBeNegative": false,
+        "zeroBaseline": true,
+        "measure": "Median domestic gas consumption",
+        "unit": "kWh",
+        "polarity": 1
+      }
+    ]
+  }
+}

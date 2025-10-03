@@ -1,0 +1,177 @@
+{
+  "@context": [
+    "http://www.w3.org/ns/csvw",
+    {
+      "@language": "en"
+    }
+  ],
+  "dc:title": "Travel time to employment centres by mode of travel",
+  "dc:publisher": "Department for Transport",
+  "dc:issued": "2021-11-04",
+  "dc:modified": "2024-10-01",
+  "tables": [
+    {
+      "url": "average-travel-time.csv",
+      "tableSchema": {
+        "columns": [
+          {
+            "name": "areacd",
+            "titles": [
+              "areacd",
+              "Area code"
+            ],
+            "datatype": "string",
+            "type": "dimension",
+            "role": "geo"
+          },
+          {
+            "titles": [
+              "areanm",
+              "Area name"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "geography",
+              "Geography type"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "name": "period",
+            "titles": [
+              "period",
+              "Time period"
+            ],
+            "datatype": "date",
+            "type": "dimension",
+            "role": "time"
+          },
+          {
+            "name": "value",
+            "titles": [
+              "observation",
+              "Observation value"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "lci",
+            "titles": [
+              "lower_confidence_interval_95",
+              "Lower confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "uci",
+            "titles": [
+              "upper_confidence_interval_95",
+              "Upper confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "status",
+            "titles": [
+              "observation_status",
+              "Observation status"
+            ],
+            "datatype": "string",
+            "type": "status"
+          },
+          {
+            "name": "indicator",
+            "titles": [
+              "mode-of-travel",
+              "Indicator"
+            ],
+            "datatype": "string",
+            "type": "indicator"
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "source": [
+      {
+        "name": "Department for Transport",
+        "href": "https://www.gov.uk/government/statistical-data-sets/journey-time-statistics-data-tables-jts",
+        "date": "2021-11-04"
+      }
+    ],
+    "experimentalStatistic": true,
+    "geography": {
+      "countries": [
+        "E"
+      ],
+      "levels": [
+        "ctry",
+        "rgn",
+        "utla",
+        "ltla"
+      ],
+      "types": [
+        "E06",
+        "E07",
+        "E08",
+        "E09",
+        "E10",
+        "E11",
+        "E12",
+        "E13",
+        "E92"
+      ],
+      "year": 2018,
+      "initialLevel": "ltla"
+    },
+    "indicators": [
+      {
+        "code": "cycling",
+        "slug": "cycling",
+        "dataset": "average-travel-time",
+        "label": "Travel time to employment centre by bicycle",
+        "standardised": false,
+        "subtitle": "Average travel time in minutes to nearest employment centre with 500+ jobs available",
+        "longDescription": "This indicator shows the average travel time in minutes to nearest employment centre with 500 to 4,999 jobs available by cycle (official statistics in development), in England, for periods 2014-2019.",
+        "caveats": "Data is not available for 2018.",
+        "confidenceIntervals": true,
+        "canBeNegative": false,
+        "zeroBaseline": true
+      },
+      {
+        "code": "driving",
+        "slug": "driving",
+        "dataset": "average-travel-time",
+        "label": "Travel time to employment centre by car",
+        "standardised": false,
+        "subtitle": "Average travel time in minutes to nearest employment centre with 500+ jobs available",
+        "longDescription": "This indicator shows the average travel time in minutes to nearest employment centre with 500 to 4,999 jobs available by car (official statistics in development), in England, for periods 2014-2019.",
+        "caveats": "Data is not available for 2018.",
+        "confidenceIntervals": true,
+        "canBeNegative": false,
+        "zeroBaseline": true
+      },
+      {
+        "code": "public transport or walking",
+        "slug": "public-transport-or-walking",
+        "dataset": "average-travel-time",
+        "label": "Travel time to employment centre by public transport and walking",
+        "standardised": false,
+        "subtitle": "Average travel time in minutes to nearest employment centre with 500+ jobs available",
+        "longDescription": "This indicator shows the average travel time in minutes to nearest employment centre with 500 to 4,999 jobs available by public transport or walking (official statistics in development), in England, for periods 2014-2019.",
+        "caveats": "Data is not available for 2018.",
+        "confidenceIntervals": true,
+        "canBeNegative": false,
+        "zeroBaseline": true
+      }
+    ]
+  }
+}

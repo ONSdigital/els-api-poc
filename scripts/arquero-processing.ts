@@ -15,8 +15,8 @@ import { parse } from 'path';
 // config.ts
 const RAW_DIR = 'scripts/insights/raw';
 const CONFIG_DIR = `${RAW_DIR}/config-data`;
-const MANIFEST = `${CONFIG_DIR}/data-files-manifest.csv` // equivalent to FILE_NAMES_LOG
-const EXCLUDED_INDICATORS_PATH = `${CONFIG_DIR}/excluded-indicators.json`;
+const MANIFEST = `${CONFIG_DIR}/manifest_metadata.csv` // equivalent to FILE_NAMES_LOG
+// const EXCLUDED_INDICATORS_PATH = `${CONFIG_DIR}/excluded-indicators.json`;
 const CSV_PREPROCESS_DIR = `${RAW_DIR}/family-ess-main`
 const EXISTING_PERIODS_FILENAME = `${CONFIG_DIR}/periods/unique-periods-lookup.csv`;
 
@@ -60,7 +60,7 @@ function processColumns(k, metaLookup, columnValues, id, size, role, dimension) 
     size.push(values.length);
 
     dimension[k] = {
-        label: row.titles[1],
+        label: k === 'measure' ? 'Measure' : row.titles[1], // measure only exists in tableSchema if there is a column called measure in the csv
         category: { index: Object.fromEntries(entries) }
 
     };
@@ -90,7 +90,8 @@ function processColumns(k, metaLookup, columnValues, id, size, role, dimension) 
         )
     }
     // if role metadata exists (currently just areacd and period), add it
-    if (row.role) {
+    // row doesn't always exist for measure, as it isn't always in the tableSchema
+    if (row && row.role) {
         if (!role[row.role]) role[row.role] = [];
         role[row.role].push(k);
     }
@@ -100,8 +101,9 @@ function indicatorToCube(indicator, t, meta_data, tableSchema) {
     console.log('Processing', indicator, '........')
     // filter file-level metadata to be indicator level
     const meta_indicator = meta_data.metadata.indicators.find(d => d.code === indicator)
-    // deconstruct meta_indicator:
-    const { label, caveats, longDescription, ...restOfMetadata } = meta_indicator
+    const manifest_metadata_indicator = manifest_metadata.filter(aq.escape(d => d.code === indicator)).objects()
+    // deconstruct meta_indicator (and remove slug as using slug from csv):
+    const { label, caveats, longDescription, slug, ...restOfMetadata } = meta_indicator
 
     const dataset = {
         version: "2.0",
@@ -111,10 +113,11 @@ function indicatorToCube(indicator, t, meta_data, tableSchema) {
         source: meta_data["dc:publisher"],
         updated: meta_data["dc:modified"],
         extension: {
-            //   topic: meta.topic,
-            //   subTopic: meta.subTopic,
+            topic: manifest_metadata_indicator[0].topic,
+            subTopic: manifest_metadata_indicator[0].subTopic,
             description: longDescription,
             source: meta_data.metadata.source,
+            slug: manifest_metadata_indicator[0].slug,
             ...restOfMetadata,
             experimentalStatistic: meta_data.experimentalStatistic,
             geography: meta_data.metadata.geography
@@ -132,7 +135,7 @@ function indicatorToCube(indicator, t, meta_data, tableSchema) {
 
     // identify empty measures to remove (e.g. if lci and uci columns are present but all empty):
     let emptyMeasures = measures.filter(d =>
-                indicatorTable.array(d).every(v => v == null || Number.isNaN(v)));
+        indicatorTable.array(d).every(v => v == null || Number.isNaN(v)));
 
     let indicatorTableLong = indicatorTable
         .select(aq.not(emptyMeasures))
@@ -252,12 +255,12 @@ function processFile(file) {
 
     //  filter out excludedIndicators - checks whether the excluded indicator matches the full indicator name
     //  entire files are excluded using the manifest
-    if (excludedIndicators.length) {
-        indicator_data = indicator_data.filter(aq.escape(
-            row =>
-                !excludedIndicators.includes(row.indicator))
-        );
-    }
+    // if (excludedIndicators.length) {
+    //     indicator_data = indicator_data.filter(aq.escape(
+    //         row =>
+    //             !excludedIndicators.includes(row.indicator))
+    //     );
+    // }
 
     // split table into one table per indicator
     const indicatorTables =
@@ -278,16 +281,21 @@ function processFile(file) {
 
 }
 
-const manifest = loadCsvWithoutBom(MANIFEST); // equivalent to previous_file_paths
+const manifest_metadata = loadCsvWithoutBom(MANIFEST);
 // const areas_geog_level = loadCsvWithoutBom(AREAS_GEOG_LEVEL_FILENAME);
-const excludedIndicators = readJsonSync(EXCLUDED_INDICATORS_PATH);
+// const excludedIndicators = readJsonSync(EXCLUDED_INDICATORS_PATH);
 
 // Throw error if new indicator files have been downloaded and need to be added to the manifest
-await abortIfNewFilesExist(manifest, CSV_PREPROCESS_DIR)
+// await abortIfNewFilesExist(manifest_metadata, CSV_PREPROCESS_DIR)
 
-// remove indicator files based on boolean in manifest (separate process to those in excluded-indicators.json)
-const file_paths = manifest.filter((f) => f.include === 'Y')
-    .array('filePath');
+// remove indicators based on boolean in manifest
+// extract distinct filepaths
+var file_paths = [
+    ...new Set(
+        manifest_metadata.filter((f) => f.include)
+            .array('filePath')
+    )
+];
 
 // read in existing periods
 // later use this to check for new indicator time periods that need adding
