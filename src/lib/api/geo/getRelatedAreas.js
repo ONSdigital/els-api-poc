@@ -19,8 +19,8 @@ export default function getRelatedAreas(code) {
   const parentLevel = ["ctry", "rgn"].includes(geoLevel) ? "ctry" : "rgn";
 
   const parents = getParentAreas(cdUpper);
-  const children = getChildAreas({ cdUpper });
-  const siblings = getSiblingAreas({ cdUpper, parentLevel });
+  const children = getChildAreas({ code: cdUpper });
+  const siblings = getSiblingAreas({ code: cdUpper, parentLevel });
   const similar = getSimilarAreas(cdUpper);
 
   for (const obj of [parents, children, siblings, similar]) {

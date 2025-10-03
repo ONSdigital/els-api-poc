@@ -8,7 +8,7 @@ export default function getSimilarAreas(code) {
     return { error: 400, message: `${code} is not a valid GSS code.` };
 
   const similar = areasSimilar[cdUpper];
-  if (!similar) return { error: 400, message: `No similar areas for ${code}` };
+  if (!similar) return [];
 
   const clusters = [];
   const clusterTypes = areasClusters.types;

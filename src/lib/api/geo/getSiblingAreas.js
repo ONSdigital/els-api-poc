@@ -24,8 +24,8 @@ export default function getSiblingAreas(params = {}) {
       )
     : area.parents[0];
 
-  return {
+  return parentCode ? {
     parent: parentCode,
     siblings: getChildAreas({ code: parentCode, geoLevel }),
-  };
+  } : {};
 }
