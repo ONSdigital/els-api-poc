@@ -43,22 +43,31 @@
 {#snippet list(areas)}
   <List>
     {#each areas as area}
-      <Li><a href={resolve(`/areas/${area.areacd}`)}>{area.areanm || area.areacd}</a> ({area.areacd})</Li>
+      <Li><a href={resolve(`/areas/${area?.areacd}`)}>{area?.areanm || area?.areacd}</a> ({area?.areacd})</Li>
     {/each}
   </List>
 {/snippet}
 
 <NavSections cls="nav-sections">
   {#if data.area.properties.parents[0]}
-    <NavSection title="Parents">
+    <NavSection title="Parent areas">
       {@render list([...data.area.properties.parents].reverse())}
     </NavSection>
   {/if}
   {#if data.area.properties.children[0]}
-    <NavSection title="Children">
+    <NavSection title="Child areas">
       {#each groupAreasByLevel(data.area.properties.children) as level}
         <h3>{level.label}</h3>
         {@render list(level.areas)}
+      {/each}
+      <!-- {@render list([...data.area.properties.children].sort((a, b) => a?.areanm?.localeCompare(b?.areanm)))} -->
+    </NavSection>
+  {/if}
+  {#if data.related.similar[0]}
+    <NavSection title="Similar areas">
+      {#each data.related.similar as cluster}
+        <h3>{cluster.label}</h3>
+        {@render list(cluster.similar.slice(0, 10).map(cd => data.areaLookup[cd]))}
       {/each}
       <!-- {@render list([...data.area.properties.children].sort((a, b) => a?.areanm?.localeCompare(b?.areanm)))} -->
     </NavSection>
@@ -72,5 +81,8 @@
     border-top: 1px solid #ddd;
     margin-top: 1.5em;
     padding-top: 1em;
+  }
+  :global(ul.ons-list) {
+    margin-bottom: 1em;
   }
 </style>
