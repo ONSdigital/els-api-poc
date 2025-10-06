@@ -63,7 +63,7 @@
       <!-- {@render list([...data.area.properties.children].sort((a, b) => a?.areanm?.localeCompare(b?.areanm)))} -->
     </NavSection>
   {/if}
-  {#if data.related.similar[0]}
+  {#if data.related?.similar?.[0]}
     <NavSection title="Similar areas">
       {#each data.related.similar as cluster}
         <h3>{cluster.label}</h3>
