@@ -20,7 +20,7 @@
 
 <PhaseBanner phase="prototype"/>
 <Header compact title="{data.indicator.label}" />
-<Breadcrumb links={[{label: "ELS API experiments", href: resolve("/"), label: "Indicators", href: resolve("/indicators")}]}/>
+<Breadcrumb links={[{label: "ELS API experiments", href: resolve("/")}, {label: "Explore indicators demo", href: resolve("/indicators")}]}/>
 
 <Section>
   <p style:margin="12px 0 32px">

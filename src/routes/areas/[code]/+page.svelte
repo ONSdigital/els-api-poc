@@ -20,7 +20,7 @@
 
 <PhaseBanner phase="prototype"/>
 <Header compact title="{data.area.properties.areanm}" />
-<Breadcrumb links={[{label: "ELS API experiments", href: resolve("/")}]}/>
+<Breadcrumb links={[{label: "ELS API experiments", href: resolve("/")}, {label: "Explore areas demo", href: resolve("/areas/")}]}/>
 
 <Section>
   {#await fetchChartData("population-indicators-Population count", data.area.properties.areacd)}
