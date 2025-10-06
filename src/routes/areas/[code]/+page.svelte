@@ -9,8 +9,11 @@
     NavSection,
     Footer,
     List,
-    Li
+    Li,
+    Icon
   } from "@onsvisual/svelte-components";
+  import groupAreasByLevel from "$lib/api/geo/helpers/groupAreasByLevel.js";
+  import { fetchChartData } from "$lib/utils.js";
 
   export let data;
 </script>
@@ -20,8 +23,20 @@
 <Breadcrumb links={[{label: "ELS API experiments", href: resolve("/")}]}/>
 
 <Section>
+  {#await fetchChartData("population-indicators-Population count", data.area.properties.areacd)}
+    <!-- Loading -->
+  {:then chartData}
+    {#if chartData?.[0]?.value}
+      <p>
+        <strong>{data.area.properties.areanm}</strong> ({data.area.properties.areacd}) had a population of <strong>{chartData[0].value.toLocaleString()}</strong> in {chartData[0].period.slice(0, 4)}.
+        <!-- <a href={resolve(`/areas/${data.area.properties.areacd}/indicators`)}>More data <Icon type="arrow"/></a> -->
+      </p>
+    {/if}
+  {:catch}
+    <!-- Population not available -->
+  {/await}
   <p style:margin="12px 0 32px">
-    Navigate areas related to {data.area.properties.areanm} ({data.area.properties.areacd}).
+    Explore areas related to {data.area.properties.areanm} below.
   </p>
 </Section>
 
@@ -41,7 +56,11 @@
   {/if}
   {#if data.area.properties.children[0]}
     <NavSection title="Children">
-      {@render list([...data.area.properties.children].sort((a, b) => a?.areanm?.localeCompare(b?.areanm)))}
+      {#each groupAreasByLevel(data.area.properties.children) as level}
+        <h3>{level.label}</h3>
+        {@render list(level.areas)}
+      {/each}
+      <!-- {@render list([...data.area.properties.children].sort((a, b) => a?.areanm?.localeCompare(b?.areanm)))} -->
     </NavSection>
   {/if}
 </NavSections>

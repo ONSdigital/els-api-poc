@@ -23,7 +23,7 @@ export const geoLevels = {
 
 export const geoLevelsOtherNamed = {
   wpc: {
-    label: "parliamentary constituencies",
+    label: "Parliamentary constituencies",
 		codes: ["E14", "N05", "N06", "S14", "W07"]
   },
   wd: {

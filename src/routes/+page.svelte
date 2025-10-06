@@ -29,8 +29,11 @@
   <Card title="Lazy charts demo" mode="featured" href="{base}/charts">
     Same as charts demo, but with data lazy loaded per chart.
   </Card>
+  <Card title="Explore areas demo" mode="featured" href="{base}/areas">
+    API-driven navigation through areas within the UK.
+  </Card>
   <Card title="Explore indicators demo" mode="featured" href="{base}/indicators">
-    Navigate through indicators within the taxonomy.
+    API-driven navigation through indicators within the taxonomy.
   </Card>
   <Card title="Single indicator demo" mode="featured" href="{base}/indicator">
     Indicator page demo, with data lazy loaded per chart/map.
