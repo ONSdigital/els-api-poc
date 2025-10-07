@@ -15,7 +15,8 @@ export async function GET({ url, params }) {
   if (areasList.error) error(areasList.error, areasList.message);
 
   if (searchPostcodes && areasList.length === 0)
-    areasList = await getPostcodesList({ name, limit });
+    areasList = await getPostcodesList({ code: name, limit });
 
+  console.log(areasList)
   return json(areasList);
 }
