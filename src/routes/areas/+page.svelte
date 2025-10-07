@@ -17,10 +17,7 @@
   async function loadOptionsFn(query, populateResults) {
     try {
       const url = resolve(`/api/v1/geo/search/${query.toLowerCase()}`);
-      const raw = await (await fetch(url)).json();
-      const results = raw.map(d => {
-        d.group = 
-      });
+      const results = await (await fetch(url)).json();
       populateResults(results);
     } catch {
       return populateResults([]);
