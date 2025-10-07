@@ -1,6 +1,7 @@
 <script>
   import { resolve } from "$app/paths";
   import { goto } from "$app/navigation";
+  import throttle from "throttleit";
   import {
     PhaseBanner,
     Header,
@@ -13,15 +14,19 @@
 
   let selected = $state();
 
-  async function loadOptions(query, populateResults) {
+  async function loadOptionsFn(query, populateResults) {
     try {
       const url = resolve(`/api/v1/geo/search/${query.toLowerCase()}`);
-      const results = await (await fetch(url)).json();
+      const raw = await (await fetch(url)).json();
+      const results = raw.map(d => {
+        d.group = 
+      });
       populateResults(results);
     } catch {
       return populateResults([]);
     }
 	}
+  const loadOptions = throttle(loadOptionsFn, 1000);
 
   function gotoSelected(e) {
     e.preventDefault();

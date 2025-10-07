@@ -36,6 +36,7 @@
     "prettier-plugin-svelte": "^3.2.6",
     "svelte": "^5.0.0",
     "svelteplot": "^0.3.7",
+    "throttleit": "^2.1.0",
     "topojson-client": "^3.1.0",
     "topojson-server": "^3.0.1",
     "vite": "^5.4.4"
