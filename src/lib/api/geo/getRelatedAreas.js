@@ -4,18 +4,24 @@ import getChildAreas from "./getChildAreas.js";
 import getParentAreas from "./getParentAreas.js";
 import getSiblingAreas from "./getSiblingAreas.js";
 import getSimilarAreas from "./getSimilarAreas.js";
+import { isValidAreaCode } from "../utils.js";
 
 export default function getRelatedAreas(code) {
-  const area = geoMetadata[code];
-    if (!area) return { error: 400, message: `Related areas not found for ${code}` };
-  
-  const geoLevel = geoLevelsLookup[code.slice(0, 3)].key;
+  const cdUpper = code.toUpperCase();
+  if (!isValidAreaCode(cdUpper))
+    return { error: 400, message: `${code} is not a valid GSS code.` };
+
+  const area = geoMetadata[cdUpper];
+  if (!area)
+    return { error: 400, message: `Related areas not found for ${code}.` };
+
+  const geoLevel = geoLevelsLookup[cdUpper.slice(0, 3)].key;
   const parentLevel = ["ctry", "rgn"].includes(geoLevel) ? "ctry" : "rgn";
 
-  const parents = getParentAreas(code);
-  const children = getChildAreas({ code });
-  const siblings = getSiblingAreas({ code, parentLevel });
-  const similar = getSimilarAreas(code);
+  const parents = getParentAreas(cdUpper);
+  const children = getChildAreas({ code: cdUpper });
+  const siblings = getSiblingAreas({ code: cdUpper, parentLevel });
+  const similar = getSimilarAreas(cdUpper);
 
   for (const obj of [parents, children, siblings, similar]) {
     if (obj?.error) return obj;
