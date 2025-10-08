@@ -1,8 +1,5 @@
 import { resolve } from '$app/paths';
 
-export const prerender = false;
-export const trailingSlash = 'always';
-
 export const load = async ({ fetch }) => {
   const exclude = ["population-by-age-and-sex"];
 

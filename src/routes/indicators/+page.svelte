@@ -7,7 +7,6 @@
     Section,
     NavSections,
     NavSection,
-    Divider,
     Footer,
   } from "@onsvisual/svelte-components";
 

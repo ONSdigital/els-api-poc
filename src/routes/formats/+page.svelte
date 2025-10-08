@@ -12,7 +12,8 @@
   import { format } from "d3-format";
   import { utcFormat } from "d3-time-format";
   import { utcYear, utcDay } from "d3-time";
-  import metadata from "$lib/data/metadata.json";
+
+  let { data } = $props();
 
   function formatDate(str) {
     const parts = str.split("/");
@@ -36,7 +37,7 @@
   }
 
   async function fetchData() {
-    const url = `${base}/api/v1/data.json?geography=E92000001&time=latest&measure=value`;
+    const url = `${base}/api/v1/data.json?geo=E92000001&time=latest&measure=value`;
     const data = await (await fetch(url)).json();
     return data;
   }
@@ -55,14 +56,14 @@
 <Grid colWidth="medium" title="Indicators for England">
   {#await fetchData()}
     Fetching data
-  {:then data}
-    {#each Object.keys(data) as key}
-      {@const meta = metadata[key].metadata}
+  {:then d}
+    {#each Object.keys(d).filter(key => key !== "population-by-age-and-sex") as key}
+      {@const meta = data.metadata.find(m => m.slug === key)}
       <DataCard
         title={meta.label.split(" (")[0]}
-        value="{meta.prefix}{format(`,.${meta.decimalPlaces}f`)(data[key].value[0])}{meta.suffix}"
-        caption="{meta.subText ? `${meta.subText} ` : ""}<span class='nobr'>in {formatDate(data[key].period[0])}</span>"
-        source="Source: {meta.sourceOrg.split("|").join(", ")}"/>
+        value="{meta.prefix}{format(`,.${meta.decimalPlaces || 0}f`)(d[key].value[0])}{meta.suffix}"
+        caption="{meta?.subText || ""}<span class='nobr'>in {formatDate(d[key].period[0])}</span>"
+        source="Source: {meta.source.map(m => m.name).join(", ")}"/>
     {/each}
   {:catch}
     Failed to load data
