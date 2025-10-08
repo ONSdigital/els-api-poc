@@ -26,7 +26,7 @@ const altLabels = {
 
 export const geoLevels = {
   ctry: {label: ctry.label, codes: [...uk.codes, ...ctry.codes]},
-  rgn: {label: rgn.label, codes: ["N92", "S92", "W92", ...rgn.codes]},
+  rgn: {label: "Region/country", codes: ["N92", "S92", "W92", ...rgn.codes]},
   cauth,
   utla,
   ltla
