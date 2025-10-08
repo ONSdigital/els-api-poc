@@ -24,7 +24,7 @@
     "@onsvisual/svelte-charts": "^0.4.11",
     "@onsvisual/svelte-components": "^1.0.12",
     "@sveltejs/adapter-auto": "^6.0.1",
-    "@sveltejs/kit": "^2.5.27",
+    "@sveltejs/kit": "^2.46.3",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
     "@turf/boolean-point-in-polygon": "^7.2.0",
     "@turf/meta": "^7.2.0",

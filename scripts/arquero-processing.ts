@@ -316,5 +316,5 @@ for (const file of file_paths) {
 }
 
 // console.log(cube.link.item)
-const output = "./src/lib/json-stat-TEST.json";
+const output = "./src/lib/data/json-stat.json";
 writeFileSync(output, JSON.stringify(cube));
