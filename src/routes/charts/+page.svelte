@@ -14,8 +14,9 @@
     LazyLoad
   } from "@onsvisual/svelte-components";
   import Beeswarm from "$lib/viz/Beeswarm.svelte";
-  import areas from "$lib/data/areas.json";
   import { fetchChartData } from "$lib/utils.js";
+
+  export let data;
 
   let selected;
   let area;
@@ -28,12 +29,15 @@
       return;
     };
     area = selected;
+
+    const exclude = ["population-by-age-and-sex"];
+
     const indicators = await (await fetch(resolve(`/api/v1/metadata/indicators?geo=${selected.areacd}`))).json();
     topics = Array.from(new Set(indicators.map(ind => ind.topic)))
       .map(topic => ({
         key: topic,
         label: `${topic[0].toUpperCase()}${topic.slice(1)}`,
-        indicators: indicators.filter(ind => ind.topic === topic)
+        indicators: indicators.filter(ind => ind.topic === topic && !exclude.includes(ind.slug))
       }));
   }
 </script>
@@ -47,7 +51,7 @@
     Select an area to display indicators. Chart data for each indicator will be lazy loaded when the chart comes into view on the page.
   </p>
   <form class="select-container" on:submit|preventDefault={() => selectArea(selected)}>
-    <Select options={areas} bind:value={selected} labelKey="areanm" label="Select a local authority" placeholder="Eg. Fareham or Newport"/>
+    <Select options={data.areaList} bind:value={selected} labelKey="areanm" label="Select a local authority" placeholder="Eg. Fareham or Newport"/>
     <Button small type="sumbit">Select area</Button>
   </form>
 </Section>

@@ -1,4 +1,4 @@
-import { base } from "$app/paths";
+import { resolve } from "$app/paths";
 import metadata from "$lib/data/metadata.json";
 
 export function parseData(data) {
@@ -14,26 +14,30 @@ export function parseData(data) {
 }
 
 export async function fetchChartData(indicator, geography = "ltla", time = "latest") {
-  const url = `${base}/api/v1/data.json?indicator=${indicator}&geo=${geography}&time=${time}`;
+  const url = resolve(`/api/v1/data.json?indicator=${indicator}&geo=${geography}&time=${time}`);
   const data = await (await fetch(url)).json();
   console.log({data})
   return parseData(data[indicator]);
 }
 
 export async function fetchTopicsData(selected, geography = "ltla", time = "latest") {
-  const url = `${base}/api/v1/data.json?geo=${geography}&time=${time}`;
-  let data = await (await fetch(url)).json();
+  const exclude = ["population-by-age-and-sex"];
+
+  const dataUrl = resolve(`/api/v1/data.json?geo=${geography}&time=${time}`);
+  const data = await (await fetch(dataUrl)).json();
+
+  const metaUrl = resolve(`/api/v1/metadata/indicators?geo=${selected.areacd}`);
+  const metadata = await (await fetch(metaUrl)).json();
 
   // Filter out empty datasets
-  const indicators = Object.keys(data).map(key => {
-    const meta = metadata[key];
-    return {meta, data: parseData(data[key])};
-  }).filter(ind => ind.meta.inferredGeos.types.includes(selected.areacd.slice(0, 3)))
-    .filter(ind => ind.data[0])
+  const indicators = metadata
+    .filter(meta => !exclude.includes(meta.slug))
+    .map(meta => ({meta, data: parseData(data[meta.slug])}));
+
   const topics = Array.from(new Set(indicators.map(ind => ind.meta.topic)))
     .map(topic => ({
       key: topic,
-      label: `${topic[0].toUpperCase()}${topic.slice(1)}`,
+      label: topic[0].toUpperCase() + topic.slice(1),
       indicators: indicators.filter(ind => ind.meta.topic === topic)
     }));
   return topics;
