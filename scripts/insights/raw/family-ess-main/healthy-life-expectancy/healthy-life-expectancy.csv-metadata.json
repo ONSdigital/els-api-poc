@@ -1,0 +1,187 @@
+{
+  "@context": [
+    "http://www.w3.org/ns/csvw",
+    {
+      "@language": "en"
+    }
+  ],
+  "dc:title": "Healthy life expectancy",
+  "dc:publisher": "Office for National Statistics",
+  "dc:issued": "2025-01-16",
+  "dc:modified": "2024-12-19",
+  "tables": [
+    {
+      "url": "healthy-life-expectancy.csv",
+      "tableSchema": {
+        "columns": [
+          {
+            "name": "indicator",
+            "titles": [
+              "indicator",
+              "Indicator"
+            ],
+            "datatype": "string",
+            "type": "indicator"
+          },
+          {
+            "name": "areacd",
+            "titles": [
+              "areacd",
+              "Area code"
+            ],
+            "datatype": "string",
+            "type": "dimension",
+            "role": "geo"
+          },
+          {
+            "titles": [
+              "areanm",
+              "Area name"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "geography",
+              "Geography type"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "name": "value",
+            "titles": [
+              "observation",
+              "Observation value"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "unit",
+            "titles": [
+              "unit",
+              "Unit"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "name": "measure",
+            "titles": [
+              "measure",
+              "Measure"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "name": "period",
+            "titles": [
+              "period",
+              "Time period"
+            ],
+            "datatype": "date",
+            "type": "dimension",
+            "role": "time"
+          },
+          {
+            "name": "lci",
+            "titles": [
+              "lower_confidence_interval_95",
+              "Lower confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "uci",
+            "titles": [
+              "upper_confidence_interval_95",
+              "Upper confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "status",
+            "titles": [
+              "observation_status",
+              "Observation status"
+            ],
+            "datatype": "string",
+            "type": "status"
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "source": [
+      {
+        "name": "Office for National Statistics",
+        "href": "https://www.ons.gov.uk/peoplepopulationandcommunity/healthandsocialcare/healthandlifeexpectancies/bulletins/healthstatelifeexpectanciesuk/previousReleases#",
+        "date": "2025-01-16"
+      }
+    ],
+    "experimentalStatistic": true,
+    "geography": {
+      "countries": [
+        "E",
+        "W"
+      ],
+      "levels": [
+        "ctry",
+        "rgn",
+        "utla",
+        "ltla"
+      ],
+      "types": [
+        "E06",
+        "E08",
+        "E09",
+        "E10",
+        "E12",
+        "E92",
+        "W06",
+        "W11",
+        "W92"
+      ],
+      "year": 2024,
+      "initialLevel": "ltla"
+    },
+    "indicators": [
+      {
+        "code": "Female healthy life expectancy",
+        "slug": "female-healthy-life-expectancy",
+        "dataset": "healthy-life-expectancy",
+        "label": "Female healthy life expectancy",
+        "standardised": false,
+        "subtitle": "Average years expected to be lived in good health for females born during year",
+        "longDescription": "This indicator shows the average years expected to be lived in good health for females born during the reference period (official statistics in development), in England and Wales, for three-year rolling periods between 2011 to 2013 and 2021 to 2023.",
+        "confidenceIntervals": true,
+        "canBeNegative": false,
+        "zeroBaseline": true,
+        "unit": "yrs",
+        "measure": "Years"
+      },
+      {
+        "code": "Male healthy life expectancy",
+        "slug": "male-healthy-life-expectancy",
+        "dataset": "healthy-life-expectancy",
+        "label": "Male healthy life expectancy",
+        "standardised": false,
+        "subtitle": "Average years expected to be lived in good health for males born during year",
+        "longDescription": "This indicator shows the average years expected to be lived in good health for males born during the reference period (official statistics in development), in England and Wales, for three-year rolling periods between 2011 to 2013 and 2021 to 2023.",
+        "confidenceIntervals": true,
+        "canBeNegative": false,
+        "zeroBaseline": true,
+        "unit": "yrs",
+        "measure": "Years"
+      }
+    ]
+  }
+}

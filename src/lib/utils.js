@@ -14,14 +14,14 @@ export function parseData(data) {
 }
 
 export async function fetchChartData(indicator, geography = "ltla", time = "latest") {
-  const url = `${base}/api/v1/data.json?indicator=${indicator}&geography=${geography}&time=${time}`;
+  const url = `${base}/api/v1/data.json?indicator=${indicator}&geo=${geography}&time=${time}`;
   const data = await (await fetch(url)).json();
   console.log({data})
   return parseData(data[indicator]);
 }
 
 export async function fetchTopicsData(selected, geography = "ltla", time = "latest") {
-  const url = `${base}/api/v1/data.json?geography=${geography}&time=${time}`;
+  const url = `${base}/api/v1/data.json?geo=${geography}&time=${time}`;
   let data = await (await fetch(url)).json();
 
   // Filter out empty datasets

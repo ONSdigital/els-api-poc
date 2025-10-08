@@ -1,0 +1,226 @@
+{
+  "@context": [
+    "http://www.w3.org/ns/csvw",
+    {
+      "@language": "en"
+    }
+  ],
+  "dc:title": "Local labour market indicators",
+  "dc:publisher": "Office for National Statistics",
+  "dc:issued": "2024-04-16",
+  "dc:modified": "2025-08-13",
+  "tables": [
+    {
+      "url": "employment-rate.csv",
+      "tableSchema": {
+        "columns": [
+          {
+            "name": "indicator",
+            "titles": [
+              "indicator",
+              "Indicator"
+            ],
+            "datatype": "string",
+            "type": "indicator"
+          },
+          {
+            "name": "areacd",
+            "titles": [
+              "areacd",
+              "Area code"
+            ],
+            "datatype": "string",
+            "type": "dimension",
+            "role": "geo"
+          },
+          {
+            "titles": [
+              "areanm",
+              "Area name"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "geography",
+              "Geography type"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "name": "value",
+            "titles": [
+              "observation",
+              "Observation value"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "numerator",
+            "titles": [
+              "numerator",
+              "Numerator"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "denominator",
+            "titles": [
+              "denominator",
+              "Denominator"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "unit",
+            "titles": [
+              "unit",
+              "Unit"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "name": "measure",
+            "titles": [
+              "measure",
+              "Measure"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "name": "period",
+            "titles": [
+              "period",
+              "Time period"
+            ],
+            "datatype": "date",
+            "type": "dimension",
+            "role": "time"
+          },
+          {
+            "name": "lci",
+            "titles": [
+              "lower_confidence_interval_95",
+              "Lower confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "uci",
+            "titles": [
+              "upper_confidence_interval_95",
+              "Upper confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "status",
+            "titles": [
+              "observation_status",
+              "Observation status"
+            ],
+            "datatype": "string",
+            "type": "status"
+          },
+          {
+            "titles": [
+              "notes",
+              "Notes"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "source": [
+      {
+        "name": "Office for National Statistics",
+        "href": "https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/datasets/li01regionallabourmarketlocalindicatorsforcountieslocalandunitaryauthorities",
+        "date": "2024-04-16"
+      }
+    ],
+    "experimentalStatistic": true,
+    "geography": {
+      "countries": [
+        "E",
+        "N",
+        "S",
+        "W"
+      ],
+      "levels": [
+        "uk",
+        "ctry",
+        "rgn",
+        "cauth",
+        "utla",
+        "ltla"
+      ],
+      "types": [
+        "E06",
+        "E07",
+        "E08",
+        "E09",
+        "E10",
+        "E12",
+        "E47",
+        "E92",
+        "K02",
+        "K03",
+        "K04",
+        "N92",
+        "S12",
+        "S92",
+        "W06",
+        "W92"
+      ],
+      "year": 2024,
+      "initialLevel": "ltla"
+    },
+    "indicators": [
+      {
+        "code": "Employment rate",
+        "slug": "employment-rate",
+        "dataset": "employment-rate",
+        "label": "Employment rate (Great Britain)",
+        "standardised": false,
+        "subtitle": "Percentage of people aged 16 to 64 in employment",
+        "longDescription": "This indicator shows the proportion of people aged between 16 and 64 years in paid work or who had a job that they were temporarily away from (official statistics in development), in Great Britain (Northern Ireland national figure included), for periods 2004 to 2023.",
+        "caveats": "Calculation of employment rate: number of employed people aged 16 to 64 years divided by the population aged 16 to 64 years. Population is the sum of employed plus unemployed plus inactive.\n\nThe ongoing challenges with response rates, response levels and weighting approach mean that labour market statistics based on both the Labour Force Survey (LFS) and Annual Population Survey (APS) will be considered [official statistics in development](https://osr.statisticsauthority.gov.uk/policies/official-statistics-policies/official-statistics-in-development/) until further review. Because of increased volatility of LFS and APS estimates, estimates of change should be treated with additional caution.",
+        "confidenceIntervals": true,
+        "canBeNegative": false,
+        "zeroBaseline": true,
+        "unit": "%",
+        "measure": "Percentage"
+      },
+      {
+        "code": "Economically inactive",
+        "slug": "economically-inactive",
+        "dataset": "employment-rate",
+        "label": "Economic inactivity rate (Great Britain)",
+        "standardised": false,
+        "subtitle": "Percentage of people aged 16 to 64 who are not in employment and are not actively seeking work",
+        "longDescription": "This indicator shows the proportion of people aged between 16 and 64 years who are not in employment but do not meet the internationally accepted definition of unemployment because they have not been seeking work within the last four weeks or they are unable to start work in the next two weeks (official statistics in development), in Great Britain (Northern Ireland national figure included), for periods 2004 to 2023.",
+        "caveats": "Calculation of economic inactivity rate: number of economically inactive people aged 16 to 64 years divided by the population aged 16 to 64 years. Population is the sum of employed plus unemployed plus inactive.\n\nThe ongoing challenges with response rates, response levels and weighting approach mean that labour market statistics based on both the Labour Force Survey (LFS) and Annual Population Survey (APS) will be considered [official statistics in development](https://osr.statisticsauthority.gov.uk/policies/official-statistics-policies/official-statistics-in-development/) until further review. Because of increased volatility of LFS and APS estimates, estimates of change should be treated with additional caution.",
+        "confidenceIntervals": true,
+        "canBeNegative": false,
+        "zeroBaseline": true,
+        "unit": "%",
+        "measure": "Percentage"
+      }
+    ]
+  }
+}

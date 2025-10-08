@@ -78,7 +78,7 @@ function toRows(cube, dims) {
 
 	const rows = [];
 	for (const item of items) {
-		const row = {indicator: cube.extension.code};
+		const row = {indicator: cube.extension.slug};
 		for (let i = 0; i < dims.length - 1; i ++) row[dims[i].key] = item[i + 1];
 		for (let j = 0; j < measuresLength; j ++) {
 			row[measures.values[j][0]] = cube.value[(item[0] * measures.count) + j]
@@ -103,7 +103,7 @@ function toJSON(cube, dims) {
 			data[measures.values[j][0]].push(cube.value[(item[0] * measures.count) + j]);
 		}
 	}
-	return [cube.extension.code, data];
+	return [cube.extension.slug, data];
 }
 
 function toCSVW(datasets, measure, url) {
@@ -294,7 +294,7 @@ export function GET({ params, url }) {
   const format = params.format || "json";
   const topic = getParam(url, "topic", "all");
   const indicator = getParam(url, "indicator", "all");
-  const geography = getParam	(url, "geography", "all");
+  const geo = getParam	(url, "geo", "all");
   const time = getParam(url, "time", "latest");
   const measure = getParam(url, "measure", "all");
 
@@ -310,7 +310,7 @@ export function GET({ params, url }) {
 	// Filter datasets by indicator
 	if (indicator !== "all") {
 		datasets = datasets.filter(
-			d => [indicator].flat().includes(d.extension.code)
+			d => [indicator].flat().includes(d.extension.slug)
 		);
 	}
 
@@ -322,7 +322,7 @@ export function GET({ params, url }) {
 
 	// Create filters for data cube dimensions
 	const filters = {};
-	if (geography !== "all") filters.areacd = makeGeoFilter(geography);
+	if (geo !== "all") filters.areacd = makeGeoFilter(geo);
 	if (time !== "all") filters.period = time;
 	if (measure !== "all") filters.measure = makeFilter(measure);
 

@@ -1,5 +1,5 @@
 <script>
-  import { base } from "$app/paths";
+  import { resolve } from "$app/paths";
   import {
     PhaseBanner,
     Header,
@@ -15,21 +15,20 @@
   } from "@onsvisual/svelte-components";
   import Beeswarm from "$lib/viz/Beeswarm.svelte";
   import areas from "$lib/data/areas.json";
-  import metadata from "$lib/data/metadata.json";
   import { fetchChartData } from "$lib/utils.js";
 
   let selected;
   let area;
   let topics;
 
-  function selectArea(selected) {
+  async function selectArea(selected) {
     if (!selected) {
       area = null;
       topics = null;
       return;
     };
     area = selected;
-    const indicators = Object.values(metadata).filter(ind => ind.inferredGeos.types.includes(area.areacd.slice(0, 3)));
+    const indicators = await (await fetch(resolve(`/api/v1/metadata/indicators?geo=${selected.areacd}`))).json();
     topics = Array.from(new Set(indicators.map(ind => ind.topic)))
       .map(topic => ({
         key: topic,
@@ -41,7 +40,7 @@
 
 <PhaseBanner phase="prototype"/>
 <Header compact title="Lazy charts demo" />
-<Breadcrumb links={[{label: "ELS API experiments", href: `${base}/`}]}/>
+<Breadcrumb links={[{label: "ELS API experiments", href: resolve("/")}]}/>
 
 <Section>
   <p style:margin="12px 0 32px">
@@ -59,10 +58,10 @@
     {#each topics as topic}
       <NavSection title={topic.label}>
         {#each topic.indicators as ind}
-        <h3>{ind.metadata.label}</h3>
+        <h3>{ind.label}</h3>
         <LazyLoad>
           <div class="chart-container">
-            {#await fetchChartData(ind.code)}
+            {#await fetchChartData(ind.slug)}
               Fetching chart data
             {:then chartData}
               <Beeswarm data={chartData} selected={area}/>

@@ -1,0 +1,195 @@
+{
+  "@context": [
+    "http://www.w3.org/ns/csvw",
+    {
+      "@language": "en"
+    }
+  ],
+  "dc:title": "Foreign direct investment (FDI)",
+  "dc:publisher": "Office for National Statistics",
+  "dc:issued": "2023-04-24",
+  "dc:modified": "2024-02-09",
+  "tables": [
+    {
+      "url": "foreign-direct-investment.csv",
+      "tableSchema": {
+        "columns": [
+          {
+            "name": "indicator",
+            "titles": [
+              "indicator",
+              "Indicator"
+            ],
+            "datatype": "string",
+            "type": "indicator"
+          },
+          {
+            "name": "areacd",
+            "titles": [
+              "areacd",
+              "Area code"
+            ],
+            "datatype": "string",
+            "type": "dimension",
+            "role": "geo"
+          },
+          {
+            "titles": [
+              "areanm",
+              "Area name"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "geography",
+              "Geography type"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "name": "value",
+            "titles": [
+              "observation",
+              "Observation value"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "unit",
+            "titles": [
+              "unit",
+              "Unit"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "name": "measure",
+            "titles": [
+              "measure",
+              "Measure"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "name": "period",
+            "titles": [
+              "period",
+              "Time period"
+            ],
+            "datatype": "date",
+            "type": "dimension",
+            "role": "time"
+          },
+          {
+            "name": "lci",
+            "titles": [
+              "lower_confidence_interval_95",
+              "Lower confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "uci",
+            "titles": [
+              "upper_confidence_interval_95",
+              "Upper confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "status",
+            "titles": [
+              "observation_status",
+              "Observation status"
+            ],
+            "datatype": "string",
+            "type": "status"
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "source": [
+      {
+        "name": "Office for National Statistics",
+        "href": "https://www.ons.gov.uk/economy/nationalaccounts/balanceofpayments/articles/foreigndirectinvestmentexperimentaluksubnationalstatistics/previousReleases",
+        "date": "2023-04-24"
+      }
+    ],
+    "experimentalStatistic": true,
+    "geography": {
+      "countries": [
+        "E",
+        "W"
+      ],
+      "levels": [
+        "uk",
+        "cauth"
+      ],
+      "types": [
+        "E47",
+        "K02",
+        "K99",
+        "na",
+        "TLC",
+        "TLD",
+        "TLE",
+        "TLF",
+        "TLG",
+        "TLH",
+        "TLI",
+        "TLJ",
+        "TLK",
+        "TLL",
+        "TLM",
+        "TLN",
+        "W42"
+      ],
+      "year": 2023,
+      "initialLevel": "cauth"
+    },
+    "indicators": [
+      {
+        "code": "Inward foreign direct investment (FDI)",
+        "slug": "inward-foreign-direct-investment",
+        "dataset": "foreign-direct-investment",
+        "label": "Inward foreign direct investment",
+        "standardised": false,
+        "subtitle": "Value of foreign direct investments (FDI) in the UK from non-resident companies",
+        "longDescription": "This indicator shows the total FDI international investment position in the UK (inward) at end period (official statistics in development), in Great Britain (Northern Ireland national figure included), for 2015-2021.",
+        "caveats": "Foreign direct investment (FDI) is cross-border investment made with the objective of establishing a lasting interest in the host economy. FDI is also defined by control relationships, where the direct investor (parent company) controls at least 10% of the voting power (ordinary shares) of the direct investment enterprise. These relationships can be measured in two directions:\n\n- outward: the direct investments of UK-resident companies in other countries \n\n- inward: the direct investments in the UK from non-resident companies",
+        "confidenceIntervals": true,
+        "canBeNegative": false,
+        "zeroBaseline": true,
+        "unit": "£ million",
+        "measure": "Pounds"
+      },
+      {
+        "code": "Outward foreign direct investment (FDI)",
+        "slug": "outward-foreign-direct-investment",
+        "dataset": "foreign-direct-investment",
+        "label": "Outward foreign direct investment",
+        "standardised": false,
+        "subtitle": "Value of foreign direct investments (FDI) of UK-resident companies in other countries",
+        "longDescription": "This indicator shows the total FDI international investment position abroad (outward) at end period (official statistics in development), in Great Britain (Northern Ireland national figure included), for 2015-2021.",
+        "caveats": "Foreign direct investment (FDI) is cross-border investment made with the objective of establishing a lasting interest in the host economy. FDI is also defined by control relationships, where the direct investor (parent company) controls at least 10% of the voting power (ordinary shares) of the direct investment enterprise. These relationships can be measured in two directions:\n\n- outward: the direct investments of UK-resident companies in other countries \n\n- inward: the direct investments in the UK from non-resident companies",
+        "confidenceIntervals": true,
+        "canBeNegative": false,
+        "zeroBaseline": true,
+        "unit": "£ million",
+        "measure": "Pounds"
+      }
+    ]
+  }
+}

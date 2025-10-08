@@ -1,15 +1,15 @@
 import { readFileSync, writeFileSync } from "fs";
 
-const input_path = "./src/lib/data/metadata.json";
+const input_path = "./src/lib/data/json-stat.json";
 const output_path = "./src/lib/data/taxonomy.json";
 
-const metadata = JSON.parse(readFileSync(input_path));
-const indicators = Object.values(metadata).map(ind => ({
-  label: ind.metadata.label,
-  key: ind.metadata.slug,
-  topic: ind.topic,
-  subTopic: ind.subTopic,
-  description: ind.metadata.subtitle
+const cube = JSON.parse(readFileSync(input_path));
+const indicators = cube.link.item.map(ds => ({
+  label: ds.label,
+  key: ds.extension.slug,
+  topic: ds.extension.topic,
+  subTopic: ds.extension.subTopic,
+  description: ds.extension.subtitle
 }));
 
 const topicsIndex = {};
