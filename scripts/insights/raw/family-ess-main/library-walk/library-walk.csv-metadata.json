@@ -1,0 +1,203 @@
+{
+  "@context": [
+    "http://www.w3.org/ns/csvw",
+    {
+      "@language": "en"
+    }
+  ],
+  "dc:title": "Residents within a 30 minute walk of their nearest library",
+  "dc:publisher": "Office for National Statistics",
+  "dc:issued": "2024-10-17",
+  "dc:modified": "2025-04-07",
+  "tables": [
+    {
+      "url": "library-walk.csv",
+      "tableSchema": {
+        "columns": [
+          {
+            "name": "areacd",
+            "titles": [
+              "AREACD",
+              "Area code"
+            ],
+            "datatype": "string",
+            "type": "dimension",
+            "role": "geo"
+          },
+          {
+            "titles": [
+              "AREANM",
+              "Area name"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "Geography",
+              "Geography type"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "Variable Name",
+              "Variable name"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "name": "indicator",
+            "titles": [
+              "Indicator"
+            ],
+            "datatype": "string",
+            "type": "indicator"
+          },
+          {
+            "name": "period",
+            "titles": [
+              "Period",
+              "Time period"
+            ],
+            "datatype": "date",
+            "type": "dimension",
+            "role": "time"
+          },
+          {
+            "name": "value",
+            "titles": [
+              "Observation",
+              "Observation value"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "measure",
+            "titles": [
+              "Measure"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "name": "unit",
+            "titles": [
+              "Unit"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "name": "lci",
+            "titles": [
+              "Lower Confidence Interval (95%)",
+              "Lower confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "uci",
+            "titles": [
+              "Upper Confidence Interval (95%)",
+              "Upper confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "status",
+            "titles": [
+              "Observation Status",
+              "Observation status"
+            ],
+            "datatype": "string",
+            "type": "status"
+          },
+          {
+            "name": "polarity",
+            "titles": [
+              "Polarity"
+            ],
+            "datatype": "number",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "Notes"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "source": [
+      {
+        "name": "Office for National Statistics",
+        "href": "https://www.ons.gov.uk/peoplepopulationandcommunity/wellbeing/datasets/traveltimetolibrariesinlocalareasenglandandwales",
+        "date": "2024-10-17"
+      }
+    ],
+    "experimentalStatistic": false,
+    "geography": {
+      "countries": [
+        "E",
+        "W"
+      ],
+      "levels": [
+        "ctry",
+        "rgn",
+        "cauth",
+        "utla",
+        "ltla"
+      ],
+      "types": [
+        "E06",
+        "E07",
+        "E08",
+        "E09",
+        "E10",
+        "E12",
+        "E47",
+        "E92",
+        "K04",
+        "W06",
+        "W92"
+      ],
+      "year": 2024,
+      "initialLevel": "ltla"
+    },
+    "indicators": [
+      {
+        "code": "Residents within a 30 minute walk of their nearest library",
+        "slug": "library-walk",
+        "dataset": "library-walk",
+        "label": "Residents within a 30 minute walk of their nearest library",
+        "prefix": null,
+        "suffix": "%",
+        "subText": null,
+        "decimalPlaces": 0,
+        "standardised": true,
+        "subtitle": "Percentage of resident population within a 30 minute walk of their nearest library",
+        "longDescription": "This indicator shows the percentage of the resident population living within a 30 minute walk of their nearest library, in England and Wales, as at May 2024.",
+        "caveats": "Travel time to libraries analysis was performed in collaboration with Ordnance Survey (OS). This analysis contains the locations of 3,159 static public libraries from the Arts Council for England dataset, accurate to May 2024. This analysis does not include mobile and other libraries that are not routinely open to the public or those that are open for less than 2 hours a week.\n\nAnalysis parameters, including walking speed of 4.8 kilometres per hour, closely follow those of the [Department for Transport Journey Time Statistics (2019)](https://www.gov.uk/government/publications/journey-time-statistics-guidance/journey-time-statistics-notes-and-definitions-2019#model-params).\n\nPlease see the ['More quality and methodology information'](https://www.ons.gov.uk/peoplepopulationandcommunity/wellbeing/bulletins/accesstolocalamenitiesinenglandandwales/october2024#data-sources-and-quality) section of the publication for further details.",
+        "confidenceIntervals": true,
+        "canBeNegative": false,
+        "zeroBaseline": true,
+        "measure": "Percentage",
+        "unit": "%",
+        "polarity": 1
+      }
+    ]
+  }
+}

@@ -11,6 +11,7 @@
     "lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. .",
     "format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. .",
     "make-json-stat": "node ./scripts/make-json-stat.js",
+    "test-arquero": "npx ts-node ./scripts/arquero-processing.ts",
     "make-geo-data": "node ./scripts/make-geo-data.js",
     "make-taxonomy": "node ./scripts/make-taxonomy.js",
     "make-clusters": "node ./scripts/make-clusters.js"
@@ -23,7 +24,7 @@
     "@onsvisual/svelte-charts": "^0.4.11",
     "@onsvisual/svelte-components": "^1.0.12",
     "@sveltejs/adapter-auto": "^6.0.1",
-    "@sveltejs/kit": "^2.5.27",
+    "@sveltejs/kit": "^2.46.3",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
     "@turf/boolean-point-in-polygon": "^7.2.0",
     "@turf/meta": "^7.2.0",
@@ -39,10 +40,16 @@
     "throttleit": "^2.1.0",
     "topojson-client": "^3.1.0",
     "topojson-server": "^3.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2",
     "vite": "^5.4.4"
   },
   "dependencies": {
+    "arquero": "^8.0.3",
     "sirv-cli": "^1.0.0"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.6.1"
   },
   "type": "module"
 }

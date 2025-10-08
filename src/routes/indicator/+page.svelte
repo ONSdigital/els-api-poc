@@ -13,13 +13,12 @@
     NavSection,
     LazyLoad
   } from "@onsvisual/svelte-components";
-  import metadata from "$lib/data/metadata.json";
   import Map from "$lib/viz/Map.svelte";
   import Bar from "$lib/viz/Bar.svelte";
   import Line from "$lib/viz/Line.svelte";
   import { fetchChartData } from "$lib/utils.js";
 
-  const indicators = Object.values(metadata).map(ind => ({id: ind.code, label: ind.metadata.label}));
+  export let data;
 
   let selected;
   let indicator;
@@ -38,7 +37,7 @@
     Select an indicator to view data as a map, bar and line chart. Chart data for each indicator will be lazy loaded when the chart comes into view on the page.
   </p>
   <form class="select-container" on:submit|preventDefault={() => selectIndicator(selected)}>
-    <Select options={indicators} bind:value={selected} label="Select an indicator" placeholder="Eg. Household income"/>
+    <Select options={data.indicators} bind:value={selected} label="Select an indicator" placeholder="Eg. Household income"/>
     <Button small type="sumbit">Select area</Button>
   </form>
 </Section>
@@ -49,7 +48,7 @@
     <NavSection title="Map">
       <LazyLoad>
         <div class="chart-container map-container">
-          {#await fetchChartData(indicator.id)}
+          {#await fetchChartData(indicator.key)}
             Fetching chart data
           {:then chartData}
             <Map data={chartData}/>
@@ -62,7 +61,7 @@
     <NavSection title="Bar">
       <LazyLoad>
         <div class="chart-container">
-          {#await fetchChartData(indicator.id)}
+          {#await fetchChartData(indicator.key, "rgn")}
             Fetching chart data
           {:then chartData}
             <Bar data={chartData}/>
@@ -75,7 +74,7 @@
     <NavSection title="Line">
       <LazyLoad>
         <div class="chart-container">
-          {#await fetchChartData(indicator.id, "ltla", "all")}
+          {#await fetchChartData(indicator.key, "ltla", "all")}
             Fetching chart data
           {:then chartData}
             <Line data={chartData}/>

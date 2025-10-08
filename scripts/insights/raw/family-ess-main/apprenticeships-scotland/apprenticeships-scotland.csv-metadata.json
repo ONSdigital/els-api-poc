@@ -1,0 +1,176 @@
+{
+  "@context": [
+    "http://www.w3.org/ns/csvw",
+    {
+      "@language": "en"
+    }
+  ],
+  "dc:title": "Apprenticeship starts and achievements (Scotland)",
+  "dc:publisher": "Skills Development Scotland",
+  "dc:issued": "2025-05-13",
+  "dc:modified": "2025-05-29",
+  "tables": [
+    {
+      "url": "apprenticeships-scotland.csv",
+      "tableSchema": {
+        "columns": [
+          {
+            "name": "areacd",
+            "titles": [
+              "AREACD",
+              "Area code"
+            ],
+            "datatype": "string",
+            "type": "dimension",
+            "role": "geo"
+          },
+          {
+            "titles": [
+              "AREANM",
+              "Area name"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "Geography",
+              "Geography type"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "name": "indicator",
+            "titles": [
+              "Indicator"
+            ],
+            "datatype": "string",
+            "type": "indicator"
+          },
+          {
+            "name": "value",
+            "titles": [
+              "Observation",
+              "Observation value"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "unit",
+            "titles": [
+              "Unit"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "name": "measure",
+            "titles": [
+              "Measure"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "name": "period",
+            "titles": [
+              "Period",
+              "Time period"
+            ],
+            "datatype": "date",
+            "type": "dimension",
+            "role": "time"
+          },
+          {
+            "name": "lci",
+            "titles": [
+              "Lower_confidence_interval_95",
+              "Lower confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "uci",
+            "titles": [
+              "Upper_confidence_interval_95",
+              "Upper confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "status",
+            "titles": [
+              "Observation_status",
+              "Observation status"
+            ],
+            "datatype": "string",
+            "type": "status"
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "source": [
+      {
+        "name": "Skills Development Scotland",
+        "href": "https://www.skillsdevelopmentscotland.co.uk/publications-statistics/statistics/modern-apprenticeships",
+        "date": "2025-05-13"
+      }
+    ],
+    "experimentalStatistic": false,
+    "geography": {
+      "countries": [
+        "S"
+      ],
+      "levels": [
+        "ctry",
+        "rgn",
+        "utla",
+        "ltla"
+      ],
+      "types": [
+        "S12",
+        "S92"
+      ],
+      "year": 2017,
+      "initialLevel": "ltla"
+    },
+    "indicators": [
+      {
+        "code": "Apprenticeships starts (Scotland)",
+        "slug": "apprenticeships-starts",
+        "dataset": "apprenticeships-scotland",
+        "label": "Apprenticeship starts (Scotland)",
+        "standardised": false,
+        "subtitle": "Modern apprenticeship programme starts by people aged 16 or above, per 100,000 people",
+        "longDescription": "This indicator shows modern apprenticeships started by adults aged 16+ based on home address, rate per 100,000 population, in Scotland, for financial years 2013/14 to 2024/25.",
+        "confidenceIntervals": true,
+        "canBeNegative": false,
+        "zeroBaseline": true,
+        "unit": "Rate per 100,000 population",
+        "measure": "Rate per 100,000 population"
+      },
+      {
+        "code": "Apprenticeships achievements (Scotland)",
+        "slug": "apprenticeships-achievements",
+        "dataset": "apprenticeships-scotland",
+        "label": "Apprenticeship achievements (Scotland)",
+        "standardised": false,
+        "subtitle": "Modern apprenticeship programme achievements by people aged 16 or above, per 100,000 people",
+        "longDescription": "This indicator shows modern apprenticeships achieved by adults aged 16+ based on home address, rate per 100,000 population, in Scotland, for financial years 2013/14 to 2024/25.",
+        "confidenceIntervals": true,
+        "canBeNegative": false,
+        "zeroBaseline": true,
+        "unit": "Rate per 100,000 population",
+        "measure": "Rate per 100,000 population"
+      }
+    ]
+  }
+}

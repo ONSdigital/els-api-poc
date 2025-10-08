@@ -32,7 +32,7 @@
   <NavSection title="Map">
     <LazyLoad>
       <div class="chart-container map-container">
-        {#await fetchChartData(data.indicator.code, "ltla")}
+        {#await fetchChartData(data.indicator.slug, "ltla")}
           Fetching chart data
         {:then chartData}
           <Map data={chartData}/>
@@ -45,7 +45,7 @@
   <NavSection title="Bar">
     <LazyLoad>
       <div class="chart-container">
-        {#await fetchChartData(data.indicator.code, "rgn")}
+        {#await fetchChartData(data.indicator.slug, "rgn")}
           Fetching chart data
         {:then chartData}
           <Bar data={chartData}/>
@@ -58,7 +58,7 @@
   <NavSection title="Line">
     <LazyLoad>
       <div class="chart-container">
-        {#await fetchChartData(data.indicator.code, "ltla", "all")}
+        {#await fetchChartData(data.indicator.slug, "ltla", "all")}
           Fetching chart data
         {:then chartData}
           <Line data={chartData}/>

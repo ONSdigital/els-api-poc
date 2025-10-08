@@ -1,0 +1,209 @@
+{
+  "@context": [
+    "http://www.w3.org/ns/csvw",
+    {
+      "@language": "en"
+    }
+  ],
+  "dc:title": "Value of UK exports",
+  "dc:publisher": "Office for National Statistics",
+  "dc:issued": "2025-02-06",
+  "dc:modified": "2025-05-19",
+  "tables": [
+    {
+      "url": "total-value-of-uk-exports.csv",
+      "tableSchema": {
+        "columns": [
+          {
+            "name": "areacd",
+            "titles": [
+              "AREACD",
+              "Area code"
+            ],
+            "datatype": "string",
+            "type": "dimension",
+            "role": "geo"
+          },
+          {
+            "titles": [
+              "AREANM",
+              "Area name"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "Geography",
+              "Geography type"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "Variable Name",
+              "Variable name"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          },
+          {
+            "name": "indicator",
+            "titles": [
+              "Indicator"
+            ],
+            "datatype": "string",
+            "type": "indicator"
+          },
+          {
+            "name": "period",
+            "titles": [
+              "Period",
+              "Time period"
+            ],
+            "datatype": "date",
+            "type": "dimension",
+            "role": "time"
+          },
+          {
+            "name": "value",
+            "titles": [
+              "Observation",
+              "Observation value"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "measure",
+            "titles": [
+              "Measure"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "name": "unit",
+            "titles": [
+              "Unit"
+            ],
+            "datatype": "string",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "name": "lci",
+            "titles": [
+              "Lower Confidence Interval (95%)",
+              "Lower confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "uci",
+            "titles": [
+              "Upper Confidence Interval (95%)",
+              "Upper confidence interval (95%)"
+            ],
+            "datatype": "number",
+            "type": "measure"
+          },
+          {
+            "name": "status",
+            "titles": [
+              "Observation Status",
+              "Observation status"
+            ],
+            "datatype": "string",
+            "type": "status"
+          },
+          {
+            "name": "polarity",
+            "titles": [
+              "Polarity"
+            ],
+            "datatype": "number",
+            "type": "metadata",
+            "suppressOutput": true
+          },
+          {
+            "titles": [
+              "Notes"
+            ],
+            "datatype": "string",
+            "suppressOutput": true
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "source": [
+      {
+        "name": "Office for National Statistics",
+        "href": "https://www.ons.gov.uk/businessindustryandtrade/internationaltrade/bulletins/internationaltradeinuknationsregionsandcities/previousReleases",
+        "date": "2025-02-06"
+      }
+    ],
+    "experimentalStatistic": true,
+    "geography": {
+      "countries": [
+        "E",
+        "N",
+        "W"
+      ],
+      "levels": [
+        "uk",
+        "ctry",
+        "cauth"
+      ],
+      "types": [
+        "E13",
+        "E47",
+        "E92",
+        "K02",
+        "N34",
+        "TLC",
+        "TLD",
+        "TLE",
+        "TLF",
+        "TLG",
+        "TLH",
+        "TLI",
+        "TLJ",
+        "TLK",
+        "TLL",
+        "TLM",
+        "TLN",
+        "W42"
+      ],
+      "year": 2023,
+      "initialLevel": "cauth"
+    },
+    "indicators": [
+      {
+        "code": "Value of UK exports",
+        "slug": "total-value-of-uk-exports",
+        "dataset": "total-value-of-uk-exports",
+        "label": "Value of UK exports",
+        "prefix": "GBPSign",
+        "suffix": null,
+        "subText": "in £ millions",
+        "decimalPlaces": 0,
+        "standardised": false,
+        "subtitle": "Estimated total value of UK exports including trade in both goods and services",
+        "longDescription": "This indicator shows the estimated total value of UK exports including trade in both goods and services (official statistics in development), in the UK, for 2019 to 2022.",
+        "caveats": "Data for lower levels of geography (ITL2 and ITL3) can be found in the original data source or in the [CSV file](https://github.com/ONSdigital/explore-local-statistics-data/blob/main/total-value-of-uk-exports/total-value-of-uk-exports.csv) on ONS Digital GitHub.",
+        "confidenceIntervals": true,
+        "canBeNegative": false,
+        "zeroBaseline": true,
+        "measure": "Pounds",
+        "unit": "£ million",
+        "polarity": 1
+      }
+    ]
+  }
+}
