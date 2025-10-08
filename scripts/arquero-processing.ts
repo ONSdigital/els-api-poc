@@ -228,7 +228,7 @@ function indicatorToCube(indicator, t, meta_data, tableSchema) {
 
     return { ...dataset, id, size, role, dimension, value, status };
 }
-function processFile(file) {
+function processFile(file, excluded_indicators) {
 
     const data_file = file.replace(`${CSV_PREPROCESS_DIR}`, '')
     let indicator_data = loadCsvWithoutBom(`${CSV_PREPROCESS_DIR}${data_file}`)
@@ -253,14 +253,14 @@ function processFile(file) {
         .select(aq.not(suppressedCols))
         .rename(varNames)
 
-    //  filter out excludedIndicators - checks whether the excluded indicator matches the full indicator name
-    //  entire files are excluded using the manifest
-    // if (excludedIndicators.length) {
-    //     indicator_data = indicator_data.filter(aq.escape(
-    //         row =>
-    //             !excludedIndicators.includes(row.indicator))
-    //     );
-    // }
+    //  filter out unwanted indicators - checks whether the excluded indicator matches the full indicator name
+    //  entire files are excluded at an earlier point when creating file_paths
+    if (excluded_indicators.length) {
+        indicator_data = indicator_data.filter(aq.escape(
+            row =>
+                !excluded_indicators.includes(row.indicator))
+        );
+    }
 
     // split table into one table per indicator
     const indicatorTables =
@@ -282,6 +282,7 @@ function processFile(file) {
 }
 
 const manifest_metadata = loadCsvWithoutBom(MANIFEST);
+const excluded_indicators = manifest_metadata.filter((f) => !f.include).array('code')
 // const areas_geog_level = loadCsvWithoutBom(AREAS_GEOG_LEVEL_FILENAME);
 // const excludedIndicators = readJsonSync(EXCLUDED_INDICATORS_PATH);
 
@@ -312,7 +313,7 @@ const cube = {
 };
 
 for (const file of file_paths) {
-    cube.link.item = [...cube.link.item, ...processFile(file)]
+    cube.link.item = [...cube.link.item, ...processFile(file,excluded_indicators)]
 }
 
 // console.log(cube.link.item)

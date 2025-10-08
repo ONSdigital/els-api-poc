@@ -7,9 +7,9 @@ population,population,population-density,FALSE,,population-indicators,Population
 population,population,population-density-female,FALSE,,population-indicators,Population density - Female,scripts/insights/raw/family-ess-main/population-indicators/population-indicators.csv,false
 population,population,population-density-male,FALSE,,population-indicators,Population density - Male,scripts/insights/raw/family-ess-main/population-indicators/population-indicators.csv,false
 population,population,five-year-population-change,FALSE,,population-indicators,5-year population change,scripts/insights/raw/family-ess-main/population-indicators/population-indicators.csv,true
-population,population,median-age,FALSE,,population-indicators,Median age - Female,scripts/insights/raw/family-ess-main/population-indicators/population-indicators.csv,false
-population,population,median-age-female,FALSE,,population-indicators,Median age - Male,scripts/insights/raw/family-ess-main/population-indicators/population-indicators.csv,false
-population,population,median-age-male,FALSE,,population-indicators,Median age,scripts/insights/raw/family-ess-main/population-indicators/population-indicators.csv,true
+population,population,median-age,FALSE,,population-indicators,Median age,scripts/insights/raw/family-ess-main/population-indicators/population-indicators.csv,true
+population,population,median-age-female,FALSE,,population-indicators,Median age - Female,scripts/insights/raw/family-ess-main/population-indicators/population-indicators.csv,false
+population,population,median-age-male,FALSE,,population-indicators,Median age - Male,scripts/insights/raw/family-ess-main/population-indicators/population-indicators.csv,false
 population,population,percentage-population-aged-0-to-15,FALSE,,population-indicators,Percentage of the population aged 0 to 15,scripts/insights/raw/family-ess-main/population-indicators/population-indicators.csv,true
 population,population,percentage-population-aged-0-to-15-female,FALSE,,population-indicators,Percentage of the population aged 0 to 15 - Female,scripts/insights/raw/family-ess-main/population-indicators/population-indicators.csv,false
 population,population,percentage-population-aged-0-to-15-male,FALSE,,population-indicators,Percentage of the population aged 0 to 15 - Male,scripts/insights/raw/family-ess-main/population-indicators/population-indicators.csv,false
