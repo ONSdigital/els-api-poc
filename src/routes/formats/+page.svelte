@@ -12,7 +12,7 @@
   import { format } from "d3-format";
   import { utcFormat } from "d3-time-format";
   import { utcYear, utcDay } from "d3-time";
-  import metadata from "$lib/metadata.json";
+  import metadata from "$lib/data/metadata.json";
 
   function formatDate(str) {
     const parts = str.split("/");
@@ -36,7 +36,7 @@
   }
 
   async function fetchData() {
-    const url = `${base}/api.json?geography=E92000001&time=latest&measure=value`;
+    const url = `${base}/api/v1/data.json?geography=E92000001&time=latest&measure=value`;
     const data = await (await fetch(url)).json();
     return data;
   }
@@ -61,7 +61,7 @@
       <DataCard
         title={meta.label.split(" (")[0]}
         value="{meta.prefix}{format(`,.${meta.decimalPlaces}f`)(data[key].value[0])}{meta.suffix}"
-        caption="{meta.subText ? `${meta.subText} ` : ""}<span class='nobr'>in {formatDate(data[key].date[0])}</span>"
+        caption="{meta.subText ? `${meta.subText} ` : ""}<span class='nobr'>in {formatDate(data[key].period[0])}</span>"
         source="Source: {meta.sourceOrg.split("|").join(", ")}"/>
     {/each}
   {:catch}

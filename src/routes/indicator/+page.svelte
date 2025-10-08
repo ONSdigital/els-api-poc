@@ -13,7 +13,7 @@
     NavSection,
     LazyLoad
   } from "@onsvisual/svelte-components";
-  import metadata from "$lib/metadata.json";
+  import metadata from "$lib/data/metadata.json";
   import Map from "$lib/viz/Map.svelte";
   import Bar from "$lib/viz/Bar.svelte";
   import Line from "$lib/viz/Line.svelte";

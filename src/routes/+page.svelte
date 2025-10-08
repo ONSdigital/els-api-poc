@@ -19,10 +19,7 @@
   </p>
 </Section>
 
-<Grid colWidth="medium">
-  <Card title="Path-based API" mode="featured" href="{base}/path">
-    Request data based on a URL path.
-  </Card>
+<Grid title="Active demos" colWidth="medium">
   <Card title="Query-based API" mode="featured" href="{base}/query">
     Request data based on URL query parameters.
   </Card>
@@ -32,11 +29,23 @@
   <Card title="Lazy charts demo" mode="featured" href="{base}/charts">
     Same as charts demo, but with data lazy loaded per chart.
   </Card>
+  <Card title="Explore areas demo" mode="featured" href="{base}/areas">
+    API-driven navigation through areas within the UK.
+  </Card>
+  <Card title="Explore indicators demo" mode="featured" href="{base}/indicators">
+    API-driven navigation through indicators within the taxonomy.
+  </Card>
   <Card title="Single indicator demo" mode="featured" href="{base}/indicator">
     Indicator page demo, with data lazy loaded per chart/map.
   </Card>
   <Card title="Formats and units" mode="featured" href="{base}/formats">
     Adding automatic units, dates and descriptions to data.
+  </Card>
+</Grid>
+
+<Grid title="Redundant demos" colWidth="medium">
+  <Card title="Path-based API" mode="featured" href="{base}/path">
+    Request data based on a URL path.
   </Card>
 </Grid>
 
