@@ -48,5 +48,8 @@
     "arquero": "^8.0.3",
     "sirv-cli": "^1.0.0"
   },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.6.1"
+  },
   "type": "module"
 }
