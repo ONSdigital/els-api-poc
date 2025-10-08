@@ -14,7 +14,8 @@
     "test-arquero": "npx ts-node ./scripts/arquero-processing.ts",
     "make-geo-data": "node ./scripts/make-geo-data.js",
     "make-taxonomy": "node ./scripts/make-taxonomy.js",
-    "make-clusters": "node ./scripts/make-clusters.js"
+    "make-clusters": "node ./scripts/make-clusters.js",
+    "data:download": "tsx ./scripts/download-data.ts"
   },
   "author": "Ahmad Barclay",
   "license": "MIT",
@@ -46,7 +47,8 @@
   },
   "dependencies": {
     "arquero": "^8.0.3",
-    "sirv-cli": "^1.0.0"
+    "sirv-cli": "^1.0.0",
+    "tsx": "^4.20.6"
   },
   "type": "module"
 }
