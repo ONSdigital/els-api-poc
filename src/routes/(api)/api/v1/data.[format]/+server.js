@@ -294,7 +294,7 @@ export function GET({ params, url }) {
   const format = params.format || "json";
   const topic = getParam(url, "topic", "all");
   const indicator = getParam(url, "indicator", "all");
-  const geography = getParam	(url, "geography", "all");
+  const geo = getParam	(url, "geo", "all");
   const time = getParam(url, "time", "latest");
   const measure = getParam(url, "measure", "all");
 
@@ -322,7 +322,7 @@ export function GET({ params, url }) {
 
 	// Create filters for data cube dimensions
 	const filters = {};
-	if (geography !== "all") filters.areacd = makeGeoFilter(geography);
+	if (geo !== "all") filters.areacd = makeGeoFilter(geo);
 	if (time !== "all") filters.period = time;
 	if (measure !== "all") filters.measure = makeFilter(measure);
 
