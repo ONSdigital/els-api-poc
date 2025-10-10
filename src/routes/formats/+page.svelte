@@ -62,7 +62,7 @@
       <DataCard
         title={meta.label.split(" (")[0]}
         value="{meta.prefix}{format(`,.${meta.decimalPlaces || 0}f`)(d[key].value[0])}{meta.suffix}"
-        caption="{meta.subText || ""}<span class='nobr'>in {formatDate(d[key].period[0])}</span>"
+        caption="{meta.subText || ""}<span class='nobr'> in {formatDate(d[key].period[0])}</span>"
         source="Source: {meta.source.map(m => m.name).join(", ")}"/>
     {/each}
   {:catch}
