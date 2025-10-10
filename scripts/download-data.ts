@@ -29,7 +29,7 @@ async function removeDirectory(dir: string): Promise<void> {
 async function cloneRepo(): Promise<void> {
     try {
         console.log('Cloning repository...');
-        await execAsync(`git clone --single-branch --branch new-app-metadata-poc ${REPO_URL} ${TEMP_DIR}`);
+        await execAsync(`git clone --single-branch --branch csvw-metadata ${REPO_URL} ${TEMP_DIR}`);
         console.log('Repository cloned successfully');
     } catch (error) {
         console.error('Error cloning repository:', error);
