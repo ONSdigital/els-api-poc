@@ -50,5 +50,8 @@
     "sirv-cli": "^1.0.0",
     "tsx": "^4.20.6"
   },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.6.1"
+  },
   "type": "module"
 }

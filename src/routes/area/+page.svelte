@@ -14,8 +14,9 @@
     LazyLoad
   } from "@onsvisual/svelte-components";
   import Beeswarm from "$lib/viz/Beeswarm.svelte";
-  import areas from "$lib/data/areas.json";
   import { fetchTopicsData } from "$lib/utils.js";
+
+  export let data;
 
   let selected;
   let area;
@@ -41,7 +42,7 @@
     Select an area to display indicators. Chart data for all indicators will be loaded at once. (Note: Charts are rendered lazily as the performance of SveltePlot does not seem to be optimised for this use case).
   </p>
   <form class="select-container" on:submit|preventDefault={() => selectArea(selected)}>
-    <Select options={areas} bind:value={selected} labelKey="areanm" label="Select a local authority" placeholder="Eg. Fareham or Newport"/>
+    <Select options={data.areaList} bind:value={selected} labelKey="areanm" label="Select a local authority" placeholder="Eg. Fareham or Newport"/>
     <Button small type="sumbit">Select area</Button>
   </form>
 </Section>
@@ -53,7 +54,7 @@
       {#each topics as topic}
         <NavSection title={topic.label}>
           {#each topic.indicators as ind}
-            <h3>{ind.meta.metadata.label}</h3>
+            <h3>{ind.meta.label}</h3>
             <div class="chart-container">
               <LazyLoad>
                 <Beeswarm data={ind.data} selected={area}/>
