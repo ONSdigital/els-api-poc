@@ -97,11 +97,12 @@ function processColumns(k, metaLookup, columnValues, id, size, role, dimension) 
     }
     return { id, size, role, dimension }
 }
-function indicatorToCube(indicator, t, meta_data, tableSchema) {
+function indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name) {
     console.log('Processing', indicator, '........')
+    console.log({dataset_name})
     // filter file-level metadata to be indicator level
     const meta_indicator = meta_data.metadata.indicators.find(d => d.code === indicator)
-    const manifest_metadata_indicator = manifest_metadata.filter(aq.escape(d => d.code === indicator)).objects()
+    const manifest_metadata_indicator = manifest_metadata.filter(aq.escape(d => d.dataset === dataset_name && d.code === indicator)).objects()
     // deconstruct meta_indicator (and remove slug as using slug from csv):
     const { label, caveats, longDescription, slug, ...restOfMetadata } = meta_indicator
 
@@ -234,6 +235,7 @@ function processFile(file, excluded_indicators) {
     let indicator_data = loadCsvWithoutBom(`${CSV_PREPROCESS_DIR}${data_file}`)
     const meta_data = JSON.parse(fs.readFileSync(`${CSV_PREPROCESS_DIR}${data_file.replace('.csv', '.csv-metadata.json')}`))
     const tableSchema = meta_data.tables[0].tableSchema.columns
+    const dataset_name = data_file.split("/")[1]
 
     // get the column titles of those columns we want to suppress
     const suppressedCols = tableSchema
@@ -275,7 +277,7 @@ function processFile(file, excluded_indicators) {
     const indicatorDatasets = []
     // loop through each indicator (when more than one)
     for (const [indicator, t] of Object.entries(indicatorTables)) {
-        indicatorDatasets.push(indicatorToCube(indicator, t, meta_data, tableSchema))
+        indicatorDatasets.push(indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name))
     }
     return indicatorDatasets
 
