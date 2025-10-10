@@ -6,9 +6,11 @@
     }
   ],
   "dc:title": "Aged 19 years and over further education and skills learner achievements",
+  "dc:creator": "Office for National Statistics",
   "dc:publisher": "Department for Education",
   "dc:issued": "2025-01-30",
   "dc:modified": "2025-10-01",
+  "dc:license": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
   "tables": [
     {
       "url": "aged-19-years-and-over-further-education-and-skills-learner-achievements.csv",
@@ -183,9 +185,12 @@
         "subtitle": "Count of learners aged 19 years and over achieving a funded further education and skills learning aim (with the exception of community learning and non-regulated Multiply aims)",
         "longDescription": "This indicator shows the count of learners achieving a funded further education and skills learning aim, with the exception of community learning, non-qualification parts of the Multiply programme and bootcamps, in England, for academic years 2018/19 to 2023/24.",
         "caveats": null,
+        "isMultivariate": false,
         "confidenceIntervals": true,
         "canBeNegative": false,
         "zeroBaseline": true,
+        "frequency": "annual",
+        "periodFormat": "academic-year",
         "measure": "Achievements gained",
         "unit": "Number",
         "polarity": 1

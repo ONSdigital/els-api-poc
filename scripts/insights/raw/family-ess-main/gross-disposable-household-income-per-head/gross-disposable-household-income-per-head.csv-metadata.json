@@ -6,9 +6,11 @@
     }
   ],
   "dc:title": "Gross disposable household income per head",
+  "dc:creator": "Office for National Statistics",
   "dc:publisher": "Office for National Statistics",
   "dc:issued": "2024-09-04",
   "dc:modified": "2025-10-01",
+  "dc:license": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
   "tables": [
     {
       "url": "gross-disposable-household-income-per-head.csv",
@@ -196,7 +198,7 @@
         "slug": "gross-disposable-household-income-per-head",
         "dataset": "gross-disposable-household-income-per-head",
         "label": "Gross disposable household income",
-        "prefix": "GBPSign",
+        "prefix": "£",
         "suffix": null,
         "subText": null,
         "decimalPlaces": 0,
@@ -204,9 +206,12 @@
         "subtitle": "Average income per person (£) after taxes and direct benefits",
         "longDescription": "This indicator shows an estimate of the amount of money each individual within a household has available for spending or saving after they have paid taxes and received any direct benefits, in pounds, in the UK, for 1997 to 2022.",
         "caveats": "Figures for 2022 are provisional, as national estimates have not been through supply and use balancing at the time of the data source publication.",
+        "isMultivariate": false,
         "confidenceIntervals": true,
         "canBeNegative": false,
         "zeroBaseline": true,
+        "frequency": "annual",
+        "periodFormat": "year",
         "measure": "Pounds",
         "unit": "£",
         "polarity": 1

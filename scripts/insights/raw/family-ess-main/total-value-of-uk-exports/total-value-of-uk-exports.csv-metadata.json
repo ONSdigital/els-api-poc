@@ -6,9 +6,11 @@
     }
   ],
   "dc:title": "Total value of uk exports",
+  "dc:creator": "Office for National Statistics",
   "dc:publisher": "Office for National Statistics",
   "dc:issued": "2025-02-06",
   "dc:modified": "2025-10-01",
+  "dc:license": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
   "tables": [
     {
       "url": "total-value-of-uk-exports.csv",
@@ -189,7 +191,7 @@
         "slug": "total-value-of-uk-exports",
         "dataset": "total-value-of-uk-exports",
         "label": "Value of UK exports",
-        "prefix": "GBPSign",
+        "prefix": "£",
         "suffix": null,
         "subText": "in £ millions",
         "decimalPlaces": 0,
@@ -197,9 +199,12 @@
         "subtitle": "Estimated total value of UK exports including trade in both goods and services",
         "longDescription": "This indicator shows the estimated total value of UK exports including trade in both goods and services (official statistics in development), in the UK, for 2019 to 2022.",
         "caveats": "Data for lower levels of geography (ITL2 and ITL3) can be found in the original data source or in the [CSV file](https://github.com/ONSdigital/explore-local-statistics-data/blob/main/total-value-of-uk-exports/total-value-of-uk-exports.csv) on ONS Digital GitHub.",
+        "isMultivariate": false,
         "confidenceIntervals": true,
         "canBeNegative": false,
         "zeroBaseline": true,
+        "frequency": "annual",
+        "periodFormat": "year",
         "measure": "Pounds",
         "unit": "£ million",
         "polarity": 1

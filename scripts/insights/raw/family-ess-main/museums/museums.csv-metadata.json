@@ -6,9 +6,11 @@
     }
   ],
   "dc:title": "Museums",
+  "dc:creator": "Office for National Statistics",
   "dc:publisher": "Office for National Statistics",
   "dc:issued": "2024-03-07",
   "dc:modified": "2025-10-02",
+  "dc:license": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
   "tables": [
     {
       "url": "museums.csv",
@@ -200,9 +202,12 @@
         "subtitle": "Museums per 100,000 people",
         "longDescription": "This indicator shows museums per 100,000 people, in the UK, as at 30 September 2021.",
         "caveats": "Per capita estimates are calculated using the usual resident population estimates from the most recent Census. These per capita estimates are not directly comparable between the different countries because of the non-consistent census dates that the population estimates were taken on.\n\nSome of this data has been aggregated and may show differences to other published figures. ",
+        "isMultivariate": false,
         "confidenceIntervals": true,
         "canBeNegative": false,
         "zeroBaseline": true,
+        "frequency": "annual",
+        "periodFormat": "year",
         "measure": "Counts of museums per 100,000 people",
         "unit": "Count per 100,000 people",
         "polarity": 1

@@ -6,9 +6,11 @@
     }
   ],
   "dc:title": "Premises below 30",
+  "dc:creator": "Office for National Statistics",
   "dc:publisher": "Ofcom",
   "dc:issued": "2025-05-08",
   "dc:modified": "2025-10-01",
+  "dc:license": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
   "tables": [
     {
       "url": "premises-below-30.csv",
@@ -200,9 +202,12 @@
         "subtitle": "Percentage of premises that do not have access to services above 30Mbps",
         "longDescription": "This dataset shows the percentage of premises that do not have access to services above 30Mbps, UK, as of January 2025.",
         "caveats": "Some of this data has been aggregated and may show differences to other published figures.",
+        "isMultivariate": false,
         "confidenceIntervals": true,
         "canBeNegative": false,
         "zeroBaseline": true,
+        "frequency": "annual",
+        "periodFormat": "year",
         "measure": "Percentage",
         "unit": "%",
         "polarity": 1

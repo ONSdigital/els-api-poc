@@ -6,9 +6,11 @@
     }
   ],
   "dc:title": "Gross value added per hour worked",
+  "dc:creator": "Office for National Statistics",
   "dc:publisher": "Office for National Statistics",
   "dc:issued": "2025-06-19",
   "dc:modified": "2025-09-29",
+  "dc:license": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
   "tables": [
     {
       "url": "gross-value-added-per-hour-worked.csv",
@@ -195,7 +197,7 @@
         "slug": "gross-value-added-per-hour-worked",
         "dataset": "gross-value-added-per-hour-worked",
         "label": "Gross value added per hour worked",
-        "prefix": "GBPSign",
+        "prefix": "£",
         "suffix": null,
         "subText": null,
         "decimalPlaces": 1,
@@ -203,9 +205,12 @@
         "subtitle": "Estimated value of goods and services produced per hour worked",
         "longDescription": "This indicator shows the measure of business productivity (estimate of the volume of goods and services produced) in £ per hour worked (official statistics in development), in the UK, for 2004 to 2023.",
         "caveats": null,
+        "isMultivariate": false,
         "confidenceIntervals": true,
         "canBeNegative": false,
         "zeroBaseline": true,
+        "frequency": "annual",
+        "periodFormat": "year",
         "measure": "Pounds",
         "unit": "£",
         "polarity": 1
