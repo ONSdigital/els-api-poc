@@ -18,7 +18,7 @@
   import Bar from "$lib/viz/Bar.svelte";
   import Line from "$lib/viz/Line.svelte";
 
-  export let data;
+  let { data } = $props();
 
   function arrayJoin(arr, separators = [", ", " and "]) {
     if (arr.length < 2) return arr.join(separators[0]);
@@ -52,16 +52,6 @@
 		.sort((a, b) => a.areanm.localeCompare(b.areanm));
 }
 
-  $: console.log(data);
-
-  $: source = data.indicator.source;
-  $: sourceName = source.map((d) => d.name);
-  $: sourceLink = source.map((d) => d.href);
-  $: sourceDate = source.map((d) => d.date);
-  // $: experimental = data.indicator.experimentalStatistic === 'T';
-  $: caveats = data.indicator.caveats;
-  // 	? new MarkdownIt().render(data.indicator.metadata.caveats)
-  // 	: null;
 </script>
 
 <Header />
@@ -71,23 +61,12 @@
   width="medium"
   meta={[
     {
-      key: source.length === 1 ? "Data source" : "Data sources",
-      value: arrayJoin(
-        Array.from(
-          sourceName
-            .keys()
-            .map(
-              (i) =>
-                `<a href="${sourceLink[i]}" target="_blank">${sourceName[i]}</a>`
-            )
-        )
-      ),
+      key: data.indicator.source.length === 1 ? "Data source" : "Data sources",
+      value: arrayJoin(data.indicator.source.map(s => `<a href="${s.href}" target="_blank">${s.name}</a>`))
     },
     {
       key: "Published on",
-      value: sourceDate.every((d) => d === sourceDate[0])
-        ? parseDate(sourceDate[0])
-        : arrayJoin(sourceDate.map((d) => parseDate(d))),
+      value: parseDate(data.indicator.updated)
     },
   ]}
   background="#eaeaea"
