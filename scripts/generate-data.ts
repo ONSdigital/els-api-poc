@@ -103,7 +103,7 @@ function indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name) {
         label: label,
         note: [caveats].filter(n => n),
         source: meta_data["dc:publisher"],
-        updated: meta_data["dc:modified"],
+        updated: meta_data["dc:issued"],
         extension: {
             topic: manifest_metadata_indicator[0].topic,
             subTopic: manifest_metadata_indicator[0].subTopic,
