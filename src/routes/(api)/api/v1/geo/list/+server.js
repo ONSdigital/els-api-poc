@@ -5,6 +5,7 @@ import getAreasList from "$lib/api/geo/getAreasList";
 export function GET({ url }) {
   const geo = getParam(url, "geo", "all");
   const year = getParam(url, "year", "latest");
+  const indicator = getParam(url, "indicator", "all");
   const asLookup = getParam(url, "asLookup", false);
   const groupByLevel = getParam(url, "groupByLevel", false);
   const includeParents = getParam(url, "includeParents", false);
@@ -15,6 +16,7 @@ export function GET({ url }) {
   const areasList = getAreasList({
     geo,
     year,
+    indicator,
     asLookup,
     groupByLevel,
     includeParents,

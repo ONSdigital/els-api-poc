@@ -10,10 +10,10 @@ aged-16-to-64-years-with-no-qualifications-great-britain,qualifications-none-gb,
 aged-16-years-and-over-modelled-unemployment,modelled-unemployment,Indicator,Modelled unemployment rate,Variable Name,Modelled unemployment rate,Modelled unemployment rate
 aged-19-years-and-over-further-education-and-skills-learner-achievements,further-education-and-skills-learner-achievements,Indicator,"19+ further education and skills learner achievements (qualifications) excluding community learning, non-qualification parts of the Multiply programme and bootcamps",Variable Name,Further education and skills learner achievements,Further education and skills learner achievements
 aged-19-years-and-over-further-education-and-skills-participation,further-education-and-skills-participation,Indicator,"19+ further education and skills participation (per 100,000 population)",Variable Name,Further education and skills participation,Further education and skills participation
-annual-personal-wellbeing-estimates,,indicator,Anxiety,NA,NA,Anxiety
-annual-personal-wellbeing-estimates,,indicator,Worthwhile,NA,NA,Worthwhile
-annual-personal-wellbeing-estimates,,indicator,Happiness,NA,NA,Happiness
-annual-personal-wellbeing-estimates,,indicator,Satisfaction,NA,NA,Satisfaction
+annual-personal-wellbeing-estimates,personal-wellbeing-estimates,indicator,Anxiety,NA,NA,Anxiety
+annual-personal-wellbeing-estimates,personal-wellbeing-estimates,indicator,Worthwhile,NA,NA,Worthwhile
+annual-personal-wellbeing-estimates,personal-wellbeing-estimates,indicator,Happiness,NA,NA,Happiness
+annual-personal-wellbeing-estimates,personal-wellbeing-estimates,indicator,Satisfaction,NA,NA,Satisfaction
 apprenticeship,apprenticeships,indicator,Apprenticeship starts (England),NA,NA,Apprenticeship starts (England)
 apprenticeship,apprenticeships,indicator,Apprenticeship achievements (England),NA,NA,Apprenticeship achievements (England)
 apprenticeships-scotland,,Indicator,Apprenticeship starts (Scotland),NA,NA,Apprenticeship starts (Scotland)
@@ -28,14 +28,14 @@ business-demography,,indicator,Business deaths,NA,NA,Business deaths
 business-demography,,indicator,High growth businesses,NA,NA,High growth businesses
 business-expenditure-on-research-and-development,research-and-development-business,Indicator,Business expenditure on research and development,Variable Name,Business expenditure on research and development,Business expenditure on research and development
 cancer-diagnosis-at-stage-1-and-2,,Indicator,Proportion of cancers diagnosed at stages 1 and 2,Variable Name,Cancer diagnosis at stage 1 and 2,Cancer diagnosis at stage 1 and 2
-child-obesity,,indicator,Aged four to five years underweight,NA,NA,Aged four to five years underweight
-child-obesity,,indicator,Aged four to five years healthy weight,NA,NA,Aged four to five years healthy weight
-child-obesity,,indicator,Aged four to five years overweight,NA,NA,Aged four to five years overweight
-child-obesity,,indicator,Aged four to five years obese,NA,NA,Aged four to five years obese
-child-obesity,,indicator,Aged 10 to 11 years underweight,NA,NA,Aged 10 to 11 years underweight
-child-obesity,,indicator,Aged 10 to 11 years healthy weight,NA,NA,Aged 10 to 11 years healthy weight
-child-obesity,,indicator,Aged 10 to 11 years overweight,NA,NA,Aged 10 to 11 years overweight
-child-obesity,,indicator,Aged 10 to 11 years obese,NA,NA,Aged 10 to 11 years obese
+child-obesity,child-weight,indicator,Aged four to five years underweight,NA,NA,Aged four to five years underweight
+child-obesity,child-weight,indicator,Aged four to five years healthy weight,NA,NA,Aged four to five years healthy weight
+child-obesity,child-weight,indicator,Aged four to five years overweight,NA,NA,Aged four to five years overweight
+child-obesity,child-weight,indicator,Aged four to five years obese,NA,NA,Aged four to five years obese
+child-obesity,child-weight,indicator,Aged 10 to 11 years underweight,NA,NA,Aged 10 to 11 years underweight
+child-obesity,child-weight,indicator,Aged 10 to 11 years healthy weight,NA,NA,Aged 10 to 11 years healthy weight
+child-obesity,child-weight,indicator,Aged 10 to 11 years overweight,NA,NA,Aged 10 to 11 years overweight
+child-obesity,child-weight,indicator,Aged 10 to 11 years obese,NA,NA,Aged 10 to 11 years obese
 children-in-relative-poverty,,Indicator,Children in poverty,Variable Name,Children in poverty,Children in poverty
 cigarette-smokers,,Indicator,Adults that currently smoke cigarettes,Variable Name,Cigarette smokers,Cigarette smokers
 claimant-count,,Indicator,Claimant Count,Variable Name,Claimant Count,Claimant Count
@@ -54,7 +54,7 @@ engagement-with-culture-and-heritage,,indicator,Visited a public library,NA,NA,V
 first-time-buyer-mortgage-sales,,Indicator,First-time buyer mortgage sales,Variable Name,First-time buyer mortgage sales,First-time buyer mortgage sales
 foreign-direct-investment,,indicator,Inward foreign direct investment,NA,NA,Inward foreign direct investment
 foreign-direct-investment,,indicator,Outward foreign direct investment,NA,NA,Outward foreign direct investment
-gcses-and-equivalent-in-english-and-maths-by-age-19,,Indicator,Young people achieving GCSEs (and equivalent qualifications) in English and maths by age 19,Variable Name,GCSEs in English and Maths,GCSEs in English and Maths
+gcses-and-equivalent-in-english-and-maths-by-age-19,gcses-in-english-and-maths,Indicator,Young people achieving GCSEs (and equivalent qualifications) in English and maths by age 19,Variable Name,GCSEs in English and Maths,GCSEs in English and Maths
 gdp-per-head,,Indicator,Gross domestic product per head at current market price,NA,NA,Gross domestic product per head at current market price
 gdp-per-head,,Indicator,Gross domestic product per head in chained volume measure,NA,NA,Gross domestic product per head in chained volume measure
 gigabit-capable-broadband,,Indicator,Premises with gigabit capable broadband,Variable Name,Gigabit capable broadband,Gigabit capable broadband

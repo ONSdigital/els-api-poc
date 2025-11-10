@@ -1,4 +1,8 @@
-import { dimsToIndex } from "./dataFormatters.js";
+function dimsToIndex(dims) {
+  let index = 0;
+  for (const dim of dims) index = (index * dim.count) + dim.value[1];
+  return index;
+}
 
 // Checks if one or more non-NULL observations exist for a set of dimensions
 export default function hasObservation(ds, dimVals) {

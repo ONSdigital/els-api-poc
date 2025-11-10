@@ -21,7 +21,7 @@
 
 <Section>
   <p style:margin="12px 0 32px">
-    {data.meta.count} of {data.meta.total || data.meta.count} areas matching <strong>"{data.meta.query}"</strong>.
+    {data.meta.total != null ? `${data.meta.count} of ${data.meta.total}` : data.meta.count} areas matching <strong>"{data.meta.query}"</strong>.
   </p>
 </Section>
 

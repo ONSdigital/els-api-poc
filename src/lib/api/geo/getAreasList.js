@@ -2,7 +2,7 @@ import { makeAreaListFilter } from "./helpers/geoFilters.js";
 import groupAreasByLevel from "./helpers/groupAreasByLevel.js";
 import makeAreasLookup from "./helpers/makeAreasLookup.js";
 import readData from "$lib/data";
-
+ 
 const geoMetadata = await readData("geo-metadata");
 const geoArray = Object.values(geoMetadata);
 const latestYear = Math.max(...geoArray.map((d) => d.start || 0));
@@ -11,7 +11,8 @@ export default function getAreasList(params = {}) {
   let areasList;
   const filter = makeAreaListFilter(
     params.geo,
-    params.year === "latest" ? latestYear : params.year
+    params.year === "latest" ? latestYear : params.year,
+    params.indicator
   );
   if (filter) areasList = geoArray.filter(filter);
   else areasList = geoArray;

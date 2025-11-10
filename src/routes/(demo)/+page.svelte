@@ -20,6 +20,9 @@
 </Section>
 
 <Grid colWidth="medium">
+  <Card title="ELS app rebuild" mode="featured" href="{base}/app">
+    Rebuilding the ELS app using the API (in progress).
+  </Card>
   <Card title="Query-based API" mode="featured" href="{base}/query">
     Request data based on URL query parameters.
   </Card>
@@ -44,8 +47,8 @@
   <Card title="Population pyramids" mode="featured" href="{base}/pyramid">
     Options for displaying population by age and sex data.
   </Card>
-  <Card title="ELS app" mode="featured" href="{base}/app">
-    Rebuilding the ELS app using the API.
+  <Card title="Selection modals" mode="featured" href="{base}/modals">
+    Example modals for making selections on pages.
   </Card>
 </Grid>
 
