@@ -37,7 +37,8 @@ export async function GET({ params, url }) {
 
 	return datasets.format === "ods" ? new Response(datasets.data, {
 		headers: {
-			'Content-Type': 'application/vnd.oasis.opendocument.spreadsheet'
+			'Content-Type': 'application/vnd.oasis.opendocument.spreadsheet',
+			'Content-Length': datasets.data.size.toString()
 		}
 	}) : datasets.format === "text" ? text(datasets.data) : json(datasets.data);
 }

@@ -32,10 +32,11 @@ export default async function generateSpreadsheet(datasets) {
     coverSheetContents: [
       "## Source",
       "Office for National Statistics (ONS) and other producers of official statistics.",
+      `Downloaded on ${(new Date()).toLocaleDateString("en-GB")} from the Explore Local Statistics service.`,
       "[Visit Explore Local Statistics on the ONS website](https://www.ons.gov.uk)",
       "## Notes",
       "Some cells are blank, indicating unavailable data.",
-      "This dataset includes time periods in an extended ISO 8601 format. These periods are written as 'YYYY-MM-DD/PnI', where 'P' means it's a period, 'n' is the number of time units and 'I' is the type of time unit (Y = year, M = month, W = week, D = day).",
+      "Dates follow the ISO 8601 standard. Some use an extended 'YYYY-MM-DD/PnI' format, where 'P' means it's a period, 'n' is the number of time units and 'I' is the type of time unit (Y = year, M = month, W = week, D = day).",
       "## Quality and methodology",
       "Details of the Explore Local Statistics service are available at the link below, including its strengths and limitations, methods used, data uses and users.",
       "[Quality and methodology information](https://www.ons.gov.uk/peoplepopulationandcommunity/healthandsocialcare/healthandwellbeing/methodologies/explorelocalstatisticsserviceqmi)",

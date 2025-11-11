@@ -93,6 +93,7 @@ export default async function filterCollection(params = {}) {
     params.format,
     singleIndicator
   );
+  if (datasets.error) return datasets;
 
   return params.format === "csv"
     ? { format: "text", data: csvSerialise(datasets) }
