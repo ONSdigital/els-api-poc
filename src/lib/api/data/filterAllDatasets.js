@@ -16,6 +16,7 @@ export default function filterAllDatasets(
   if (format === "csv") return filtered.map((f) => f[1]);
   if (!filtered?.length)
     return { message: "Data not available for the selected filters." };
+  if (format === "ods") return filtered;
   if (["rows", "cols"].includes(format.slice(0, 4)))
     return singleIndicator && filtered.length === 1
       ? filtered[0][1]

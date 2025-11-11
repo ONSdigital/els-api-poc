@@ -2,7 +2,7 @@ import { json, text, error } from "@sveltejs/kit";
 import { getParam, getDimensionFilters } from "$lib/api/utils.js";
 import filterCollection from "$lib/api/data/filterCollection.js";
 
-export function GET({ params, url }) {
+export async function GET({ params, url }) {
   const format = params.format || "cols";
   const topic = getParam(url, "topic", "all");
   const indicator = getParam(url, "indicator", "all");
@@ -17,7 +17,7 @@ export function GET({ params, url }) {
   const includeStatus = getParam(url, "includeStatus", false);
 	const dimFilters = getDimensionFilters(url);
 
-	const datasets = filterCollection({
+	const datasets = await filterCollection({
 		format,
 		topic,
 		indicator,
@@ -35,5 +35,9 @@ export function GET({ params, url }) {
 	});
   if (datasets.error) error(datasets.error, datasets.message);
 
-	return datasets.format === "text" ? text(datasets.data) : json(datasets.data);
+	return datasets.format === "ods" ? new Response(datasets.data, {
+		headers: {
+			'Content-Type': 'application/vnd.oasis.opendocument.spreadsheet'
+		}
+	}) : datasets.format === "text" ? text(datasets.data) : json(datasets.data);
 }
