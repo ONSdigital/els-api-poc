@@ -59,8 +59,6 @@ export function getTime(values, params = {}) {
 	const isRange = periods[0].period.length > 1;
 	const date = isRange || params.time.length === 10 ? toPlainDate(params.time, true) : [toPlainDate(params.time, false), toPlainDate(params.time, true)];
 
-	console.log({date, nearest, isRange});
-
 	let match;
 	if (isRange) match = periods.findLast(p => Temporal.PlainDate.compare(date, p.period[0]) !== -1 && Temporal.PlainDate.compare(date, p.period[1]) !== 1);
 	else match = periods.findLast(p => Temporal.PlainDate.compare(p.period[0], date[0]) !== -1 && Temporal.PlainDate.compare(p.period[0], date[1]) !== 1);
