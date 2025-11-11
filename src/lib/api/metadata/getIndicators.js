@@ -16,7 +16,7 @@ function formatMetadata(ds, minimalMetadata = false, fullDims = false) {
     };
 
   const metadata = { label: ds.label, ...ds.extension, updated: ds.updated, caveats: ds.note };
-  metadata.dimensions = ds.id.map((key) => formatDimension(ds, key, fullDims));
+  metadata.dimensions = Object.fromEntries(ds.id.map((key, i) => [key, {...formatDimension(ds, key, fullDims), order: i}]));
   return metadata;
 }
 
