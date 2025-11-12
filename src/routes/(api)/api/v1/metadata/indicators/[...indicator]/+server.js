@@ -3,7 +3,7 @@ import { getParam } from "$lib/api/utils.js";
 import getIndicators from "$lib/api/metadata/getIndicators.js";
 
 export function GET({ params, url }) {
-  const indicator = params.indicator || null;
+  const indicator = params.indicator || getParam(url, "indicator", null);
   const topic = getParam(url, "topic", "all");
   const excludeMultivariate = getParam(url, "excludeMultivariate", false);
   const hasGeo = getParam(url, "hasGeo", "all");
@@ -16,7 +16,8 @@ export function GET({ params, url }) {
     excludeMultivariate,
     hasGeo,
     hasYear,
-    fullDims
+    fullDims,
+    singleIndicator: !!params.indicator
   });
 
   if (metadata.error) error(400, metadata.error);

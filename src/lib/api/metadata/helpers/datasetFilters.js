@@ -1,9 +1,14 @@
 // Functions to filter JSON-Stat at a dataset level
 import { geoLevels } from "$lib/config/geo-levels.js";
 
-export function makeTopicFilter(topic) {
-  return (ds) =>
-    ds.extension.topic === topic || ds.extension.subtopic === topic;
+export function makeIndicatorFilter(indicator, topic) {
+  if ((!indicator || indicator === "all") && topic === "all") return () => true;
+
+  const topics = [topic].flat();
+  const indicators = [indicator].flat();
+  return (!indicator || indicator === "all")? (ds) => [ds.extension.topic, ds.extension.subtopic].some(t => topics.includes(t)) :
+    indicator && topic === "all" ? (ds) => indicators.includes(ds.extension.slug) :
+    (ds) => indicators.includes(ds.extension.slug) || [ds.extension.topic, ds.extension.subtopic].some(t => topics.includes(t));
 }
 
 export function makeYearFilter(year) {
@@ -28,13 +33,13 @@ export function makeDatasetGeoFilter(geo) {
   return {error: "Invalid 'hasGeo' parameter. Must be a valid GSS code or geography level."};
 }
 
-export function makeDatasetFilter(topic, excludeMultivariate, geo, year) {
-  if (topic === "all" && geo === "all" && year === "all" && !excludeMultivariate) return () => true;
+export function makeDatasetFilter(indicator, topic, excludeMultivariate, geo, year) {
+  if (!indicator && topic === "all" && geo === "all" && year === "all" && !excludeMultivariate) return () => true;
   const multivariateFilter = excludeMultivariate === true ? (ds) => !ds.extension.isMultivariate : () => true;
-  const topicFilter = topic === "all" ? () => true : makeTopicFilter(topic);
+  const indicatorFilter = makeIndicatorFilter(indicator, topic);
   const yearFilter = year === "all" ? () => true : makeYearFilter(year);
   if (yearFilter.error) return yearFilter;
   const geoFilter = geo === "all" ? () => true : makeDatasetGeoFilter(geo);
   if (geoFilter.error) return geoFilter;
-  return (ds) => topicFilter(ds) && multivariateFilter(ds) && yearFilter(ds) && geoFilter(ds);
+  return (ds) => indicatorFilter(ds) && multivariateFilter(ds) && yearFilter(ds) && geoFilter(ds);
 }
