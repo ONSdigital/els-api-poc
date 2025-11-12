@@ -23,8 +23,8 @@
   <Card title="ELS app rebuild" mode="featured" href="{base}/app">
     Rebuilding the ELS app using the API (in progress).
   </Card>
-  <Card title="Query-based API" mode="featured" href="{base}/query">
-    Request data based on URL query parameters.
+  <Card title="Query builder" mode="featured" href="{base}/query">
+    Build a query to download data from the API.
   </Card>
   <Card title="Area charts demo" mode="featured" href="{base}/area">
     Load all data for a selected area and then render charts.

@@ -13,7 +13,7 @@ export const load = async ({ fetch }) => {
   const areas = (await (await fetch(areasPath)).json())
     .sort((a, b) => a.areanm.localeCompare(b.areanm));
   const gLevels = metadata.geography.levels.map(id => ({id, ...geoLevels[id]}));
-	const periods = Object.keys(metadata.dimensions[1].category.index);
+	const periods = Object.keys(metadata.dimensions.period.category.index);
 
   return {
     metadata,
