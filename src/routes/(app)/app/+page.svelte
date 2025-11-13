@@ -39,7 +39,7 @@
 
   function gotoSelected(e) {
     e.preventDefault();
-    if (selected) goto(resolve(selected.lng ? `/areas/search?q=${selected.areacd}` : `/areas/${selected.areacd}/`))
+    if (selected) goto(resolve(selected.lng ? `/app/areas/search?q=${selected.areacd}` : `/app/areas/${selected.areacd}/`))
   }
 </script>
 

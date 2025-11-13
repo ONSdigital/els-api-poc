@@ -6,7 +6,8 @@ export const load = async ({ params, fetch }) => {
 	const indicator = await(await fetch(path)).json();
 
 	const periodPath = resolve(`/api/v1/metadata/indicators/${params.code}/dimensions/period`);
-	const periods = await(await fetch(periodPath)).json();
+	const periodsRaw = await(await fetch(periodPath)).json()
+	const periods = Object.keys(periodsRaw.category.index);
 
 	const areasPath = resolve(`/api/v1/geo/list?indicator=${params.code}&year=all`);
 	const areas = (await (await fetch(areasPath)).json())

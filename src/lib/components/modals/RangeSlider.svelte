@@ -6,6 +6,9 @@
     formatTick = (d) => d
   } = $props();
 
+  $inspect(options)
+  $inspect(selectedRange)
+
   let selectedIndices = $state([
     options.indexOf(selectedRange[0]) ?? 0,
     options.indexOf(selectedRange[1]) ?? options.length - 1

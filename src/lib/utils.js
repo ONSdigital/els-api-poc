@@ -69,7 +69,7 @@ export function makePeriodFormatter(periodFormat) {
   const range = +periodFormat.match(/^\d+/)?.[0];
   const formatter = periodFormat === "month" ? utcFormat("%b %Y") :
     periodFormat === "quarter" ? utcFormat("Q%q %Y") :
-    periodFormat === "year" ? utcFormat("%Y") :
+    periodFormat === "year" ? (d) => String(d.getFullYear()) :
     periodFormat === "academic-year" ? (d) => {const year = d.getFullYear(); return `AY ${year}-${(year + 1) % 100}`} :
     periodFormat === "financial-year" ? (d) => {const year = d.getFullYear(); return `FY ${year}-${(year + 1) % 100}`} :
     range ? (d) => {const year = d.getFullYear(); return `${year}-${(year + range) % 100}`} :

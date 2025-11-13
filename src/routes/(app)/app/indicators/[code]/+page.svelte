@@ -2,6 +2,7 @@
   //@ts-nocheck
   import { base, assets } from "$app/paths";
   import { afterNavigate } from "$app/navigation";
+  import { setContext } from "svelte";
   import {
     Hero,
     NavSections,
@@ -14,11 +15,15 @@
   } from "@onsvisual/svelte-components";
   import { capitalise } from "@onsvisual/robo-utils";
   import { fetchChartDataV1 } from "$lib/utils.js";
+  import AreasModal from "$lib/components/modals/AreasModal.svelte";
+  import OptionsModal from "$lib/components/modals/OptionsModal.svelte";
   import Map from "$lib/viz/Map.svelte";
   import Bar from "$lib/viz/Bar.svelte";
   import Line from "$lib/viz/Line.svelte";
+  import { makePeriodFormatter } from "$lib/utils.js";
 
   let { data } = $props();
+  $inspect(data);
 
   function arrayJoin(arr, separators = [", ", " and "]) {
     if (arr.length < 2) return arr.join(separators[0]);
@@ -37,21 +42,37 @@
     });
   };
 
-  export function pivotData(data, filter = null) {
-	const piv = {};
+  export function pivotData(data, formatPeriod = (d) => d, filter = null) {
+    const piv = {};
 
-	for (const d of data) {
-		if (!filter || filter.includes(d.areacd.slice(0, 3))) {
-			if (!piv[d.areacd]) piv[d.areacd] = { areacd: d.areacd, areanm: d.areanm };
-			piv[d.areacd][d['period']] = d.value;
-		}
-	}
+    for (const d of data) {
+      if (!filter || filter.includes(d.areacd.slice(0, 3))) {
+        if (!piv[d.areacd])
+          piv[d.areacd] = { "Area code": d.areacd, "Area name": d.areanm };
+        piv[d.areacd][formatPeriod(d["period"])] = d.value;
+      }
+    }
 
-	return Object.keys(piv)
-		.map((key) => piv[key])
-		.sort((a, b) => a.areanm.localeCompare(b.areanm));
-}
+    return Object.keys(piv)
+      .map((key) => piv[key])
+      .sort((a, b) => a["Area name"].localeCompare(b["Area name"]));
+  }
 
+  let formatPeriod = $derived(makePeriodFormatter(data.indicator.periodFormat));
+
+  let pageState = $state({
+    selectedAreas: [],
+    selectedGeoLevel: data.geoLevels.find(
+      (g) => g.id === data.indicator.geography.initialLevel
+    ),
+    selectedPeriodRange: [
+      data.periods[0],
+      data.periods[data.periods.length - 1],
+    ],
+    showConfidenceIntervals: false,
+    formatPeriod: () => formatPeriod,
+  });
+  setContext("pageState", pageState);
 </script>
 
 <Header />
@@ -62,17 +83,22 @@
   meta={[
     {
       key: data.indicator.source.length === 1 ? "Data source" : "Data sources",
-      value: arrayJoin(data.indicator.source.map(s => `<a href="${s.href}" target="_blank">${s.name}</a>`))
+      value: arrayJoin(
+        data.indicator.source.map(
+          (s) => `<a href="${s.href}" target="_blank">${s.name}</a>`
+        )
+      ),
     },
     {
       key: "Published on",
-      value: parseDate(data.indicator.updated)
+      value: parseDate(data.indicator.updated),
     },
   ]}
   background="#eaeaea"
   titleBadge={{
-    // label: experimental ? 'Official statistics in development' : capitalise(data.indicator.topic),
-    label: capitalise(data.indicator.topic),
+    label: data.indicator.experimentalStatistic
+      ? "Official statistics in development"
+      : capitalise(data.indicator.topic),
     ariaLabel: `Topic: ${capitalise(data.indicator.topic)}`,
     color: "#003c57",
   }}
@@ -87,18 +113,13 @@
     <NavSection title="Map">
       <div class="row-container">
         <div class="content-dropdowns" data-html2canvas-ignore>
-          <Dropdown
-            label="Geography type"
-          />
-          <Dropdown
-            id="year"
-            label="Time period"
-          />
+          <AreasModal />
+          <OptionsModal />
         </div>
       </div>
       <LazyLoad>
         <div class="chart-container map-container">
-          {#await fetchChartDataV1(data.indicator.slug)}
+          {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange[1].slice(0, 10) } )}
             Fetching chart data
           {:then chartData}
             <Map data={chartData} />
@@ -112,7 +133,7 @@
   <NavSection title="Line">
     <LazyLoad>
       <div class="chart-container">
-        {#await fetchChartDataV1(data.indicator.slug, { time: "all" })}
+        {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange.map( (p) => p.slice(0, 10) ) } )}
           Fetching chart data
         {:then chartData}
           <Line data={chartData} />
@@ -125,7 +146,7 @@
   <NavSection title="Bar">
     <LazyLoad>
       <div class="chart-container">
-        {#await fetchChartDataV1(data.indicator.slug)}
+        {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange[1].slice(0, 10) } )}
           Fetching chart data
         {:then chartData}
           <Bar data={chartData} />
@@ -138,10 +159,15 @@
   <NavSection title="Table">
     <LazyLoad>
       <div class="chart-container">
-        {#await fetchChartDataV1(data.indicator.slug, { time: "all" })}
+        {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: "all" } )}
           Fetching chart data
         {:then chartData}
-          <Table data={pivotData(chartData)} sortable compact height={400} />
+          <Table
+            data={pivotData(chartData, formatPeriod)}
+            sortable
+            compact
+            height={400}
+          />
         {:catch}
           Failed to load chart data
         {/await}

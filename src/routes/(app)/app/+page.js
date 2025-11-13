@@ -5,10 +5,10 @@ export const load = async ({ fetch }) => {
 	const taxonomy = await(await fetch(path)).json();
 
     const pathFlat = resolve("/api/v1/metadata/taxonomy?flat=true");
-        const taxonomyFlat = await(await fetch(pathFlat)).json()
+    const taxonomyFlat = await(await fetch(pathFlat)).json()
 
 	return {
 		taxonomy,
-        taxonomyFlat
+    taxonomyFlat
 	};
 };
