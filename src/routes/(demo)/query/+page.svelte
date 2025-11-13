@@ -1,6 +1,7 @@
 <script>
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import { sleep } from "$lib/utils.js";
   import {
     PhaseBanner,
     Header,
@@ -60,14 +61,13 @@
   let selectedTimePeriod = $state([data.time[0], data.time[1]]);
   let selectAllYears = $state(false);
   let selectedMeasures = $state(
-    data.measure[0] === "all"
-      ? data.measures.map((m) => m.key)
-      : data.measure
+    data.measure[0] === "all" ? data.measures.map((m) => m.key) : data.measure
   );
   let selectAllMeasures = $derived(
     selectedMeasures.length === data.measures.length
   );
   let selectedFormat = $state(formats[0]);
+  let showLinkMessage = $state(false);
 
   function toggleAllTopics() {
     if (selectAllTopics) selectedTopics = data.topics.map((t) => t.slug);
@@ -147,7 +147,9 @@
     format
   ) {
     let parts = [];
-    const joinParts = () => page.url.origin + `/api/v1/data.${format.id}?includeNames=true&${parts.join("&")}`;
+    const joinParts = () =>
+      page.url.origin +
+      `/api/v1/data.${format.id}?includeNames=true&${parts.join("&")}`;
 
     const topic =
       topics.length === data.topics.length ? null : topics.join(",");
@@ -160,7 +162,13 @@
     const geo = geos.map((geo) => geo.areacd).join(",");
     const geoLevel =
       geoLevels.length === data.geoLevels.length ? null : geoLevels.join(",");
-    if (geo || geoLevel) parts.push(`geo=${[geo, geoLevel].filter(g => g).flat().join(",")}`);
+    if (geo || geoLevel)
+      parts.push(
+        `geo=${[geo, geoLevel]
+          .filter((g) => g)
+          .flat()
+          .join(",")}`
+      );
     const time = allTimes ? "all" : times.filter((time) => time).join(",");
     if (time) parts.push(`time=${time}`);
     const measure =
@@ -181,6 +189,13 @@
       selectedFormat
     )
   );
+
+  async function copyPermalink() {
+    await navigator.clipboard.writeText(dataUrl);
+    showLinkMessage = true;
+    await sleep(3000);
+    showLinkMessage = false;
+  }
 </script>
 
 <PhaseBanner phase="prototype" />
@@ -191,7 +206,8 @@
 
 <Section marginBottom={false}>
   <p style:margin="12px 0 32px">
-    Construct a query by indicator, geography and time period, then download the data in your preferred format.
+    Construct a query by indicator, geography and time period, then download the
+    data in your preferred format.
   </p>
 </Section>
 
@@ -217,7 +233,9 @@
       labelKey="label"
       bind:selected={selectedIndicators}
     />
-    <Button href="{nextPath}&step={data.step === 1 ? 2 : data.step }" small
+    <Button
+      href="{nextPath}&step={data.step === 1 ? 2 : data.step}"
+      small
       noScroll>{data.step === 1 ? "Next step" : "Update selection"}</Button
     >
   </Details>
@@ -243,7 +261,9 @@
         labelKey="areanm"
         bind:selected={selectedGeos}
       />
-      <Button href="{nextPath}&step={data.step === 2 ? 3 : data.step }" small
+      <Button
+        href="{nextPath}&step={data.step === 2 ? 3 : data.step}"
+        small
         noScroll>{data.step === 2 ? "Next step" : "Update selection"}</Button
       >
     </Details>
@@ -269,7 +289,9 @@
         bind:checked={selectAllYears}
         compact
       />
-      <Button href="{nextPath}&step={data.step === 3 ? 4 : data.step }" small
+      <Button
+        href="{nextPath}&step={data.step === 3 ? 4 : data.step}"
+        small
         noScroll>{data.step === 3 ? "Next step" : "Update selection"}</Button
       >
     </Details>
@@ -288,7 +310,9 @@
         compact
         on:change={toggleAllMeasures}
       />
-      <Button href="{nextPath}&step={data.step === 4 ? 5 : data.step }" small
+      <Button
+        href="{nextPath}&step={data.step === 4 ? 5 : data.step}"
+        small
         noScroll>{data.step === 4 ? "Next step" : "Update selection"}</Button
       >
     </Details>
@@ -296,9 +320,17 @@
   {#if data.step > 4}
     <Details title="Step 5. Get the data" open={data.step === 5}>
       <Radios items={formats} bind:value={selectedFormat} compact />
-      <Input label="Permalink" value={dataUrl}/>
-      <Button icon="download" href={dataUrl} download="data.{selectedFormat.id}" small>Download data</Button>
-      <Button variant="secondary" small>Copy permalink</Button>
+      <Input label="Permalink" value={dataUrl} />
+      <Button
+        icon="download"
+        href={dataUrl}
+        download="data.{selectedFormat.id === 'csvw'
+          ? 'csvw.json'
+          : selectedFormat.id}"
+        small>Download data</Button
+      >
+      <Button variant="secondary" on:click={copyPermalink} small>Copy permalink</Button>
+      {#if showLinkMessage}<span class="copy-link-message">Link copied!</span>{/if}
     </Details>
   {/if}
 </Section>
@@ -318,10 +350,10 @@
     padding: 1em 0;
     border-top: 1px solid grey;
   }
-  :global(.ons-checkboxes__item){
+  :global(.ons-checkboxes__item) {
     margin: 0.5em 0 1em;
   }
-  :global(.ons-btn){
+  :global(.ons-btn) {
     margin: 0.5em 0 1em;
   }
   .select-year-container {
@@ -335,5 +367,11 @@
   }
   .select-year-container :global(.ons-input) {
     width: 140px;
+  }
+  .copy-link-message {
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+    margin: .5em 0 0 .3em;
   }
 </style>
