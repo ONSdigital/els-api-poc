@@ -58,6 +58,7 @@
     data.areaList.filter((area) => data.geo.includes(area.areacd))
   );
   let selectedTimePeriod = $state([data.time[0], data.time[1]]);
+  let selectAllYears = $state(false);
   let selectedMeasures = $state(
     data.measure[0] === "all"
       ? data.measures.map((m) => m.key)
@@ -88,6 +89,7 @@
     geos,
     geoLevels,
     times,
+    allTimes,
     measures,
     step
   ) {
@@ -111,7 +113,7 @@
     if (geoLevel) parts.push(`geoLevel=${geoLevel}`);
     if (step === 2) return joinParts();
 
-    const time = times.filter((time) => time).join(",");
+    const time = allTimes ? "all" : times.filter((time) => time).join(",");
     if (time) parts.push(`time=${time}`);
     if (step === 3) return joinParts();
 
@@ -128,6 +130,7 @@
       selectedGeos,
       selectedGeoLevels,
       selectedTimePeriod,
+      selectAllYears,
       selectedMeasures,
       data.step
     )
@@ -139,11 +142,12 @@
     geos,
     geoLevels,
     times,
+    allTimes,
     measures,
     format
   ) {
     let parts = [];
-    const joinParts = () => page.url.origin + `/api/v1/data.${format.id}?${parts.join("&")}`;
+    const joinParts = () => page.url.origin + `/api/v1/data.${format.id}?includeNames=true&${parts.join("&")}`;
 
     const topic =
       topics.length === data.topics.length ? null : topics.join(",");
@@ -157,7 +161,7 @@
     const geoLevel =
       geoLevels.length === data.geoLevels.length ? null : geoLevels.join(",");
     if (geo || geoLevel) parts.push(`geo=${[geo, geoLevel].filter(g => g).flat().join(",")}`);
-    const time = times.filter((time) => time).join(",");
+    const time = allTimes ? "all" : times.filter((time) => time).join(",");
     if (time) parts.push(`time=${time}`);
     const measure =
       measures.length === data.measures.length ? null : measures.join(",");
@@ -172,6 +176,7 @@
       selectedGeos,
       selectedGeoLevels,
       selectedTimePeriod,
+      selectAllYears,
       selectedMeasures,
       selectedFormat
     )
@@ -184,11 +189,13 @@
   links={[{ label: "ELS API experiments", href: `${resolve("/")}` }]}
 />
 
-<Section>
+<Section marginBottom={false}>
   <p style:margin="12px 0 32px">
     Construct a query by indicator, geography and time period, then download the data in your preferred format.
   </p>
+</Section>
 
+<Section width="medium">
   <Details title="Step 1. Topics and indicators" open={data.step === 1}>
     <ChipGroup
       label="Select topics"
@@ -243,15 +250,24 @@
   {/if}
   {#if data.step > 2}
     <Details title="Step 3. Time period" open={data.step === 3}>
-      <Dropdown
-        label="Start year"
-        options={data.years}
-        bind:value={selectedTimePeriod[0]}
-      />
-      <Dropdown
-        label="End year"
-        options={data.years}
-        bind:value={selectedTimePeriod[1]}
+      <div class="select-year-container">
+        <Dropdown
+          label="Start year"
+          placeholder="Select year"
+          options={data.years}
+          bind:value={selectedTimePeriod[0]}
+        />
+        <Dropdown
+          label="End year"
+          placeholder="Select year"
+          options={data.years}
+          bind:value={selectedTimePeriod[1]}
+        />
+      </div>
+      <Checkbox
+        label="All years available"
+        bind:checked={selectAllYears}
+        compact
       />
       <Button href="{nextPath}&step={data.step === 3 ? 4 : data.step }" small
         noScroll>{data.step === 3 ? "Next step" : "Update selection"}</Button
@@ -280,8 +296,8 @@
   {#if data.step > 4}
     <Details title="Step 5. Get the data" open={data.step === 5}>
       <Radios items={formats} bind:value={selectedFormat} compact />
-      <Input label="Permalink" value={dataUrl} />
-      <Button icon="download" href={dataUrl} small>Download data</Button>
+      <Input label="Permalink" value={dataUrl}/>
+      <Button icon="download" href={dataUrl} download="data.{selectedFormat.id}" small>Download data</Button>
       <Button variant="secondary" small>Copy permalink</Button>
     </Details>
   {/if}
@@ -302,4 +318,23 @@
     padding: 1em 0;
     border-top: 1px solid grey;
   }
+  :global(.ons-checkboxes__item){
+    margin: 0.5em 0 1em;
+  }
+  :global(.ons-btn){
+    margin: 0.5em 0 1em;
+  }
+  .select-year-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .select-year-container :global(.ons-field) {
+    margin: 0;
+  }
+  .select-year-container :global(.ons-input) {
+    width: 140px;
+  }
+  ons-field 
 </style>
