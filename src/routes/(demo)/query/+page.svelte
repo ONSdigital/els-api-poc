@@ -336,5 +336,4 @@
   .select-year-container :global(.ons-input) {
     width: 140px;
   }
-  ons-field 
 </style>
