@@ -338,10 +338,6 @@
 <Footer compact />
 
 <style>
-  :global(.ons-input) {
-    color: #707070;
-    margin-bottom: 10px;
-  }
   :global(.ons-details) {
     padding: 1em 0;
     border-top: 1px solid grey;
