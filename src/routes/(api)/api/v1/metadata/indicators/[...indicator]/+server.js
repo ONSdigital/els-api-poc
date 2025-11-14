@@ -9,6 +9,7 @@ export function GET({ params, url }) {
   const hasGeo = getParam(url, "hasGeo", "all");
   const hasYear = getParam(url, "hasYear", "all");
   const fullDims = getParam(url, "fullDims", false);
+  const asLookup = getParam(url, "asLookup", false);
 
   const metadata = getIndicators({
     indicator,
@@ -17,6 +18,7 @@ export function GET({ params, url }) {
     hasGeo,
     hasYear,
     fullDims,
+    asLookup,
     singleIndicator: !!params.indicator
   });
 
