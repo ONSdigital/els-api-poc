@@ -7,7 +7,7 @@
 
   let pageState = getContext("pageState");
 
-  let formatTick = $derived(pageState.formatPeriod());
+  let formatTick = $derived(pageState?.formatPeriod?.() || ((d) => d));
 </script>
 
 <Modal title="Chart options" label="Chart options">
