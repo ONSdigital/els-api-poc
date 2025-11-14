@@ -54,18 +54,18 @@ export function getTime(values, params = {}) {
 	if (params.time === "latest") return [values[values.length - 1]];
 	if (params.time === "earliest") return [values[0]];
 
-	const date = toPlainDate(params.time, true);
 	const periods = values.map(v => ({value: v, period: periodToDateRange(v[0])}));
 	const nearest = params.nearest || "none";
 	const isRange = periods[0].period.length > 1;
+	const date = isRange || params.time.length === 10 ? toPlainDate(params.time, true) : [toPlainDate(params.time, false), toPlainDate(params.time, true)];
 
 	let match;
 	if (isRange) match = periods.findLast(p => Temporal.PlainDate.compare(date, p.period[0]) !== -1 && Temporal.PlainDate.compare(date, p.period[1]) !== 1);
-	else match = periods.findLast(p => Temporal.PlainDate.compare(date, p.period[0]) !== -1);
+	else match = periods.findLast(p => Temporal.PlainDate.compare(p.period[0], date[0]) !== -1 && Temporal.PlainDate.compare(p.period[0], date[1]) !== 1);
 	if (match) return [match.value];
 
-	if (Temporal.PlainDate.compare(date, periods.slice(-1)[0].period.slice(-1)[0]) === 1 && ["latest", "any"].includes(nearest)) return [periods[periods.length - 1].value];
-	if (Temporal.PlainDate.compare(date, periods[0].period[0]) === -1 && ["earliest", "any"].includes(nearest)) return [periods[0].value];
+	if (Temporal.PlainDate.compare(date?.[1] || date, periods.slice(-1)[0].period.slice(-1)[0]) === 1 && ["latest", "any"].includes(nearest)) return [periods[periods.length - 1].value];
+	if (Temporal.PlainDate.compare(date?.[0] || date, periods[0].period[0]) === -1 && ["earliest", "any"].includes(nearest)) return [periods[0].value];
 	return [];
 }
 

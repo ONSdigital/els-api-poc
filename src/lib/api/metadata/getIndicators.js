@@ -16,24 +16,13 @@ function formatMetadata(ds, minimalMetadata = false, fullDims = false) {
     };
 
   const metadata = { label: ds.label, ...ds.extension, updated: ds.updated, caveats: ds.note };
-  metadata.dimensions = ds.id.map((key) => formatDimension(ds, key, fullDims));
+  metadata.dimensions = Object.fromEntries(ds.id.map((key, i) => [key, {...formatDimension(ds, key, fullDims), order: i}]));
   return metadata;
 }
 
 export default function getIndicators(params = {}) {
-  if (params.indicator) {
-    const indicator = rawMetadata.link.item.find(
-      (ds) => ds.extension.slug === params.indicator
-    );
-    if (!indicator) return { error: "Invalid indicator code" };
-    return formatMetadata(
-      indicator,
-      params.minimalMetadata,
-      params.fullDims
-    );
-  }
-
   const filter = makeDatasetFilter(
+    params.indicator,
     params.topic,
     params.excludeMultivariate,
     params.hasGeo,
@@ -47,5 +36,5 @@ export default function getIndicators(params = {}) {
       formatMetadata(ds, params.minimalMetadata, params.fullDims)
     );
 
-  return metadata;
+  return params.singleIndicator ? metadata[0] : metadata;
 }

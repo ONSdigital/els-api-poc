@@ -15,30 +15,37 @@ export async function GET({ params, url }) {
   const measure = getParam(url, "measure", "all");
   const includeNames = getParam(url, "includeNames", false);
   const includeStatus = getParam(url, "includeStatus", false);
-	const dimFilters = getDimensionFilters(url);
+  const dimFilters = getDimensionFilters(url);
 
-	const datasets = await filterCollection({
-		format,
-		topic,
-		indicator,
-		excludeMultivariate,
-		geo,
-		geoExtent,
-		hasGeo,
-		time,
-		timeNearest,
-		measure,
-		includeNames,
-		includeStatus,
-		dimFilters,
-		href: url.href
-	});
+  const datasets = await filterCollection({
+    format,
+    topic,
+    indicator,
+    excludeMultivariate,
+    geo,
+    geoExtent,
+    hasGeo,
+    time,
+    timeNearest,
+    measure,
+    includeNames,
+    includeStatus,
+    dimFilters,
+    href: url.href,
+  });
   if (datasets.error) error(datasets.error, datasets.message);
 
-	return datasets.format === "ods" ? new Response(datasets.data, {
-		headers: {
-			'Content-Type': 'application/vnd.oasis.opendocument.spreadsheet',
-			'Content-Length': datasets.data.size.toString()
-		}
-	}) : datasets.format === "text" ? text(datasets.data) : json(datasets.data);
+  const headers = { "Access-Control-Allow-Origin": "*" };
+
+  return datasets.format === "ods"
+    ? new Response(datasets.data, {
+        headers: {
+          ...headers,
+          "Content-Type": "application/vnd.oasis.opendocument.spreadsheet",
+          "Content-Length": datasets.data.size.toString(),
+        },
+      })
+    : datasets.format === "text"
+      ? text(datasets.data, { headers })
+      : json(datasets.data, { headers });
 }

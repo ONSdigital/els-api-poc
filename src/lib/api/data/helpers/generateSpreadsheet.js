@@ -11,7 +11,10 @@ export function getSpreadsheetMetadata(ds) {
     decimalPlaces: ds.extension.decimalPlaces,
     subtitle: ds.extension.subtitle,
     source: ds.extension.source,
-    colLookup: {},
+    colLookup: {
+      areanm: "Area name",
+      status: "Status"
+    },
   };
   for (const key in ds.dimension) meta.colLookup[key] = ds.dimension[key].label;
   for (const key in ds.dimension.measure.category.label) {
