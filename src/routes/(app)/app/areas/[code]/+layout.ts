@@ -1,25 +1,24 @@
 import { error, redirect } from '@sveltejs/kit';
-import { base, resolve } from '$app/paths';
+import { resolve } from '$app/paths';
 import type { LayoutLoad } from './$types';
-import { getName } from '@onsvisual/robo-utils';
-import { Breadcrumb } from '@onsvisual/svelte-components';
+// import { getName } from '@onsvisual/robo-utils';
+// import { Breadcrumb } from '@onsvisual/svelte-components';
 
 export const load: LayoutLoad = async ({ params, fetch }) => {
+	const areaPath = resolve(`/api/v1/geo/lookup/${params.code}`);
+	const relatedPath = resolve(`/api/v1/geo/related/${params.code}`);
 
-  if (params.code.kind === 'Failure') {
-		error(404, { message: 'Invalid area code' });
+	try {
+		const area = await(await fetch(areaPath)).json();
+		const related = await(await fetch(relatedPath)).json();
+
+		return {
+			area,
+			related
+		};
+	} catch {
+		error(404, { message: 'Area not found' });
 	}
-    const areaPath = resolve(`/api/v1/geo/lookup/${params.code}`);
-    const area = await(await fetch(areaPath)).json();
-  
-    const relatedPath = resolve(`/api/v1/geo/related/${params.code}`);
-    const related = await(await fetch(relatedPath)).json();
-  
-    return {
-      area,
-      related
-    };
-	
 
 	// const result = await getArea(fetch, code.type, code.value);
 
@@ -36,8 +35,8 @@ export const load: LayoutLoad = async ({ params, fetch }) => {
 	// 		redirect(301, canonicalSlug);
 	// 	}
 
-		return {
-			area,
+		// return {
+		// 	area,
 	// 		links: productLinks.map(addBaseUrlsToProductLink),
 	// 		title: `${getName(result.place)} (${result.place.areacd}) - ONS`,
 	// 		description: `Find facts and figures from across the ONS on ${getName(result.place, 'the')} (${result.place.typenm}).`,
@@ -53,12 +52,11 @@ export const load: LayoutLoad = async ({ params, fetch }) => {
 	// 		],
 	// 		background: '#fff'
 	// 	};
-	}
+	// }
+}
 
-};
-
-const addBaseUrlsToProductLink = (link: (typeof productLinks)[0]) => ({
-	...link,
-	url: link.url.startsWith('/') ? base + link.url : link.url,
-	image: link.image.startsWith('/') ? base + link.image : link.image
-});
+// const addBaseUrlsToProductLink = (link: (typeof productLinks)[0]) => ({
+// 	...link,
+// 	url: link.url.startsWith('/') ? base + link.url : link.url,
+// 	image: link.image.startsWith('/') ? base + link.image : link.image
+// });
