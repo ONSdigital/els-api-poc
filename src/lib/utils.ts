@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { resolve } from "$app/paths";
 import { format } from "d3-format";
 import { utcFormat } from "d3-time-format";

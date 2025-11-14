@@ -4,12 +4,14 @@
 
   let {
     data,
-    hovered = $bindable(),
+    hovered = false,
     xKey = "time",
     yKey = "value",
     zKey = "areacd",
     selected = $bindable(),
   } = $props();
+
+  const nticks = 2;
 
   let _data = $derived.by(() => {
     const keyed = {};
@@ -19,6 +21,8 @@
     }
     return { keyed, array: Object.values(keyed).flat() };
   });
+
+  $inspect(_data);
 
   let xDomain = $derived.by(() => {
     const vals = _data.array.map((d) => d[xKey]);
@@ -36,27 +40,47 @@
     const fn = (v) =>
       ((v - domain[0]) / (domain[1] - domain[0])) * (range[1] - range[0]) +
       range[0];
+    fn.domain = () => domain;
     fn.range = () => range;
+    fn.ticks = (count = nticks) => {
+      const step = (domain[1] - domain[0]) / count;
+      return Array.from({ length: count + 1 }, (_, i) => domain[0] + i * step);
+    };
     return fn;
   }
 
   function scaleY({ domain, plotHeight, plotOptions }) {
     const { marginTop, marginBottom } = plotOptions;
-    const range = [plotHeight - marginTop - marginBottom, marginBottom];
+    const range = [plotHeight, marginBottom];
     const fn = (v) =>
       ((v - domain[0]) / (domain[1] - domain[0])) * (range[1] - range[0]) +
       range[0];
+    fn.domain = () => domain;
     fn.range = () => range;
+    fn.ticks = (count = nticks) => {
+      const step = (domain[1] - domain[0]) / count;
+      return Array.from({ length: count + 1 }, (_, i) => domain[0] + i * step);
+    };
     return fn;
   }
+
+  $inspect(hovered)
 </script>
 
 <Plot
   x={{ domain: xDomain, scale: scaleX }}
   y={{ domain: yDomain, scale: scaleY }}
 >
-  <AxisX />
-  <AxisY />
+  <AxisX
+    anchor="bottom"
+    stroke="black"
+    strokeWidth={1}
+    tickFormat={(v) => {
+      const d = v instanceof Date ? v : new Date(v);
+      return d.toISOString().slice(0, 4);
+    }}
+  />
+  <AxisY anchor="left" stroke="black" />
   <Line
     data={_data.array}
     x={xKey}
@@ -64,9 +88,12 @@
     z={zKey}
     stroke="grey"
     strokeWidth="1"
-    pointerEvent="stroke"
+    onpointerenter={() => hovered = true}
+    onpointerleave={() => hovered = false}
+    opacity={(d) => hovered ? 0.3 : 1}
+    pointerEvents="stroke"
   />
-  <Pointer data={_data.array} x={xKey} y={yKey} z={zKey}>
+  <Pointer data={_data.array} x={xKey} y={yKey} z={zKey} maxDistance={20}>
     {#snippet children({ data })}
       <Line
         class="hovered-line"
@@ -83,7 +110,4 @@
 </Plot>
 
 <style>
-  :global(.hovered-line) {
-    pointer-events: none !important;
-  }
 </style>
