@@ -56,11 +56,13 @@ export function getTime(values, params = {}) {
 
 	const periods = values.map(v => ({value: v, period: periodToDateRange(v[0])}));
 	const nearest = params.nearest || "none";
-	const isRange = periods[0].period.length > 1;
-	const date = isRange || params.time.length === 10 ? toPlainDate(params.time, true) : [toPlainDate(params.time, false), toPlainDate(params.time, true)];
+	const periodIsRange = periods[0].period.length > 1; // Time periods have a duration component
+	const dateIsExact = params.time.length === 10; // Requested date is to nearest day
+	const date = periodIsRange || dateIsExact ? toPlainDate(params.time, true) : [toPlainDate(params.time, false), toPlainDate(params.time, true)];
 
 	let match;
-	if (isRange) match = periods.findLast(p => Temporal.PlainDate.compare(date, p.period[0]) !== -1 && Temporal.PlainDate.compare(date, p.period[1]) !== 1);
+	if (periodIsRange) match = periods.findLast(p => Temporal.PlainDate.compare(date, p.period[0]) !== -1 && Temporal.PlainDate.compare(date, p.period[1]) !== 1);
+	else if (dateIsExact) match = periods.findLast(p => Temporal.PlainDate.compare(date, p.period[0]) === 0);
 	else match = periods.findLast(p => Temporal.PlainDate.compare(p.period[0], date[0]) !== -1 && Temporal.PlainDate.compare(p.period[0], date[1]) !== 1);
 	if (match) return [match.value];
 
