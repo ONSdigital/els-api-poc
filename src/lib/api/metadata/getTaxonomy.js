@@ -1,5 +1,5 @@
 import getIndicators from "./getIndicators.js";
-import { capitalise } from "$lib/utils.js";
+import { capitalise } from "$lib/utils.ts";
 
 function makeItem(slug, label = null, description = null) {
   const item = {label: label || capitalise(slug), slug};

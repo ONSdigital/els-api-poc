@@ -10,7 +10,7 @@
   } from "@onsvisual/svelte-components";
   import AreasModal from "$lib/components/modals/AreasModal.svelte";
   import OptionsModal from "$lib/components/modals/OptionsModal.svelte";
-  import { makePeriodFormatter } from "$lib/utils.js";
+  import { makePeriodFormatter } from "$lib/utils.ts";
 
   let { data } = $props();
 

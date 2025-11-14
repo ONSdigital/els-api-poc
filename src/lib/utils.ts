@@ -76,3 +76,30 @@ export function makePeriodFormatter(periodFormat) {
     utcFormat("%-d %b %Y");
   return (p) => formatter(parsePeriod(p));
 }
+
+export function slugify(text: string) {
+	const matches = text
+		.toLowerCase()
+		.replace(/'/g, '') // remove apostrophes since we don't want to split apostrophised words
+		.replace(/&+/g, 'and') // special case 'and'
+		.match(/[a-zA-Z0-9]+/g); // match alphanumeric sequences
+
+	return matches ? matches.join('-') : '';
+}
+
+export const makeCanonicalSlug = (code: string, name?: string) => {
+	if (!code) {
+		throw 'No area code was given';
+	}
+
+	if (name === undefined) {
+		return code;
+	}
+
+	if (!name) {
+		throw 'No area name was given';
+	}
+
+	const slugifiedName = slugify(name);
+	return `${code}-${slugifiedName}`;
+};
