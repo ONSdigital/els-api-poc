@@ -19,7 +19,6 @@
 </script>
 
 <PhaseBanner phase="prototype" />
-<Header />
 <!-- update this link when app homepage built -->
 <Breadcrumb links={[{ label: "ELS API experiments", href: resolve("/") }]} />
 
