@@ -10,8 +10,6 @@
     value = $bindable([]),
     visuallyHideLegend = false,
   } = $props();
-
-  $inspect(value);
 </script>
 
 <fieldset class="button-group">
