@@ -9,14 +9,16 @@
     NavSection,
   } from "@onsvisual/svelte-components";
   import BigNumber from "./BigNumber.svelte";
+  import AreasModal from "$lib/components/modals/AreasModal.svelte";
   import OptionsModal from "$lib/components/modals/OptionsModal.svelte";
+  import IndicatorRow from "./IndicatorRow.svelte";
 
   let { data } = $props();
 
-  $inspect(data.metadata);
+  let defaultComparisonArea = $derived(data.areas.find(a => a.areacd === data.parent.areacd));
 
   let pageState = $state({
-    selectedAreas: [data.area.properties.areacd],
+    selectedAreas: [defaultComparisonArea],
     selectedGeoLevel: data.area.properties.groupcd,
     selectedPeriodRange: [
       data.periods[0],
@@ -28,10 +30,6 @@
 </script>
 
 <Hero title="Local indicators for {data.area.properties.areanm}" />
-
-<Section>
-  <div><OptionsModal /></div>
-</Section>
 
 <Grid>
   {#each ["population-count", "five-year-population-change", "median-age"].filter((slug) => slug in data.metadata) as slug}
@@ -51,11 +49,23 @@
     {/each}
   {:else}
     <strong>{item.label}</strong>
-    <p>Charts go here.</p>
+    <IndicatorRow
+      indicator={item.slug}
+      timeRange={pageState.selectedPeriodRange}
+      selected={[data.area.properties.areacd, ...pageState.selectedAreas.map(a => a.areacd)]}
+      geoLevel={pageState.selectedGeoLevel}/>
   {/if}
 {/snippet}
 
 <NavSections>
+  {#snippet before()}
+		<div class="modals-sticky">
+      <div>
+        <AreasModal />
+        <OptionsModal />
+      </div>
+    </div>
+	{/snippet}
   <NavSection title="Topics" />
   {#each data.taxonomy as topic}
     <NavSection title={topic.label} subsection>
@@ -100,3 +110,14 @@
     </p>
   </NavSection>
 </NavSections>
+
+<style>
+  .modals-sticky {
+    z-index: 1;
+    display: block;
+    position: sticky;
+    top: 0;
+    background: var(--ons-color-page-light);
+    padding: .5em 0;
+  }
+</style>

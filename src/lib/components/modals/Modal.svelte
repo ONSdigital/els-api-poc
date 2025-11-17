@@ -1,13 +1,13 @@
 <script>
   import { Button } from "@onsvisual/svelte-components";
 
-  let { title, label, children } = $props();
+  let { title, label, icon = null, children } = $props();
 
   let id = $derived(title.toLowerCase().replaceAll(" ", "-"));
   let dialog = $state();
 </script>
 
-<Button variant="secondary" small on:click={() => dialog.showModal()}>{label}</Button>
+<Button variant="secondary" {icon} small on:click={() => dialog.showModal()}>{label}</Button>
 
 <dialog aria-labelledby="{id}" bind:this={dialog}>
   <h1 id="{id}" tabindex="-1">{title}</h1>

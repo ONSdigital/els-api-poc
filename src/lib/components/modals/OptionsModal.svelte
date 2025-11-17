@@ -10,7 +10,7 @@
   let formatTick = $derived(pageState?.formatPeriod?.() || ((d) => d));
 </script>
 
-<Modal title="Chart options" label="Chart options">
+<Modal title="Chart options" label="Chart options" icon="cog">
   <RangeSlider
     label="Selected time range"
     options={page.data.periods}
