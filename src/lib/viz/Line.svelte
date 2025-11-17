@@ -11,7 +11,8 @@
     selected = $bindable(),
   } = $props();
 
-  const nticks = 2;
+  const nticks = 2; 
+  // not got this to properly work yet
 
   let _data = $derived.by(() => {
     const keyed = {};

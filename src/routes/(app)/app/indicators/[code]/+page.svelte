@@ -75,8 +75,6 @@
   setContext("pageState", pageState);
 </script>
 
-<Header />
-
 <Hero
   title={data.indicator.label}
   width="medium"

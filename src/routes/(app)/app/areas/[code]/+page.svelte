@@ -18,6 +18,7 @@
   import { base } from "$app/paths";
   import { makeCanonicalSlug } from "$lib/utils.ts";
   import throttle from "throttleit";
+  import { goto } from "$app/navigation";
   let { data } = $props();
   let selected = $state();
   $inspect(data);
