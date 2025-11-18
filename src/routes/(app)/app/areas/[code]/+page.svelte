@@ -12,6 +12,7 @@
     PhaseBanner,
     Header,
     Breadcrumb,
+    Tabs, Tab
   } from "@onsvisual/svelte-components";
   import { getName, capitalise } from "@onsvisual/robo-utils";
   import topojson from "$lib/data/topo.json";
@@ -21,6 +22,7 @@
   import { goto } from "$app/navigation";
   let { data } = $props();
   let selected = $state();
+  let clientWidth =$state()
   $inspect(data);
 
   async function loadOptionsFn(query, populateResults) {
@@ -53,10 +55,13 @@
       );
   }
   $inspect(selected);
+  
+  let childTypes = $derived(data.area.properties.child_typecds);
+  let childType = $derived(data.area.properties.child_typecds[0])
+  $inspect(childTypes)
 </script>
 
 <PhaseBanner phase="prototype" />
-<Header />
 <Breadcrumb links={[{ label: "ELS API experiments", href: resolve("/") }]} />
 
 <Hero
@@ -79,11 +84,11 @@
       <!-- {data.related.parents[0].areanm} -->
       <a
         href="{base}/app/areas/{makeCanonicalSlug(
-          data.related.parents[0].areacd
+          data.area.properties.parents[0].areacd
         )}"
         data-sveltekit-noscroll
       >
-        {getName(data.related.parents[0])}</a
+        {getName(data.area.properties.parents[0])}</a
       >
       <!-- do we want the URLS to be just the code or the code-name? -->
     {/if}
@@ -91,6 +96,10 @@
 </Hero>
 
 <Grid>
+  <GridCell colspan={2}>
+    <h2> Area nav map here for {data.area.properties.areanm}</h2>
+  </GridCell>
+
   <div class="ons-grid__col ons-col-4@l grid-cell-flex">
     {#if data.area.properties.areacd !== "K02000001"}
       <div class="local-indicators-card">
@@ -140,6 +149,18 @@
       </form>
     </div>
   </div>
+  <GridCell colspan={3}>
+    <!-- <div style:margin-top="10px" class="ons-u-d-b@s" bind:clientWidth={tabsWidth}></div> -->
+    <!-- {#key childType} -->
+    {#if childTypes.length === 1}
+						<Tabs
+							selected={childType}
+							compact
+						>
+            </Tabs>
+      {/if}
+    <!-- {/key} -->
+  </GridCell>
 </Grid>
 
 <style>
