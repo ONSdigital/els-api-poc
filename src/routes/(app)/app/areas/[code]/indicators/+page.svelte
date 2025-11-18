@@ -27,6 +27,8 @@
     showConfidenceIntervals: false,
   });
   setContext("pageState", pageState);
+
+  let hovered = $state();
 </script>
 
 <Hero title="Local indicators for {data.area.properties.areanm}" />
@@ -53,7 +55,8 @@
       indicator={item.slug}
       timeRange={pageState.selectedPeriodRange}
       selected={[data.area.properties.areacd, ...pageState.selectedAreas.map(a => a.areacd)]}
-      geoLevel={pageState.selectedGeoLevel}/>
+      geoLevel={pageState.selectedGeoLevel}
+      bind:hovered/>
   {/if}
 {/snippet}
 

@@ -51,7 +51,7 @@
 <Observe bind:visible>
   <div class="indicator-row">
     <div class="indicator-beeswarm">
-      <Beeswarm data={beeswarmData || {message: "No data"}} {selected}/>
+      <Beeswarm data={beeswarmData || {message: "No data"}} {selected} {visible} bind:hovered/>
     </div>
     <div class="indicator-sparkline">
       <Sparkline data={sparklineData || {message: "No data"}} {selected}/>
@@ -64,10 +64,12 @@
     display: flex;
     flex-direction: row;
     gap: 1rem;
+    width: 100%;
     height: 120px;
   }
   .indicator-beeswarm {
     flex-grow: 1;
+    max-width: 470px;
   }
   .indicator-sparkline {
     flex-shrink: 1;

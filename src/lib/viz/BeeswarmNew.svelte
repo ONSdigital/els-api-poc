@@ -3,7 +3,7 @@
   import { parseDataKeyed } from "$lib/utils";
   import { ONSpalette } from "$lib/config";
 
-  let { data, xKey = "value", yKey = "y", zKey = "areacd", selected = [] } = $props();
+  let { data, xKey = "value", yKey = "y", zKey = "areacd", selected = [], hovered = $bindable(), visible = true } = $props();
 
   let _data = $derived.by(() => {
     const _data = parseDataKeyed(data, zKey);
@@ -18,20 +18,24 @@
     x={xKey}
     y={yKey}
     fill="#99999955"
-    r={4}/>
-  {#each selected.filter(cd => cd in _data.keyed) as cd, i}
+    r={4}
+    onmouseover={(e, d) => hovered = d[zKey]}
+    onmouseleave={() => hovered = null}/>
+  {#each (visible ? [...selected, hovered] : selected).filter(cd => cd in _data.keyed) as cd, i}
     {@const data = _data.keyed[cd]}
     {@const name = data?.[0]?.areanm}
     <Dot
+      class="active-dot"
       {data}
       x={xKey}
-      y={() => 0}
-      fill={ONSpalette[i]}
+      y={(d) => d[zKey] === hovered ? d[yKey] : 0}
+      fill={(d) => d[zKey] === hovered ? "orange" : ONSpalette[i]}
       r={6}/>
     <Text
+      class="active-label"
       {data}
       x={xKey}
-      y={() => 0}
+      y={(d) => d[zKey] === hovered ? d[yKey] : 0}
       dy={-5}
       lineAnchor="bottom"
       fill="black"
@@ -41,3 +45,9 @@
       text={name} />
   {/each}
 </Plot>
+
+<style>
+  :global(.active-dot), :global(.active-label) {
+    pointer-events: none;
+  }
+</style>
