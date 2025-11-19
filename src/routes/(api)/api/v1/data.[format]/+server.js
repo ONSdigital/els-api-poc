@@ -9,6 +9,7 @@ export async function GET({ params, url }) {
   const excludeMultivariate = getParam(url, "excludeMultivariate", false);
   const geo = getParam(url, "geo", "all");
   const geoExtent = getParam(url, "geoExtent", "all");
+  const geoCluster = getParam(url, "geoCluster", "all");
   const hasGeo = getParam(url, "hasGeo", "any");
   const time = getParam(url, "time", "latest");
   const timeNearest = getParam(url, "timeNearest", "none");
@@ -24,6 +25,7 @@ export async function GET({ params, url }) {
     excludeMultivariate,
     geo,
     geoExtent,
+    geoCluster,
     hasGeo,
     time,
     timeNearest,
