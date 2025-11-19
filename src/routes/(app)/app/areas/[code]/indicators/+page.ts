@@ -13,17 +13,20 @@ export const load: PageLoad = async ({ params, parent, fetch }) => {
 	const taxonomyPath = resolve(`/api/v1/metadata/taxonomy?hasGeo=${params.code}&excludeMultivariate=true`);
 	const metadataPath = resolve(`/api/v1/metadata/indicators?hasGeo=${params.code}&excludeMultivariate=true&asLookup=true`);
 	const areasPath = resolve(`/api/v1/geo/list?year=latest`);
+	const relatedPath = resolve(`/api/v1/geo/related/${params.code}`);
 
 	try {
 		const taxonomy = await(await fetch(taxonomyPath)).json();
 		const metadata = await(await fetch(metadataPath)).json();
 		const areas = [...await(await fetch(areasPath)).json()].sort((a, b) => a.areanm.localeCompare(b.areanm));
+		const related = await(await fetch(relatedPath)).json();
 
 		return {
-			taxonomy,
+			taxonomy: taxonomy.data,
 			metadata,
 			areas,
 			parent: areaParent,
+			related,
 			periods: summaryData.years
 		};
 	} catch {

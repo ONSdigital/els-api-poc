@@ -17,7 +17,6 @@
     if (dataUrl !== loadedDataUrl) {
       try {
         data = await (await fetch(dataUrl)).json();
-        console.log({data})
       } catch {
         console.log("Failed to load big number data");
       }
