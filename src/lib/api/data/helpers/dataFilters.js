@@ -21,7 +21,7 @@ export function makeGeoFilter(geo, geoExtent, geoCluster) {
   const types = new Set();
   for (const g of [geo].flat()) {
     // if (g.match(/^[EKNSW]\d{2}$/)) types.add(g);
-    if (geoLevels[g] && geoCluster !== "all") {
+    if (geoLevels[g] && geoCluster === "all") {
 			if (geoExtent.match(/^[EKNSW]\d{8}$/)) {
 				const children = getChildAreas({code: geoExtent, geoLevel: g, includeNames: false});
 				for (const child of children) codes.add(child);
