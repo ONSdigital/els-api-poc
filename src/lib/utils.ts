@@ -165,7 +165,8 @@ export function makeDataUrl(
   timeNearest = null,
   geoSelected = [],
   geoLevel = null,
-  geoRelated = null
+  geoExtent = null,
+  geoCluster = null
 ) {
   const base = "/api/v1/data.cols.json";
   const chunks = [];
@@ -180,6 +181,8 @@ export function makeDataUrl(
     )
   );
   if (geo.length > 0) chunks.push({ key: "geo", value: geo.join(",") });
+  if (geoExtent) chunks.push({ key: "geoExtent", value: geoExtent });
+  if (geoCluster) chunks.push({ key: "geoCluster", value: geoCluster });
 
   const time = Array.isArray(timeRange) ? timeRange.join(",") : timeRange;
   if (time) chunks.push({ key: "time", value: time });

@@ -21,6 +21,9 @@
   {#if mode === "indicator"}
     <Dropdown id="geo-level-select" label="Geography type" options={page.data.geoLevels} bind:value={pageState.selectedGeoLevel}/>
   {/if}
+  {#if mode === "area"}
+    <Dropdown id="geo-related-select" label="Geography group" options={page.data.geoGroups} bind:value={pageState.selectedGeoGroup}/>
+  {/if}
   <div class="select-container">
     <Select id="area-select" label={mode === "area" ? "Comparison areas" : "Individual areas"} placeholder="Choose one or more" options={page.data.areas} labelKey="areanm" on:change={(e) => addArea(e.detail)} autoClear/>
   </div>
@@ -41,6 +44,7 @@
     margin: .5em .5em 0 0;
   }
   .select-container {
+    margin-top: 1em;
     width: 22.5rem;
     max-width: 100%;
   }

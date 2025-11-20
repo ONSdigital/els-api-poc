@@ -19,7 +19,7 @@
 
   let pageState = $state({
     selectedAreas: [defaultComparisonArea],
-    selectedGeoLevel: data.area.properties.groupcd,
+    selectedGeoGroup: data.geoGroups[0],
     selectedPeriodRange: [
       data.periods[0],
       data.periods[data.periods.length - 1],
@@ -55,7 +55,7 @@
       indicator={item.slug}
       timeRange={pageState.selectedPeriodRange}
       selected={[data.area.properties.areacd, ...pageState.selectedAreas.map(a => a.areacd)]}
-      geoLevel={pageState.selectedGeoLevel}
+      geoGroup={pageState.selectedGeoGroup}
       bind:hovered/>
   {/if}
 {/snippet}

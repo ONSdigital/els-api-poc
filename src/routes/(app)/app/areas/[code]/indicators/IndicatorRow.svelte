@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Observe } from "@onsvisual/svelte-components";
-  import { makeDataUrl, parseData } from "$lib/utils.ts";
+  import { makeDataUrl } from "$lib/utils.ts";
   import Beeswarm from "$lib/viz/BeeswarmNew.svelte";
   import Sparkline from "$lib/viz/Sparkline.svelte";
 
@@ -8,8 +8,7 @@
     indicator,
     timeRange,
     selected = [],
-    geoLevel,
-    geoRelated,
+    geoGroup,
     hovered = $bindable(),
   } = $props();
 
@@ -21,9 +20,9 @@
   let loadedSparklineUrl = $state();
   let sparklineData = $state();
 
-  async function fetchData(indicator, timeRange, selected, geoLevel, geoRelated, visible) {
+  async function fetchData(indicator, timeRange, selected, geoLevel, geoExtent, geoCluster, visible) {
     if (!visible) return;
-    const beeswarmUrl = makeDataUrl(indicator, timeRange[1], "latest", selected, geoLevel, geoRelated);
+    const beeswarmUrl = makeDataUrl(indicator, timeRange[1], "latest", selected, geoLevel, geoExtent, geoCluster);
     if (beeswarmUrl !== loadedBeeswarmUrl) {
       try {
         beeswarmData = await (await fetch(beeswarmUrl)).json();
@@ -44,7 +43,7 @@
   }
   $effect(async () => {
     console.log(`Refreshing ${indicator} data`);
-    fetchData(indicator, timeRange, selected, geoLevel, geoRelated, visible);
+    fetchData(indicator, timeRange, selected, geoGroup.geoLevel, geoGroup.geoExtent, geoGroup.geoCluster, visible);
   });
 </script>
 
