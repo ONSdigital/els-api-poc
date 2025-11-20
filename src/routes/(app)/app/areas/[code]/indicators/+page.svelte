@@ -4,10 +4,12 @@
   import {
     Hero,
     Grid,
-    Section,
+    Details,
     NavSections,
     NavSection,
+    Dropdown
   } from "@onsvisual/svelte-components";
+  import { formatName } from "@onsvisual/robo-utils";
   import BigNumber from "./BigNumber.svelte";
   import AreasModal from "$lib/components/modals/AreasModal.svelte";
   import OptionsModal from "$lib/components/modals/OptionsModal.svelte";
@@ -24,6 +26,7 @@
       data.periods[0],
       data.periods[data.periods.length - 1],
     ],
+    selectedCluster: data.related.similar[0],
     showConfidenceIntervals: false,
   });
   setContext("pageState", pageState);
@@ -78,9 +81,22 @@
     </NavSection>
   {/each}
   <NavSection title="Select an indicator" />
+  {#if data.related.similar[0]}
+    <NavSection title="Similar areas">
+      <p>See which areas are similar to {formatName(data.area.properties.areanm, "the")} based on specific groups of indicators. These clusters of areas are based on an analysis carried out by the ONS.</p>
+      <Dropdown label="Select a group of indicators" options={data.related.similar} bind:value={pageState.selectedCluster}/>
+      <Details title="Show the 20 most similar areas to {formatName(data.area.properties.areanm, "the")}">
+        <ol>
+          {#each pageState.selectedCluster.similar as area}
+            <li>{area.areanm}</li>
+          {/each}
+        </ol>
+      </Details>
+    </NavSection>
+  {/if}
   <NavSection title="Get the data">
     <p>
-      Download all datasets that include {data.area.properties.areanm} in a
+      Download all datasets that include {formatName(data.area.properties.areanm, "the")} in a
       <a
         href={resolve(`/api/v1/data.csv?hasGeo=${data.area.properties.areacd}&time=all&excludeMultivariate=true`)}
         download="data.csv">CSV</a

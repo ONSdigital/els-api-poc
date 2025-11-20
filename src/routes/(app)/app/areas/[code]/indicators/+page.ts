@@ -30,20 +30,18 @@ export const load: PageLoad = async ({ params, parent, fetch }) => {
       a.areanm.localeCompare(b.areanm)
     );
     const related = await (await fetch(relatedPath)).json();
-    const geoGroups = [
-      { id: "level", label: `All ${pluralise(geoLevel.label)}`, geoLevel: geoLevel.key },
-      {
-        id: "siblings",
-        label: `All ${pluralise(geoLevel.label)} ${formatName(related.siblings.parent.areanm, "in")}`,
-        geoLevel: geoLevel.key,
-        geoExtent: related.siblings.parent.areacd,
-      },
-      {
-        id: "cluster",
-        label: `Similar demographics to ${formatName(area.properties.areanm, "the")}`,
-        geoCluster: `demographic_${related.similar[2].cluster.key}`,
-      },
-    ];
+    const geoGroups = [{ id: "level", label: `All ${pluralise(geoLevel.label)}`, geoLevel: geoLevel.key }];
+		if (geoLevel && related?.siblings?.parent) geoGroups.push({
+			id: "siblings",
+			label: `All ${pluralise(geoLevel.label)} ${formatName(related.siblings.parent.areanm, "in")}`,
+			geoLevel: geoLevel.key,
+			geoExtent: related.siblings.parent.areacd,
+		});
+		if (related.similar?.[2]?.cluster) geoGroups.push({
+			id: "cluster",
+			label: `Similar demographics to ${formatName(area.properties.areanm, "the")}`,
+			geoCluster: `demographic_${related.similar[2].cluster.key}`,
+		});
 
     return {
       taxonomy: taxonomy.data,
@@ -54,7 +52,8 @@ export const load: PageLoad = async ({ params, parent, fetch }) => {
       geoGroups,
       periods: summaryData.years,
     };
-  } catch {
+  } catch(err) {
+		console.log(err);
     error(404, { message: "Could not retrieve metadata" });
   }
 };
