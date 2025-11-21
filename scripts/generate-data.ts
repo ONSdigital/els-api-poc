@@ -316,9 +316,26 @@ const indicators = [];
 for (const file of file_paths) {
     indicators.push(...processFile(file,excluded_indicators));
 }
-cube.link.item = indicator_slugs.map(slug => indicators.find(ind => ind.extension.slug === slug))
+// Sort indicators to match order in manifest (ie. taxonomy order)
+cube.link.item = indicator_slugs.map(slug => indicators.find(ind => ind.extension.slug === slug));
 
-// console.log(cube.link.item)
 const output = "./src/lib/data/json-stat.json";
 writeFileSync(output, JSON.stringify(cube));
 console.log(`Wrote ${output}.`)
+
+// Generate JSON file with summary stats/data
+const summaryData = {
+    count: cube.link.item.length,
+    topics: Array.from(new Set(cube.link.item.map(ds => ds.extension.topic)))
+        .map(t => ({slug: t.replaceAll(" ", "-"), label: t[0].toUpperCase() + t.slice(1)})),
+    years: Array.from(
+        new Set(cube.link.item.map(ds => 
+            Object.keys(ds.dimension.period.category.index).map(val => +val.slice(0, 4))
+        ).flat())).sort((a, b) => a - b),
+    geoYears: Array.from(new Set(cube.link.item.map(ds => ds.extension.geography.year)))
+        .sort((a, b) => a - b)
+};
+
+const summaryOutput = "./src/lib/data/json-stat-summary.json";
+writeFileSync(summaryOutput, JSON.stringify(summaryData));
+console.log(`Wrote ${summaryOutput}.`);

@@ -37,7 +37,7 @@
 		analyticsEvent(eventData);
 	});
 
-	console.log($page.data);
+	// console.log($page.data);
 </script>
 
 <svelte:head>

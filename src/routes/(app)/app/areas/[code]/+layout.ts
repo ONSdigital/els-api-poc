@@ -1,8 +1,8 @@
 import { error, redirect } from '@sveltejs/kit';
-import { base, resolve } from '$app/paths';
+import { resolve } from '$app/paths';
 import type { LayoutLoad } from './$types';
-import { getName } from '@onsvisual/robo-utils';
-import { Breadcrumb } from '@onsvisual/svelte-components';
+// import { getName } from '@onsvisual/robo-utils';
+// import { Breadcrumb } from '@onsvisual/svelte-components';
 
 export const load: LayoutLoad = async ({ params, fetch }) => {
 
@@ -32,8 +32,8 @@ export const load: LayoutLoad = async ({ params, fetch }) => {
 	// 		redirect(301, canonicalSlug);
 	// 	}
 
-		return {
-			area,
+		// return {
+		// 	area,
 	// 		links: productLinks.map(addBaseUrlsToProductLink),
 	// 		title: `${getName(result.place)} (${result.place.areacd}) - ONS`,
 	// 		description: `Find facts and figures from across the ONS on ${getName(result.place, 'the')} (${result.place.typenm}).`,
@@ -49,12 +49,11 @@ export const load: LayoutLoad = async ({ params, fetch }) => {
 	// 		],
 	// 		background: '#fff'
 	// 	};
-	}
+	// }
+}
 
-};
-
-const addBaseUrlsToProductLink = (link: (typeof productLinks)[0]) => ({
-	...link,
-	url: link.url.startsWith('/') ? base + link.url : link.url,
-	image: link.image.startsWith('/') ? base + link.image : link.image
-});
+// const addBaseUrlsToProductLink = (link: (typeof productLinks)[0]) => ({
+// 	...link,
+// 	url: link.url.startsWith('/') ? base + link.url : link.url,
+// 	image: link.image.startsWith('/') ? base + link.image : link.image
+// });

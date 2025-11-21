@@ -15,9 +15,25 @@ function formatMetadata(ds, minimalMetadata = false, fullDims = false) {
       description: ds.extension.subtitle,
     };
 
-  const metadata = { label: ds.label, ...ds.extension, updated: ds.updated, caveats: ds.note };
-  metadata.dimensions = Object.fromEntries(ds.id.map((key, i) => [key, {...formatDimension(ds, key, fullDims), order: i}]));
+  const metadata = {
+    label: ds.label,
+    ...ds.extension,
+    updated: ds.updated,
+    caveats: ds.note,
+  };
+  metadata.dimensions = Object.fromEntries(
+    ds.id.map((key, i) => [
+      key,
+      { ...formatDimension(ds, key, fullDims), order: i },
+    ])
+  );
   return metadata;
+}
+
+function arrayToLookup(metadata) {
+  const lookup = {};
+  for (const ds of metadata) lookup[ds.slug] = ds;
+  return lookup;
 }
 
 export default function getIndicators(params = {}) {
@@ -32,9 +48,11 @@ export default function getIndicators(params = {}) {
 
   const metadata = rawMetadata.link.item
     .filter(filter)
-    .map((ds) =>
-      formatMetadata(ds, params.minimalMetadata, params.fullDims)
-    );
+    .map((ds) => formatMetadata(ds, params.minimalMetadata, params.fullDims));
 
-  return params.singleIndicator ? metadata[0] : metadata;
+  return params.singleIndicator
+    ? metadata[0]
+    : params.asLookup
+      ? arrayToLookup(metadata)
+      : metadata;
 }
