@@ -5,6 +5,6 @@ export const load = async ({ fetch }) => {
 	const taxonomy = await(await fetch(path)).json();
 
 	return {
-		taxonomy
+		taxonomy: taxonomy.data
 	};
 };

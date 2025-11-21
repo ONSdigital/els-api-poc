@@ -19,9 +19,9 @@ export const load = async ({ fetch, url }) => {
 	const areaList = await(await fetch(`/api/v1/geo/list`)).json();
   areaList.sort((a, b) => a.areanm.localeCompare(b.areanm));
 
-  const taxonomy = await (
+  const taxonomy = (await (
     await fetch(resolve("/api/v1/metadata/taxonomy?flat=true"))
-  ).json();
+  ).json()).data;
 
   const topics = Array.from(new Set(taxonomy.map((t) => t.topic))).map((t) => ({
     slug: t,

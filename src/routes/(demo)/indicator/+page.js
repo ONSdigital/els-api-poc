@@ -7,6 +7,6 @@ export const load = async ({ fetch }) => {
 	const indicators = await(await fetch(path)).json();
 
 	return {
-		indicators: indicators.filter(ind => !exclude.includes(ind.slug))
+		indicators: indicators.data.filter(ind => !exclude.includes(ind.slug))
 	};
 };

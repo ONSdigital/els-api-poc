@@ -81,7 +81,7 @@
 
   <Card title="Local indicators" mode="featured">
     <p style:margin-bottom="28px">
-      Explore {$page.data.taxonomyFlat.length} indicators, including
+      Explore {$page.data.taxonomy.count} indicators, including
       <a
         href={resolve(`/app/indicators/gross-disposable-household-income-per-head`)}
         class="no-wrap">household income</a

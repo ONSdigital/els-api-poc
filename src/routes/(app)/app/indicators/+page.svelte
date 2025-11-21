@@ -24,7 +24,7 @@
 
 <Hero width="medium" title="Local indicators" cls="titleblock-transparent">
   <p class="ons-hero__text">
-    Explore our {data.taxonomyFlat.length} local indicators, including
+    Explore our {data.taxonomy.count} local indicators, including
     <b>disposable household income</b>,
     <b>participation in further education</b>
     and
@@ -41,7 +41,7 @@
 {/snippet}
 
 <NavSections cls="nav-sections">
-  {#each data.taxonomy as theme}
+  {#each data.taxonomy.data as theme}
     <NavSection title={theme.label} id={theme.slug}>
       {#each theme.children as child}
         {#if child.description}
