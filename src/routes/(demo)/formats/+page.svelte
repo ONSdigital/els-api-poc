@@ -9,7 +9,7 @@
     Grid,
     DataCard
   } from "@onsvisual/svelte-components";
-  import { makeValueFormatter, makePeriodFormatter } from "$lib/utils.js";
+  import { makeValueFormatter, makePeriodFormatter } from "$lib/utils.ts";
 
   let { data } = $props();
 

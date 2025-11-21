@@ -3,6 +3,9 @@ import { geoLevels } from "$lib/config/geo-levels.js";
 import getChildAreas from "$lib/api/geo/getChildAreas.js";
 import hasObservation from "./hasObservation.js";
 import { isValidMonth, isValidYear } from "$lib/api/utils.js";
+import readData from "$lib/data";
+
+const areasClusters = await readData("areas-clusters");
 
 export function ascending(a, b) {
   return a == null || b == null ? NaN : a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
@@ -13,12 +16,12 @@ export function makeFilter(param) {
   return d => set.has(d[0]);
 }
 
-export function makeGeoFilter(geo, geoExtent) {
+export function makeGeoFilter(geo, geoExtent, geoCluster) {
   const codes = new Set();
   const types = new Set();
   for (const g of [geo].flat()) {
     // if (g.match(/^[EKNSW]\d{2}$/)) types.add(g);
-    if (geoLevels[g]) {
+    if (geoLevels[g] && geoCluster === "all") {
 			if (geoExtent.match(/^[EKNSW]\d{8}$/)) {
 				const children = getChildAreas({code: geoExtent, geoLevel: g, includeNames: false});
 				for (const child of children) codes.add(child);
@@ -28,6 +31,13 @@ export function makeGeoFilter(geo, geoExtent) {
     }
     else if (g.match(/^[EKNSW]\d{8}$/) && !types.has(g.slice(0, 3))) codes.add(g);
   }
+	if (geoCluster) {
+		const [grouping, cluster] = geoCluster.split("_");
+		const cds = areasClusters.clusters?.[grouping]?.[cluster];
+		if (Array.isArray(cds)) {
+			for (const cd of cds) codes.add(cd);
+		}
+	}
   return codes.size > 0 && types.size > 0 ? d => codes.has(d[0]) || types.has(d[0].slice(0, 3)) :
     types.size > 0 ? d => types.has(d[0].slice(0, 3)) :
     codes.size > 0 ? d => codes.has(d[0]) :
@@ -56,11 +66,13 @@ export function getTime(values, params = {}) {
 
 	const periods = values.map(v => ({value: v, period: periodToDateRange(v[0])}));
 	const nearest = params.nearest || "none";
-	const isRange = periods[0].period.length > 1;
-	const date = isRange || params.time.length === 10 ? toPlainDate(params.time, true) : [toPlainDate(params.time, false), toPlainDate(params.time, true)];
+	const periodIsRange = periods[0].period.length > 1; // Time periods have a duration component
+	const dateIsExact = params.time.length === 10; // Requested date is to nearest day
+	const date = periodIsRange || dateIsExact ? toPlainDate(params.time, true) : [toPlainDate(params.time, false), toPlainDate(params.time, true)];
 
 	let match;
-	if (isRange) match = periods.findLast(p => Temporal.PlainDate.compare(date, p.period[0]) !== -1 && Temporal.PlainDate.compare(date, p.period[1]) !== 1);
+	if (periodIsRange) match = periods.findLast(p => Temporal.PlainDate.compare(date, p.period[0]) !== -1 && Temporal.PlainDate.compare(date, p.period[1]) !== 1);
+	else if (dateIsExact) match = periods.findLast(p => Temporal.PlainDate.compare(date, p.period[0]) === 0);
 	else match = periods.findLast(p => Temporal.PlainDate.compare(p.period[0], date[0]) !== -1 && Temporal.PlainDate.compare(p.period[0], date[1]) !== 1);
 	if (match) return [match.value];
 

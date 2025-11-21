@@ -14,7 +14,7 @@
     LazyLoad
   } from "@onsvisual/svelte-components";
   import Beeswarm from "$lib/viz/Beeswarm.svelte";
-  import { fetchChartDataV1 } from "$lib/utils.js";
+  import { fetchChartDataV1 } from "$lib/utils.ts";
 
   export let data;
 

@@ -39,7 +39,7 @@
 
   function gotoSelected(e) {
     e.preventDefault();
-    if (selected) goto(resolve(selected.lng ? `/areas/search?q=${selected.areacd}` : `/areas/${selected.areacd}/`))
+    if (selected) goto(resolve(selected.lng ? `/app/areas/search?q=${selected.areacd}` : `/app/areas/${selected.areacd}/`))
   }
 </script>
 
@@ -81,16 +81,16 @@
 
   <Card title="Local indicators" mode="featured">
     <p style:margin-bottom="28px">
-      Explore {$page.data.taxonomyFlat.length} indicators, including
+      Explore {$page.data.taxonomy.count} indicators, including
       <a
-        href={resolve(`/indicators/gross-disposable-household-income-per-head`)}
+        href={resolve(`/app/indicators/gross-disposable-household-income-per-head`)}
         class="no-wrap">household income</a
       >,
-      <a href={resolve(`/indicators/further-education-and-skills-participation`)}
+      <a href={resolve(`/app/indicators/further-education-and-skills-participation`)}
         >further education participation</a
       >
       and
-      <a href={resolve(`/indicators/wellbeing-satisfaction`)}>life satisfaction</a>.
+      <a href={resolve(`/app/indicators/wellbeing-satisfaction`)}>life satisfaction</a>.
     </p>
     <Button icon="arrow" iconPosition="after" href={resolve(`/app/indicators`)} small
       >Explore indicators</Button

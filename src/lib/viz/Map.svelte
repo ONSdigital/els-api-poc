@@ -35,10 +35,10 @@
     domain: {type: "FeatureCollection", features: geo}
   }}
   color={{
-    scheme: "blues",
+    scheme: "YlGnBu",
     legend: true,
     n: 5,
-    type: "linear"
+    type: "quantile"
   }}>
   <Geo
     data={geo}

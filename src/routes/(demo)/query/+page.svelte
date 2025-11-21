@@ -1,7 +1,7 @@
 <script>
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
-  import { sleep } from "$lib/utils.js";
+  import { sleep } from "$lib/utils.ts";
   import {
     PhaseBanner,
     Header,

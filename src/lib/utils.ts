@@ -1,6 +1,8 @@
+//@ts-nocheck
 import { resolve } from "$app/paths";
 import { format } from "d3-format";
 import { utcFormat } from "d3-time-format";
+import { geoLevels } from "./config/geo-levels.js";
 
 export function parseData(data) {
   const cols = Object.keys(data);
@@ -13,6 +15,22 @@ export function parseData(data) {
     rows.push(row);
   }
   return rows;
+}
+
+export function parseDataKeyed(data, zKey, rowTemplate = {}) {
+  if (data.message) return { keyed: {}, array: [] };
+  const keyed = {};
+  const array = [];
+  const cols = Object.keys(data);
+  for (let i = 0; i < data[cols[0]].length; i++) {
+    const row = {...rowTemplate};
+    for (const col of cols) row[col] = data[col][i];
+    row.time = new Date(data.period[i].split("/")[0]);
+    if (!keyed[data[zKey][i]]) keyed[data[zKey][i]] = [];
+    keyed[data[zKey][i]].push(row);
+    array.push(row);
+  }
+  return { keyed, array };
 }
 
 export async function fetchChartData(
@@ -113,4 +131,64 @@ export function makePeriodFormatter(periodFormat) {
 
 export function sleep(ms = 1000) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function slugify(text: string) {
+  const matches = text
+    .toLowerCase()
+    .replace(/'/g, "") // remove apostrophes since we don't want to split apostrophised words
+    .replace(/&+/g, "and") // special case 'and'
+    .match(/[a-zA-Z0-9]+/g); // match alphanumeric sequences
+
+  return matches ? matches.join("-") : "";
+}
+
+export const makeCanonicalSlug = (code: string, name?: string) => {
+  if (!code) {
+    throw "No area code was given";
+  }
+
+  if (name === undefined) {
+    return code;
+  }
+
+  if (!name) {
+    throw "No area name was given";
+  }
+
+  const slugifiedName = slugify(name);
+  return `${code}-${slugifiedName}`;
+};
+
+export function makeDataUrl(
+  indicator,
+  timeRange,
+  timeNearest = null,
+  geoSelected = [],
+  geoLevel = null,
+  geoExtent = null,
+  geoCluster = null
+) {
+  const base = "/api/v1/data.cols.json";
+  const chunks = [];
+
+  if (indicator) chunks.push({ key: "indicator", value: indicator });
+
+  const geoLevelObj = geoLevels[geoLevel];
+  const geo = geoLevelObj ? [geoLevel] : [];
+  geo.push(
+    ...geoSelected.filter((cd) =>
+      !geoLevelObj ? true : !geoLevelObj.codes.includes(cd.slice(0, 3))
+    )
+  );
+  if (geo.length > 0) chunks.push({ key: "geo", value: geo.join(",") });
+  if (geoExtent) chunks.push({ key: "geoExtent", value: geoExtent });
+  if (geoCluster) chunks.push({ key: "geoCluster", value: geoCluster });
+
+  const time = Array.isArray(timeRange) ? timeRange.join(",") : timeRange;
+  if (time) chunks.push({ key: "time", value: time });
+  if (timeNearest) chunks.push({ key: "timeNearest", value: timeNearest });
+
+  const url = `${base}?${chunks.map((ch) => `${ch.key}=${ch.value}`).join("&")}&includeNames=true`;
+  return resolve(url);
 }

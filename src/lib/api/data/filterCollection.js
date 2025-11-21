@@ -66,8 +66,8 @@ export default async function filterCollection(params = {}) {
   }
 
   // Create filters for standard dimensions
-  if (params.geo !== "all")
-    filters.areacd = makeGeoFilter(params.geo, params.geoExtent);
+  if (params.geo !== "all" || params.geoCluster !== "all")
+    filters.areacd = makeGeoFilter(params.geo, params.geoExtent, params.geoCluster);
   if (params.time !== "all") {
     if (
       [params.time]
