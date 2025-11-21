@@ -12,7 +12,8 @@
     PhaseBanner,
     Header,
     Breadcrumb,
-    Tabs, Tab
+    Tabs,
+    Tab,
   } from "@onsvisual/svelte-components";
   import { getName, capitalise } from "@onsvisual/robo-utils";
   import topojson from "$lib/data/topo.json";
@@ -22,7 +23,7 @@
   import { goto } from "$app/navigation";
   let { data } = $props();
   let selected = $state();
-  let clientWidth =$state()
+  let clientWidth = $state();
   $inspect(data);
 
   async function loadOptionsFn(query, populateResults) {
@@ -55,10 +56,21 @@
       );
   }
   $inspect(selected);
-  
+
   let childTypes = $derived(data.area.properties.child_typecds);
-  let childType = $derived(data.area.properties.child_typecds[0])
-  $inspect(childTypes)
+  let childType = $derived(data.area.properties.child_typecds[0]);
+  console.log("Child types:");
+  $inspect(childTypes);
+  console.log("Current child type:");
+  $inspect(childType);
+
+  let grouped = {};
+  for (const child of data.area.properties.children) {
+    const type = child.areacd.slice(0, 3);
+    if (!grouped[type]) grouped[type] = [];
+    grouped[type].push(child);
+  }
+  $inspect(grouped);
 </script>
 
 <PhaseBanner phase="prototype" />
@@ -97,7 +109,7 @@
 
 <Grid>
   <GridCell colspan={2}>
-    <h2> Area nav map here for {data.area.properties.areanm}</h2>
+    <h2>Area nav map here for {data.area.properties.areanm}</h2>
   </GridCell>
 
   <div class="ons-grid__col ons-col-4@l grid-cell-flex">
@@ -130,7 +142,7 @@
           <Select
             {loadOptions}
             label=""
-            placeholder='Eg. "Fareham" or "Newport"'
+            placeholder="Eg. `Fareham` or `Newport`"
             on:change={(e) => (selected = e.detail)}
             labelKey="areanm"
             mode="search"
@@ -152,13 +164,22 @@
   <GridCell colspan={3}>
     <!-- <div style:margin-top="10px" class="ons-u-d-b@s" bind:clientWidth={tabsWidth}></div> -->
     <!-- {#key childType} -->
-    {#if childTypes.length === 1}
-						<Tabs
-							selected={childType}
-							compact
-						>
-            </Tabs>
-      {/if}
+    <Tabs selected={childType} compact>
+      {#each childTypes as type, i}
+        <Tab title={capitalise(type)} id={type} hideTitle>
+          <ul class="list-columns">
+            {#each grouped[type] as child}
+              <li>
+                <a
+                  href="{base}/app/areas/{makeCanonicalSlug(child.areacd)}"
+                  data-sveltekit-noscroll>{getName(child)}</a
+                >
+              </li>
+            {/each}
+          </ul>
+        </Tab>
+      {/each}
+    </Tabs>
     <!-- {/key} -->
   </GridCell>
 </Grid>
