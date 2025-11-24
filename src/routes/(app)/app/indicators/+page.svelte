@@ -18,13 +18,9 @@
   $: console.log(data);
 </script>
 
-<PhaseBanner phase="prototype" />
-<!-- update this link when app homepage built -->
-<Breadcrumb links={[{ label: "ELS API experiments", href: resolve("/") }]} />
-
 <Hero width="medium" title="Local indicators" cls="titleblock-transparent">
   <p class="ons-hero__text">
-    Explore our {data.taxonomy.count} local indicators, including
+    Explore our {data.taxonomy.meta.count} local indicators, including
     <b>disposable household income</b>,
     <b>participation in further education</b>
     and

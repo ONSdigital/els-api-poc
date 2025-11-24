@@ -73,9 +73,6 @@
   $inspect(grouped);
 </script>
 
-<PhaseBanner phase="prototype" />
-<Breadcrumb links={[{ label: "ELS API experiments", href: resolve("/") }]} />
-
 <Hero
   title={data.area.properties.areanm}
   titleBadge={{

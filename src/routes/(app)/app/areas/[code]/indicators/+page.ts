@@ -7,6 +7,7 @@ import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ params, parent, fetch }) => {
   const { area } = await parent();
+
   const geoLevel = geoLevelsLookup[area.properties.areacd.slice(0, 3)];
   const parentLevel =
     geoLevels[["ctry", "rgn"].includes(geoLevel?.key) ? "ctry" : "rgn"];
@@ -30,18 +31,26 @@ export const load: PageLoad = async ({ params, parent, fetch }) => {
       a.areanm.localeCompare(b.areanm)
     );
     const related = await (await fetch(relatedPath)).json();
-    const geoGroups = [{ id: "level", label: `All ${pluralise(geoLevel.label)}`, geoLevel: geoLevel.key }];
-		if (geoLevel && related?.siblings?.parent) geoGroups.push({
-			id: "siblings",
-			label: `All ${pluralise(geoLevel.label)} ${formatName(related.siblings.parent.areanm, "in")}`,
-			geoLevel: geoLevel.key,
-			geoExtent: related.siblings.parent.areacd,
-		});
-		if (related.similar?.[2]?.cluster) geoGroups.push({
-			id: "cluster",
-			label: `Similar demographics to ${formatName(area.properties.areanm, "the")}`,
-			geoCluster: `demographic_${related.similar[2].cluster.key}`,
-		});
+    const geoGroups = [
+      {
+        id: "level",
+        label: `All ${pluralise(geoLevel.label)}`,
+        geoLevel: geoLevel.key,
+      },
+    ];
+    if (geoLevel && related?.siblings?.parent)
+      geoGroups.push({
+        id: "siblings",
+        label: `All ${pluralise(geoLevel.label)} ${formatName(related.siblings.parent.areanm, "in")}`,
+        geoLevel: geoLevel.key,
+        geoExtent: related.siblings.parent.areacd,
+      });
+    if (related.similar?.[2]?.cluster)
+      geoGroups.push({
+        id: "cluster",
+        label: `Similar demographics to ${formatName(area.properties.areanm, "the")}`,
+        geoCluster: `demographic_${related.similar[2].cluster.key}`,
+      });
 
     return {
       taxonomy: taxonomy.data,
@@ -51,9 +60,22 @@ export const load: PageLoad = async ({ params, parent, fetch }) => {
       related,
       geoGroups,
       periods: summaryData.years,
+
+      // Page metadata
+      title: `${getName(area.properties)} (${area.properties.areacd}) - ONS`,
+      description: `Find facts and figures from across the ONS on ${getName(area.properties, "the")} (${area.properties.typenm}).`,
+      pageType: `area page`,
+      breadcrumbLinks: [
+        { label: "Home", href: resolve("/") },
+        { label: "Explore local statistics", href: resolve("/app") },
+        ...[...area.properties.parents].reverse().map((p) => ({
+          label: getName(p),
+          href: resolve(`/app/areas/${p.areacd}`),
+        })),
+      ],
     };
-  } catch(err) {
-		console.log(err);
+  } catch (err) {
+    console.log(err);
     error(404, { message: "Could not retrieve metadata" });
   }
 };
