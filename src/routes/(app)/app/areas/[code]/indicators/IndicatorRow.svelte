@@ -1,18 +1,23 @@
 <script lang="ts">
   import { Observe } from "@onsvisual/svelte-components";
-  import { makeDataUrl } from "$lib/utils.ts";
+  import { makeDataUrl, makeValueFormatter, makePeriodFormatter } from "$lib/utils.ts";
   import Beeswarm from "$lib/viz/BeeswarmNew.svelte";
   import Sparkline from "$lib/viz/Sparkline.svelte";
 
   let {
     indicator,
+    metadata,
     timeRange,
     selected = [],
     geoGroup,
     hovered = $bindable(),
   } = $props();
 
+  console.log("periodFormat", metadata.periodFormat)
+
   let visible = $state();
+  let formatValue = $derived(makeValueFormatter(metadata.decimalPlaces));
+  let formatPeriod = $derived(makePeriodFormatter(metadata.periodFormat));
 
   let loadedBeeswarmUrl = $state();
   let beeswarmData = $state();
@@ -50,7 +55,7 @@
 <Observe bind:visible>
   <div class="indicator-row">
     <div class="indicator-beeswarm">
-      <Beeswarm data={beeswarmData || {message: "No data"}} {selected} {visible} bind:hovered/>
+      <Beeswarm data={beeswarmData || {message: "No data"}} {formatValue} {formatPeriod} {visible} {selected} bind:hovered/>
     </div>
     <div class="indicator-sparkline">
       <Sparkline data={sparklineData || {message: "No data"}} {selected}/>
@@ -64,7 +69,7 @@
     flex-direction: row;
     gap: 1rem;
     width: 100%;
-    height: 120px;
+    height: 150px;
   }
   .indicator-beeswarm {
     flex-grow: 1;

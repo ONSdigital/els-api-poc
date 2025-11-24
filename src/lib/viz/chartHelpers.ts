@@ -1,0 +1,127 @@
+import { scaleLinear } from "d3-scale";
+import { AccurateBeeswarm } from "accurate-beeswarm-plot";
+import parse from "parse-color";
+
+// Gets the median for a sorted array of numbers
+export function median(xs) {
+  if (xs.length === 0) {
+    throw new Error("Can't compute median of an empty array.");
+  }
+
+  if (xs.length % 2) {
+    // The array has an odd number of elements
+    return xs[Math.floor(xs.length / 2)];
+  }
+
+  // The array has an even number of elements
+  const position = Math.floor(xs.length / 2);
+  const a = xs[position - 1];
+  const b = xs[position];
+  return (a + b) / 2;
+}
+
+// Returns the median and MAD for a sorted array of numbers
+export function medMad(xs, constant = 1.4826) {
+  const med = median(xs);
+  const absDeviations = xs.map((x) => Math.abs(x - med));
+  const mad = constant * median([...absDeviations].sort((a, b) => a - b));
+  return { med, mad };
+}
+
+export function parseChartData(data, valueKey = "value", periodKey = "period", idKey = "areacd") {
+	if (data.message) return null;
+	if (!data[valueKey] || !data[periodKey] || !data[idKey]) throw new Error("Columns missing from data.");
+
+	const array = [];
+	const keyed = {};
+	const valueDomain = [Infinity, -Infinity];
+	const dateDomain = [Infinity, -Infinity];
+
+	const cols = Object.keys(data);
+	for (let i = 0; i < data[cols[0]].length; i ++) {
+		if (data[valueKey][i] == null) continue;
+
+		const row = {};
+		for (const col of cols) row[col] = data[col][i];
+		row.date = new Date(row[periodKey].slice(0, 10));
+
+		if (row[valueKey] < valueDomain[0]) valueDomain[0] = row[valueKey];
+		if (row[valueKey] > valueDomain[1]) valueDomain[1] = row[valueKey];
+		if (row.date < dateDomain[0]) dateDomain[0] = row.date;
+		if (row.date > dateDomain[1]) dateDomain[1] = row.date;
+
+		if (!keyed[row[idKey]]) keyed[row[idKey]] = [];
+		keyed[row[idKey]].push(row);
+		array.push(row);
+	}
+
+	return { array, keyed, valueDomain, dateDomain};
+}
+
+export function parseBeeswarmData(
+  data,
+  xKey,
+  zKey,
+  width = 400,
+  height = 100,
+  radius = 3
+) {
+  if (data.message) return null;
+
+  const vals = data[xKey].filter((d) => d != null);
+  const sorted = [...vals].sort((a, b) => a - b);
+  const { med, mad } = medMad(sorted);
+  const xLo = med - 3 * mad;
+  const xHi = med + 3 * mad;
+  const domain = [
+    xLo < sorted[0] ? sorted[0] : xLo,
+    xHi > sorted[sorted.length - 1] ? sorted[sorted.length - 1] : xHi,
+  ];
+  const range = [0, width];
+
+  const scale = scaleLinear().domain(domain).range(range).clamp(true);
+  const points = new AccurateBeeswarm(vals, radius, (val) => scale(val))
+    .oneSided()
+    .calculateYPositions();
+  const yMax = Math.max(...points.map((p) => p.y));
+  const xScaleFactor = 100 / width;
+  const yScaleFactor = yMax > height ? height / yMax : 1;
+
+  const array = [];
+  const keyed = {};
+  const cols = Object.keys(data);
+
+  for (let i = 0; i < data[cols[0]].length; i++) {
+    if (data[xKey][i] == null) continue;
+
+    const row = {};
+    for (const col of cols) row[col] = data[col][i];
+    row.x = points[i].x * xScaleFactor;
+    row.y = points[i].y * yScaleFactor;
+
+    array.push(row);
+    keyed[row[zKey]] = row;
+  }
+
+  return { array, keyed, median: med, mad, domain };
+}
+
+export const contrastColor = (color) => {
+  if (!color || typeof color !== "string") return "black";
+  const rgb = parse(color).rgb;
+  if (rgb) {
+    const brightness = (rgb[0] * 299 + rgb[1] * 587 + rgb[2] * 114) / 1000;
+    return brightness > 125 ? "black" : "white";
+  }
+  return "black";
+};
+
+export const markerPaths = {
+  circle: "M3,0A3,3,0,1,1,-3,0A3,3,0,1,1,3,0Z",
+  diamond: "M0,-3.33L3.33,0L0,3.33L-3.33,0Z",
+  square: "M2.356,2.356L2.356,-2.356L-2.356,-2.356L-2.356,2.356Z",
+  triangle: "M0,-3.629L3.142,1.814L-3.142,1.814Z",
+  plus: "M 3.5 0.8 L 3.5 -0.8 L 0.8 -0.8 L 0.8 -3.5 L -0.8 -3.5 L -0.8 -0.8 L -3.5 -0.8 L -3.5 0.8 L -0.8 0.8 L -0.8 3.5 L 0.8 3.5 L 0.8 0.8 Z",
+  cross:
+    "M 1.9092 3.0406 L 3.0406 1.9092 L 1.1314 -0 L 3.0406 -1.9092 L 1.9092 -3.0406 L -0 -1.1314 L -1.9092 -3.0406 L -3.0406 -1.9092 L -1.1314 0 L -3.0406 1.9092 L -1.9092 3.0406 L 0 1.1314 Z",
+};

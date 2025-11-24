@@ -56,6 +56,7 @@
     <strong>{item.label}</strong>
     <IndicatorRow
       indicator={item.slug}
+      metadata={data.metadata[item.slug]}
       timeRange={pageState.selectedPeriodRange}
       selected={[data.area.properties.areacd, ...pageState.selectedAreas.map(a => a.areacd)]}
       geoGroup={pageState.selectedGeoGroup}

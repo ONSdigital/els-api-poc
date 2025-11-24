@@ -1,33 +1,75 @@
-<script>
-  import { Plot, Line, Text } from "svelteplot";
-  import { parseDataKeyed } from "$lib/utils";
-  import { ONSpalette } from "$lib/config";
+<script lang="ts">
+  import { scaleLinear } from "d3-scale";
+  import { parseChartData, markerPaths, contrastColor } from "./chartHelpers";
+  import { ONSpalette } from "$lib/config.js";
 
   let {
     data,
-    xKey = "time",
+    xKey = "period",
     yKey = "value",
-    zKey = "areacd",
-    selected = [],
+    idKey = "areacd",
+    labelKey = "areanm",
+    formatValue = (d) => d,
+    formatPeriod = (d) => d,
+    selected = []
   } = $props();
 
-  let _data = $derived.by(() => parseDataKeyed(data, zKey));
-  let xDomain = $derived.by(() => {
-    const xVals = _data.array.map((d) => d[xKey]);
-    return [Math.min(...xVals), Math.max(...xVals)];
-  });
+  let _data = $derived(parseChartData(data, yKey, xKey, idKey));
+  let _selected = $derived(
+    _data ? selected.map((cd) => _data.keyed[cd]).filter((d) => d) : []
+  );
+  $inspect(_selected);
+
+  let xScale = $derived(scaleLinear().domain(_data.dateDomain).range([0, 100]));
+  let yScale = $derived(scaleLinear().domain(_data.valueDomain).range([100, 0]));
 </script>
 
-<Plot height={100} x={{ ticks: xDomain }} y={{ label: false }}>
-  {#each selected.filter(cd => cd in _data.keyed) as cd, i}
-    <Line
-      data={_data.keyed[cd]}
-      x={xKey}
-      y={yKey}
-      z={zKey}
-      stroke={ONSpalette[i]}
-      strokeWidth={2}
-      markerEnd="dot"
-    />
-  {/each}
-</Plot>
+{#snippet line(arr, width = 2, color = "grey")}
+  <polyline
+    points={arr.map(d => [xScale(d.date), yScale(d[yKey])].join(",")).join(" ")}
+    stroke={color}
+    stroke-width={width}/>
+{/snippet}
+
+<div class="sparkline-wrapper">
+  <svg viewBox="0 0 100 100" class="sparkline-chart" preserveAspectRatio="none">
+    {#if _data}
+      <g class="sparkline-lines">
+        {#each _selected as arr, i}
+          {@render line(arr, 2, ONSpalette[i])}
+        {/each}
+      </g>
+    {/if}
+  </svg>
+  <!-- {#if _data}
+    {#each _selected as d, i}
+      {@render label(d, ONSpalette[i], false)}
+    {/each}
+  {/if} -->
+</div>
+
+<style>
+  .sparkline-wrapper {
+    display: block;
+    position: relative;
+  }
+  .sparkline-chart {
+    width: 100%;
+    height: 70px;
+    margin-top: 30px;
+    overflow: visible;
+  }
+  .sparkline-chart polyline {
+    vector-effect: non-scaling-stroke;
+    fill: none;
+  }
+  .sparkline-label {
+    position: absolute;
+    top: 0;
+    transform: translateX(-50%);
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    line-height: 1.2;
+  }
+</style>
