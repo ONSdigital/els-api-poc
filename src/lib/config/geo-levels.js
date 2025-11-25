@@ -57,10 +57,19 @@ function makeLookup(arr) {
   return lookup;
 }
 
+function makeOrderedCodes(arr) {
+  const codes = new Set();
+  for (const level of arr) {
+    for (const code of level.codes) codes.add(code);
+  }
+  return Array.from(codes);
+}
+
 export const geoLevelsArray = makeArray(geoLevels);
 export const geoLevelsLookup = makeLookup(geoLevelsArray);
 
 export const geoLevelsAllArray = makeArray(geoLevelsAll);
 export const geoLevelsAllLookup = makeLookup(geoLevelsAllArray);
+export const geoCodesAllArray = makeOrderedCodes(geoLevelsAllArray);
 
 export const countriesMap = {E: "E92000001", N: "N92000002", S: "S92000003", W: "W92000004"};

@@ -15,7 +15,6 @@
   import { capitalise } from "@onsvisual/robo-utils";
 
   export let data;
-  $: console.log(data);
 </script>
 
 <Hero width="medium" title="Local indicators" cls="titleblock-transparent">

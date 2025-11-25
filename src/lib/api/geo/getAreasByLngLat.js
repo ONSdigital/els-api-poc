@@ -3,6 +3,7 @@ import pointInPolygon from "@turf/boolean-point-in-polygon";
 import { areaTilesBase } from "../config.js";
 import { isValidLngLat } from "../utils.js";
 import groupAreasByLevel from "./helpers/groupAreasByLevel.js";
+import sortAreasByLevel from "./helpers/sortAreasByLevel.js";
 import { geoYearFilter, makeGeoLevelFilter } from "./helpers/geoFilters.js";
 import { geoLevelsAllLookup } from "$lib/config/geo-levels.js";
 import readData from "$lib/data";
@@ -40,9 +41,10 @@ export default async function getAreasByLngLat(params = {}) {
       meta: {
         lng: params.lng,
         lat: params.lat,
-        count: areas.length
+        count: areas.length,
+        total: areas.length
       },
-      data: params.groupByLevel ? groupAreasByLevel(areas) : areas
+      data: params.groupByLevel ? groupAreasByLevel(areas) : sortAreasByLevel(areas)
     };
   } catch {
     return {error: 400, message: "No areas found. Requested coordinates out of range."}

@@ -9,6 +9,7 @@
     Section,
     Divider,
     List,
+    Li,
     Grid,
     Card,
     Button,
@@ -55,7 +56,7 @@
   }
 </script>
 
-<Hero title="Explore local statistics" background="#e9eff4">
+<Hero title="Explore local statistics" background="#e9eff4" height={230}>
   <UKMap />
   <p class="ons-hero__text">
     Find, compare and visualise statistics about places in the United Kingdom.
@@ -70,12 +71,14 @@
         constituency or other named area.</label
       >
     </p>
-    <form class="form-select" onsubmit={gotoSelected}>
-      <div class="select-wrapper">
+    <form class="search-form" action={resolve("/app/areas/search")} onsubmit={gotoSelected}>
+      <div class="search-input">
         <Select
+          id="search"
+          name="q"
           {loadOptions}
-          label=""
-          placeholder={'Eg. "Fareham" or "Newport"'}
+          label={null}
+          placeholder={`Eg. "Fareham" or "PO15 5RR"`}
           on:change={(e) => (selected = e.detail)}
           labelKey="areanm"
           mode="search"
@@ -89,8 +92,7 @@
         text="Search"
         icon="search"
         small
-        hideLabel
-        disabled={!selected}>{"Search"}</Button
+        hideLabel>{"Search"}</Button
       >
     </form>
   </Card>
@@ -143,7 +145,7 @@
   </p>
 
   <List mode="dash">
-    <li>
+    <Li>
       <a
         href="https://statswales.gov.wales/Catalogue"
         target="_blank"
@@ -153,8 +155,8 @@
       <span class="ons-external-link__new-window-description ons-u-vh"
         >(opens in a new tab)</span
       >
-    </li>
-    <li>
+    </Li>
+    <Li>
       <a
         href="https://statistics.gov.scot/home"
         target="_blank"
@@ -164,8 +166,8 @@
       <span class="ons-external-link__new-window-description ons-u-vh"
         >(opens in a new tab)</span
       >
-    </li>
-    <li>
+    </Li>
+    <Li>
       <a href="https://data.nisra.gov.uk/" target="_blank" rel="noreferrer"
         >Northern Ireland Statistics and Research Agency</a
       >
@@ -173,7 +175,7 @@
       <span class="ons-external-link__new-window-description ons-u-vh"
         >(opens in a new tab)</span
       >
-    </li>
+    </Li>
   </List>
 </Section>
 <Section title="About these pages">
@@ -211,6 +213,16 @@
 </Section>
 
 <style>
+  .search-form {
+    display: flex;
+    flex-direction: row;
+    align-items: end;
+    width: 100%;
+    gap: .5rem;
+  }
+  .search-input {
+    flex-grow: 1;
+  }
   .no-wrap {
     white-space: nowrap;
   }
