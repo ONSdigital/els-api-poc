@@ -14,13 +14,12 @@
     LazyLoad,
   } from "@onsvisual/svelte-components";
   import { capitalise } from "@onsvisual/robo-utils";
-  import { fetchChartDataV1 } from "$lib/utils.ts";
+  import { fetchChartDataV1, makePeriodFormatter } from "$lib/utils";
   import AreasModal from "$lib/components/modals/AreasModal.svelte";
   import OptionsModal from "$lib/components/modals/OptionsModal.svelte";
   import Map from "$lib/viz/Map.svelte";
   import Bar from "$lib/viz/Bar.svelte";
   import Line from "$lib/viz/Line.svelte";
-  import { makePeriodFormatter } from "$lib/utils.ts";
 
   let { data } = $props();
   $inspect(data);

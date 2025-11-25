@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Observe } from "@onsvisual/svelte-components";
-  import { makeDataUrl, makeValueFormatter, makePeriodFormatter } from "$lib/utils.ts";
+  import { makeDataUrl, makeValueFormatter, makePeriodFormatter } from "$lib/utils";
   import Beeswarm from "$lib/viz/BeeswarmNew.svelte";
   import Sparkline from "$lib/viz/Sparkline.svelte";
 

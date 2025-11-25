@@ -1,6 +1,6 @@
 import getIndicators from "./getIndicators.js";
 import summaryData from "$lib/data/json-stat-summary.json";
-import { capitalise } from "$lib/utils.ts";
+import { capitalise } from "$lib/utils";
 
 function makeItem(slug, label = null, description = null) {
   const item = { label: label || capitalise(slug), slug };

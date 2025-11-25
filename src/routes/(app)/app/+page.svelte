@@ -80,6 +80,7 @@
           labelKey="areanm"
           mode="search"
           autoClear={false}
+          renderFallback
           clearable
         />
       </div>

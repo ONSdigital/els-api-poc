@@ -16,7 +16,7 @@
   import Map from "$lib/viz/Map.svelte";
   import Bar from "$lib/viz/Bar.svelte";
   import Line from "$lib/viz/Line.svelte";
-  import { fetchChartData } from "$lib/utils.ts";
+  import { fetchChartData } from "$lib/utils";
 
   export let data;
 

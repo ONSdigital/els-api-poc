@@ -14,7 +14,7 @@
     LazyLoad
   } from "@onsvisual/svelte-components";
   import Beeswarm from "$lib/viz/Beeswarm.svelte";
-  import { fetchTopicsData } from "$lib/utils.ts";
+  import { fetchTopicsData } from "$lib/utils";
 
   export let data;
 

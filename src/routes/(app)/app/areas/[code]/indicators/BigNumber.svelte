@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Card, Icon, Observe } from "@onsvisual/svelte-components";
-  import { makePeriodFormatter, makeDataUrl } from "$lib/utils.js";
+  import { makePeriodFormatter, makeDataUrl } from "$lib/utils";
 
   let { indicator, geography, period } = $props();
 

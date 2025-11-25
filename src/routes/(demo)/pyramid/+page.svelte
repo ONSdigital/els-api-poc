@@ -6,7 +6,7 @@
     Select,
     Button,
   } from "@onsvisual/svelte-components";
-  import { fetchChartDataV1 } from "$lib/utils.ts";
+  import { fetchChartDataV1 } from "$lib/utils";
   import Pyramid from "./Pyramid.svelte";
   import BarcodeJoined from "./BarcodeJoined.svelte";
 
