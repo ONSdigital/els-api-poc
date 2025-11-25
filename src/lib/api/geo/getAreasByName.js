@@ -1,5 +1,6 @@
 import { makeGeoLevelFilter, geoYearFilter } from "./helpers/geoFilters";
 import groupAreasByLevel from "./helpers/groupAreasByLevel";
+import { geoLevelsAllLookup } from "$lib/config/geo-levels";
 import readData from "$lib/data";
 
 const areasList = await readData("areas-list");
@@ -10,6 +11,15 @@ function makeAreaRow(json, i) {
   const row = { areacd: json.areacd[i], areanm: json.areanm[i] };
   if (json.parentcd[i]) row.parentnm = geoMetadata?.[json.parentcd[i]]?.areanm;
   return row;
+}
+
+function addAreaTypes(areas) {
+  if (areas.length === 0) return areas;
+  return areas.map((area) => {
+    const type = geoLevelsAllLookup[area.areacd.slice(0, 3)];
+    area.typenm = type?.label;
+    return area;
+  });
 }
 
 function makeCombinedFilter(name, geo, year) {
@@ -63,11 +73,13 @@ export default function getAreasByName(params = {}) {
       if (combinedFilter(areasList, i)) matches.push(makeAreaRow(areasList, i));
     }
 
-    areas = matches.toSorted((a, b) => {
-      const aMatch = a.areanm.match(regexStart);
-      const bMatch = b.areanm.match(regexStart);
-      return aMatch && bMatch ? 0 : aMatch ? -1 : bMatch ? 1 : 0;
-    }).slice(offset, offset + limit);
+    areas = matches
+      .toSorted((a, b) => {
+        const aMatch = a.areanm.match(regexStart);
+        const bMatch = b.areanm.match(regexStart);
+        return aMatch && bMatch ? 0 : aMatch ? -1 : bMatch ? 1 : 0;
+      })
+      .slice(offset, offset + limit);
   }
 
   const result = {
@@ -76,10 +88,12 @@ export default function getAreasByName(params = {}) {
       count: areas.length,
       total: matches.length,
       limit,
-      offset
+      offset,
     },
-    data: params.groupByLevel ? groupAreasByLevel(areas) : areas,
-  }
+    data: params.groupByLevel
+      ? groupAreasByLevel(addAreaTypes(areas))
+      : addAreaTypes(areas),
+  };
 
   return result;
 }

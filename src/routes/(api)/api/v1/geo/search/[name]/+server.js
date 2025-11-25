@@ -15,8 +15,6 @@ export async function GET({ url, params }) {
   let areasList = getAreasByName({ name, year, limit, offset, geoLevel, groupByLevel });
   if (areasList.error) error(areasList.error, areasList.message);
 
-  console.log({areasList})
-
   if (searchPostcodes && areasList.meta.count === 0)
     areasList = await getPostcodesList({ code: name, limit, offset });
 

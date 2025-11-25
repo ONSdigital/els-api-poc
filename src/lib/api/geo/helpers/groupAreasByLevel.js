@@ -8,8 +8,6 @@ export default function groupAreasByLevel(areas) {
     l.codes.some((cd) => cds.has(cd))
   );
 
-  console.log({cds, levels});
-
   return levels.map((l) => ({
     key: l.key,
     label: l.label,

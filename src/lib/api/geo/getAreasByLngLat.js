@@ -4,6 +4,7 @@ import { areaTilesBase } from "../config.js";
 import { isValidLngLat } from "../utils.js";
 import groupAreasByLevel from "./helpers/groupAreasByLevel.js";
 import { geoYearFilter, makeGeoLevelFilter } from "./helpers/geoFilters.js";
+import { geoLevelsAllLookup } from "$lib/config/geo-levels.js";
 import readData from "$lib/data";
 
 const geoLatestYear = await readData("geo-latest-year");
@@ -26,7 +27,15 @@ export default async function getAreasByLngLat(params = {}) {
   try {
     const geojson = await (await fetch(url)).json();
     const features = geojson.features.filter(f => pointInPolygon(point, f) && yearFilter(f.properties) && geoFilter(f.properties.areacd));
-		const areas = features.map(f => makeArea(f.properties));
+		const areas = features.map(f => makeArea(f.properties)).filter(d => geoLevelsAllLookup[d?.areacd?.slice(0, 3)]);
+
+    // Add parent area name (small areas only) and area type name
+    const ltla = areas.find(area => geoLevelsAllLookup[area.areacd.slice(0, 3)].key === "ltla");
+    for (const area of areas) {
+      const type = geoLevelsAllLookup[area.areacd.slice(0, 3)];
+      area.typenm = type?.label;
+      if (ltla && ["oa", "lsoa", "msoa", "wd", "par"].includes(type?.key)) area.parentnm = ltla.areanm;
+    }
     return {
       meta: {
         lng: params.lng,
