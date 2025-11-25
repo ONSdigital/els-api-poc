@@ -1,14 +1,15 @@
 import { error } from "@sveltejs/kit";
 import { resolve } from "$app/paths";
-import { pluralise, formatName } from "@onsvisual/robo-utils";
+import { pluralise, getName } from "@onsvisual/robo-utils";
 import summaryData from "$lib/data/json-stat-summary.json";
 import { geoLevels, geoLevelsLookup } from "$lib/config/geo-levels.js";
 import type { PageLoad } from "./$types";
 
-export const load: PageLoad = async ({ params, parent, fetch }) => {
+export const load: PageLoad = async ({ parent, fetch }) => {
   const { area } = await parent();
+  const code = area.properties.areacd;
 
-  const geoLevel = geoLevelsLookup[area.properties.areacd.slice(0, 3)];
+  const geoLevel = geoLevelsLookup[code.slice(0, 3)];
   const parentLevel =
     geoLevels[["ctry", "rgn"].includes(geoLevel?.key) ? "ctry" : "rgn"];
   const areaParent = area.properties.parents.find((p) =>
@@ -16,13 +17,13 @@ export const load: PageLoad = async ({ params, parent, fetch }) => {
   );
 
   const taxonomyPath = resolve(
-    `/api/v1/metadata/taxonomy?hasGeo=${params.code}&excludeMultivariate=true`
+    `/api/v1/metadata/taxonomy?hasGeo=${code}&excludeMultivariate=true`
   );
   const metadataPath = resolve(
-    `/api/v1/metadata/indicators?hasGeo=${params.code}&excludeMultivariate=true&asLookup=true`
+    `/api/v1/metadata/indicators?hasGeo=${code}&excludeMultivariate=true&asLookup=true`
   );
   const areasPath = resolve(`/api/v1/geo/list?year=latest`);
-  const relatedPath = resolve(`/api/v1/geo/related/${params.code}`);
+  const relatedPath = resolve(`/api/v1/geo/related/${code}`);
 
   try {
     const taxonomy = await (await fetch(taxonomyPath)).json();
@@ -41,14 +42,14 @@ export const load: PageLoad = async ({ params, parent, fetch }) => {
     if (geoLevel && related?.siblings?.parent)
       geoGroups.push({
         id: "siblings",
-        label: `All ${pluralise(geoLevel.label)} ${formatName(related.siblings.parent.areanm, "in")}`,
+        label: `All ${pluralise(geoLevel.label)} ${getName(related.siblings.parent, "in")}`,
         geoLevel: geoLevel.key,
         geoExtent: related.siblings.parent.areacd,
       });
     if (related.similar?.[2]?.cluster)
       geoGroups.push({
         id: "cluster",
-        label: `Similar demographics to ${formatName(area.properties.areanm, "the")}`,
+        label: `Similar demographics to ${getName(area.properties, "the")}`,
         geoCluster: `demographic_${related.similar[2].cluster.key}`,
       });
 

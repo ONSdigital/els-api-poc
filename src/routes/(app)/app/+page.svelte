@@ -3,6 +3,7 @@
   import { resolve } from "$app/paths";
   import { goto } from "$app/navigation";
   import throttle from "throttleit";
+	import { makeCanonicalSlug } from '$lib/api/geo/helpers/areaSlugUtils';
   import {
     Breadcrumb,
     Hero,
@@ -50,7 +51,7 @@
         resolve(
           selected.lng
             ? `/app/areas/search?q=${selected.areacd}`
-            : `/app/areas/${selected.areacd}/`
+            : `/app/areas/${makeCanonicalSlug(selected.areacd, selected.areanm)}/`
         )
       );
   }
@@ -128,11 +129,11 @@
 <Section>
   <p>
     You can also start your search from
-    <a href={resolve(`/areas/E92000001-england`)}>England</a>,
-    <a href={resolve(`/areas/W92000004-wales`)}>Wales</a>,
-    <a href={resolve(`/areas/S92000003-scotland`)}>Scotland</a>
+    <a href={resolve(`/app/areas/E92000001-england`)}>England</a>,
+    <a href={resolve(`/app/areas/W92000004-wales`)}>Wales</a>,
+    <a href={resolve(`/app/areas/S92000003-scotland`)}>Scotland</a>
     or
-    <a href={resolve(`/areas/N92000002-northern-ireland`)}>Northern Ireland</a>.
+    <a href={resolve(`/app/areas/N92000002-northern-ireland`)}>Northern Ireland</a>.
   </p>
 </Section>
 

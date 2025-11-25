@@ -18,13 +18,12 @@
   import { getName, capitalise } from "@onsvisual/robo-utils";
   import topojson from "$lib/data/topo.json";
   import { base } from "$app/paths";
-  import { makeCanonicalSlug } from "$lib/utils";
+	import { makeCanonicalSlug } from '$lib/api/geo/helpers/areaSlugUtils';
   import throttle from "throttleit";
   import { goto } from "$app/navigation";
   let { data } = $props();
   let selected = $state();
   let clientWidth = $state();
-  $inspect(data);
 
   async function loadOptionsFn(query, populateResults) {
     try {

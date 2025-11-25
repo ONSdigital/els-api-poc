@@ -4,7 +4,7 @@
 	import { base } from '$app/paths';
 	import { geoCodesLookup } from '$lib/config/geoConfig';
 	import { capitalise } from '@onsvisual/robo-utils';
-	import { makeCanonicalSlug } from '$lib/util/areas/makeCanonicalSlug';
+	import { makeCanonicalSlug } from '$lib/api/geo/helpers/areaSlugUtils';
 	import { Theme, Button } from '@onsvisual/svelte-components';
 	import { analyticsEvent } from '@onsvisual/svelte-components';
 	// import Icon from '$lib/components/Icon.svelte';
