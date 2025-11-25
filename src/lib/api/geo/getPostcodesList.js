@@ -2,7 +2,7 @@ import { isValidPartialPostcode } from "$lib/api/utils.js";
 import { postcodeLookupBase } from "../config.js";
 
 function makePostcodeRow(json, i) {
-  return { areacd: json.cd[i], lng: json.lng[i], lat: json.lat[i] };
+  return { areacd: json.cd[i], type: "postcode", lng: json.lng[i], lat: json.lat[i] };
 }
 
 export default async function getPostcodesList(params = {}) {

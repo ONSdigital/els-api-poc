@@ -9,7 +9,7 @@ const geoMetadata = await readData("geo-metadata");
 
 function makeAreaRow(json, i) {
   const row = { areacd: json.areacd[i], areanm: json.areanm[i] };
-  if (json.parentcd[i]) row.parentnm = geoMetadata?.[json.parentcd[i]]?.areanm;
+  if (json.parentcd[i]) row.parent = geoMetadata?.[json.parentcd[i]]?.areanm;
   return row;
 }
 
@@ -17,7 +17,7 @@ function addAreaTypes(areas) {
   if (areas.length === 0) return areas;
   return areas.map((area) => {
     const type = geoLevelsAllLookup[area.areacd.slice(0, 3)];
-    area.typenm = type?.label;
+    area.type = type?.label;
     return area;
   });
 }

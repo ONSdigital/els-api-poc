@@ -33,8 +33,8 @@ export default async function getAreasByLngLat(params = {}) {
     const ltla = areas.find(area => geoLevelsAllLookup[area.areacd.slice(0, 3)].key === "ltla");
     for (const area of areas) {
       const type = geoLevelsAllLookup[area.areacd.slice(0, 3)];
-      area.typenm = type?.label;
-      if (ltla && ["oa", "lsoa", "msoa", "wd", "par"].includes(type?.key)) area.parentnm = ltla.areanm;
+      area.type = type?.label;
+      if (ltla && ["oa", "lsoa", "msoa", "wd", "par"].includes(type?.key)) area.parent = ltla.areanm;
     }
     return {
       meta: {
