@@ -45,7 +45,7 @@
   const loadOptions = throttle(loadOptionsFn, 500);
 
   function gotoSelected(e) {
-    e.preventDefault();
+    e?.preventDefault();
     if (selected)
       goto(
         resolve(
@@ -80,7 +80,10 @@
           {loadOptions}
           label={null}
           placeholder={`Eg. "Fareham" or "PO15 5RR"`}
-          on:change={(e) => (selected = e.detail)}
+          on:change={(e) => {
+            selected = e.detail;
+            gotoSelected();
+          }}
           labelKey="areanm"
           mode="search"
           autoClear={false}

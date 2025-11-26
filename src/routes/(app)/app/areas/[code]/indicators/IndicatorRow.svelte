@@ -53,7 +53,7 @@
 </script>
 
 <Observe bind:visible>
-  <div class="indicator-row">
+  <div id={indicator} class="indicator-row">
     <div class="indicator-beeswarm">
       <Beeswarm data={beeswarmData || {message: "No data"}} {formatValue} {formatPeriod} {visible} {selected} bind:hovered/>
     </div>

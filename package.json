@@ -23,7 +23,7 @@
     "@mapbox/tilebelt": "^2.0.2",
     "@onsvisual/robo-utils": "^0.3.9",
     "@onsvisual/svelte-charts": "^0.4.11",
-    "@onsvisual/svelte-components": "^1.0.34",
+    "@onsvisual/svelte-components": "^1.0.37",
     "@onsvisual/svelte-maps": "^1.2.25",
     "@sveltejs/adapter-netlify": "^5.2.4",
     "@sveltejs/adapter-node": "^5.3.3",
