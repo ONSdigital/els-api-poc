@@ -1,6 +1,6 @@
 import { json, error } from "@sveltejs/kit";
-import { getParam } from "$lib/api/utils.js";
-import getChildAreas from "$lib/api/geo/getChildAreas.js";
+import { getParam } from "$lib/api/utils";
+import getChildAreas from "$lib/api/geo/getChildAreas";
 
 export function GET({ url, params }) {
   const code = params.code;

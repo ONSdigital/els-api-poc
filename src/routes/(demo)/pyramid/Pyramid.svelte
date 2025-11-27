@@ -4,7 +4,7 @@
   export let data;
   export let selectedArea;
   export let groupKey = "areacd";
-  import { colours } from "$lib/config.js";
+  import { colours } from "$lib/config";
 
   function doSelect(cd) {
     selectedArea = cd;

@@ -1,10 +1,10 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync, statSync } from "fs";
 import { execSync } from "child_process";
 import { csvParse, autoType } from "d3-dsv";
-import { reverseDate, stripBom, titleFromSlug } from "./utils.js";
-import { skipDatasets, colLookup } from "./config.js";
-import inferGeos from "./infer-geos.js";
-import inferPeriodFormat from "./infer-period-format.js";
+import { reverseDate, stripBom, titleFromSlug } from "./utils";
+import { skipDatasets, colLookup } from "./config";
+import inferGeos from "./infer-geos";
+import inferPeriodFormat from "./infer-period-format";
 
 function formatColumns(cols) {
   // Some CSVs currently use a "measure" column in place of "indicator"

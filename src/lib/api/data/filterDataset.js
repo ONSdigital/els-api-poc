@@ -1,10 +1,10 @@
-import { filterTime, filterTimeForGeo } from "./helpers/dataFilters.js";
+import { filterTime, filterTimeForGeo } from "./helpers/dataFilters";
 import {
   toJSONStat,
   toRows,
   toCols
-} from "./helpers/dataFormatters.js";
-import { getSpreadsheetMetadata } from "./helpers/generateSpreadsheet.js";
+} from "./helpers/dataFormatters";
+import { getSpreadsheetMetadata } from "./helpers/generateSpreadsheet";
 
 export default function filterDataset(
   cube,

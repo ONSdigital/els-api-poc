@@ -1,5 +1,5 @@
-import { postcodeLookupBase } from "../config.js";
-import { isValidPostcode } from "../utils.js";
+import { postcodeLookupBase } from "../config";
+import { isValidPostcode } from "../utils";
 
 export default async function getPostcode(code) {
   const cdUpper = code.toUpperCase();

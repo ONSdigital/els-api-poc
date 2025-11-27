@@ -1,4 +1,4 @@
-import filterDataset from "./filterDataset.js";
+import filterDataset from "./filterDataset";
 
 export default function filterAllDatasets(
   datasets,

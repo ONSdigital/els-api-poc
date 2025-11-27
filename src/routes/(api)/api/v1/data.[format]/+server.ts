@@ -1,6 +1,6 @@
 import { json, text, error } from "@sveltejs/kit";
-import { getParam, getDimensionFilters } from "$lib/api/utils.js";
-import filterCollection from "$lib/api/data/filterCollection.js";
+import { getParam, getDimensionFilters } from "$lib/api/utils";
+import filterCollection from "$lib/api/data/filterCollection";
 
 export async function GET({ params, url }) {
   const format = params.format || "cols";

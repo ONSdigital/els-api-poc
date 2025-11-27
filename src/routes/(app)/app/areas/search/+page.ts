@@ -1,6 +1,6 @@
 import type { PageLoad } from './$types';
 import { resolve } from '$app/paths';
-import { getParam, isValidPostcode } from "$lib/api/utils.js";
+import { getParam, isValidPostcode } from "$lib/api/utils";
 
 // Hard coded limit of 10 results per page
 const limit = 10;

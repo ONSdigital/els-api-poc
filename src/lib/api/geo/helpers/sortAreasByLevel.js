@@ -1,4 +1,4 @@
-import { geoCodesAllArray } from "$lib/config/geo-levels.js";
+import { geoCodesAllArray } from "$lib/config/geo-levels";
 
 // Sorts areas from large to small (ie. from country to output area)
 function sortAreas(a, b) {

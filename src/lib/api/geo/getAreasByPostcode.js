@@ -1,4 +1,4 @@
-import getAreasByLngLat from "./getAreasByLngLat.js";
+import getAreasByLngLat from "./getAreasByLngLat";
 
 export async function getAreasByPostcode(params = {}) {
   const areas = await getAreasByLngLat({

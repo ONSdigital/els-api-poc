@@ -1,5 +1,5 @@
-import { makeDatasetFilter } from "./helpers/datasetFilters.js";
-import { formatDimension } from "./helpers/formatMetadata.js";
+import { makeDatasetFilter } from "./helpers/datasetFilters";
+import { formatDimension } from "./helpers/formatMetadata";
 import readData from "$lib/data";
 
 const rawMetadata = await readData("json-stat");

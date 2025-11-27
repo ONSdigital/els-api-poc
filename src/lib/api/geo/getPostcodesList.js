@@ -1,5 +1,5 @@
-import { isValidPartialPostcode } from "$lib/api/utils.js";
-import { postcodeLookupBase } from "../config.js";
+import { isValidPartialPostcode } from "$lib/api/utils";
+import { postcodeLookupBase } from "../config";
 
 function makePostcodeRow(json, i) {
   return { areacd: json.cd[i], type: "postcode", lng: json.lng[i], lat: json.lat[i] };

@@ -1,6 +1,6 @@
-import { makeAreaListFilter } from "./helpers/geoFilters.js";
-import groupAreasByLevel from "./helpers/groupAreasByLevel.js";
-import makeAreasLookup from "./helpers/makeAreasLookup.js";
+import { makeAreaListFilter } from "./helpers/geoFilters";
+import groupAreasByLevel from "./helpers/groupAreasByLevel";
+import makeAreasLookup from "./helpers/makeAreasLookup";
 import readData from "$lib/data";
  
 const geoMetadata = await readData("geo-metadata");

@@ -1,5 +1,5 @@
 // Functions to filter geography metadata
-import { geoLevels, geoLevelsAll } from "$lib/config/geo-levels.js";
+import { geoLevels, geoLevelsAll } from "$lib/config/geo-levels";
 import readData from "$lib/data";
 
 const cube = await readData("json-stat");

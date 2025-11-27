@@ -1,6 +1,6 @@
 import { json, error } from "@sveltejs/kit";
-import getPostcodesList from "$lib/api/geo/getPostcodesList.js";
-import { getParam } from "$lib/api/utils.js";
+import getPostcodesList from "$lib/api/geo/getPostcodesList";
+import { getParam } from "$lib/api/utils";
 
 export async function GET({ params, url }) {
   const code = params.code;

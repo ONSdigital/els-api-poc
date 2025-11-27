@@ -1,6 +1,6 @@
 <script>
   import { scaleLinear, scaleBand } from "d3-scale";
-  import { colours } from "$lib/config.js";
+  import { colours } from "$lib/config";
 
   export let barHeight = 35;
   export let gutter = 70;

@@ -1,5 +1,5 @@
 import { resolve } from "$app/paths";
-import { geoLevels as geoLevelsLookup } from "$lib/config/geo-levels.js";
+import { geoLevels as geoLevelsLookup } from "$lib/config/geo-levels";
 
 function getParamVals(url, param, fallback = null) {
   const val = url.searchParams.get(param);

@@ -12,7 +12,7 @@
     Li,
     Icon
   } from "@onsvisual/svelte-components";
-  import groupAreasByLevel from "$lib/api/geo/helpers/groupAreasByLevel.js";
+  import groupAreasByLevel from "$lib/api/geo/helpers/groupAreasByLevel";
   import { fetchChartData } from "$lib/utils";
 
   let { data } = $props();

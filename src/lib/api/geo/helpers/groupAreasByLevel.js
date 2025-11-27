@@ -1,4 +1,4 @@
-import { geoLevelsAllArray } from "$lib/config/geo-levels.js";
+import { geoLevelsAllArray } from "$lib/config/geo-levels";
 
 export default function groupAreasByLevel(areas) {
   if (areas.length === 0) return [];

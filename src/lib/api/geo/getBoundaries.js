@@ -1,7 +1,7 @@
 import { feature } from "topojson-client";
 import { topology } from "topojson-server";
 import { coordEach } from "@turf/meta";
-import { geoYearFilter, makeCountryFilter } from "./helpers/geoFilters.js";
+import { geoYearFilter, makeCountryFilter } from "./helpers/geoFilters";
 import readData from "$lib/data";
 
 const topojson = await readData("topo");

@@ -1,6 +1,6 @@
 import { json, error } from "@sveltejs/kit";
-import { getParam } from "$lib/api/utils.js";
-import getIndicators from "$lib/api/metadata/getIndicators.js";
+import { getParam } from "$lib/api/utils";
+import getIndicators from "$lib/api/metadata/getIndicators";
 
 export function GET({ params, url }) {
   const indicator = params.indicator || getParam(url, "indicator", null);

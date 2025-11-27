@@ -1,6 +1,6 @@
-import { geoLevels } from "$lib/config/geo-levels.js";
-import { isValidAreaCode } from "../utils.js";
-import { addAreaNames } from "./helpers/areaCodesNames.js";
+import { geoLevels } from "$lib/config/geo-levels";
+import { isValidAreaCode } from "../utils";
+import { addAreaNames } from "./helpers/areaCodesNames";
 import readData from "$lib/data";
 
 const geoMetadata = await readData("geo-metadata");

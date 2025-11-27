@@ -1,6 +1,6 @@
 import { json } from "@sveltejs/kit";
-import { getParam } from "$lib/api/utils.js";
-import getTaxonomy from "$lib/api/metadata/getTaxonomy.js";
+import { getParam } from "$lib/api/utils";
+import getTaxonomy from "$lib/api/metadata/getTaxonomy";
 
 export function GET({url}) {
   const topic = getParam(url, "topic", "all");

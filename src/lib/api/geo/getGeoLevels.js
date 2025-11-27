@@ -1,4 +1,4 @@
-import { geoLevelsArray } from "$lib/config/geo-levels.js";
+import { geoLevelsArray } from "$lib/config/geo-levels";
 import { geoYearFilter } from "./helpers/geoFilters";
 import readData from "$lib/data";
 

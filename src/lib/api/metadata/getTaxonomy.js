@@ -1,4 +1,4 @@
-import getIndicators from "./getIndicators.js";
+import getIndicators from "./getIndicators";
 import summaryData from "$lib/data/json-stat-summary.json";
 import { capitalise } from "$lib/utils";
 

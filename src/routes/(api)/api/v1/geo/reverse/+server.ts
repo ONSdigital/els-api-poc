@@ -1,6 +1,6 @@
 import { json, error } from "@sveltejs/kit";
-import { getParam } from "$lib/api/utils.js";
-import getAreasByLngLat from "$lib/api/geo/getAreasByLngLat.js";
+import { getParam } from "$lib/api/utils";
+import getAreasByLngLat from "$lib/api/geo/getAreasByLngLat";
 
 export async function GET({ url }) {
   const lng = getParam(url, "lng", undefined);

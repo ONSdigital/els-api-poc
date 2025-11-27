@@ -1,11 +1,11 @@
 import { pointToTile } from "@mapbox/tilebelt";
 import pointInPolygon from "@turf/boolean-point-in-polygon";
-import { areaTilesBase } from "../config.js";
-import { isValidLngLat } from "../utils.js";
-import groupAreasByLevel from "./helpers/groupAreasByLevel.js";
-import sortAreasByLevel from "./helpers/sortAreasByLevel.js";
-import { geoYearFilter, makeGeoLevelFilter } from "./helpers/geoFilters.js";
-import { geoLevelsAllLookup } from "$lib/config/geo-levels.js";
+import { areaTilesBase } from "../config";
+import { isValidLngLat } from "../utils";
+import groupAreasByLevel from "./helpers/groupAreasByLevel";
+import sortAreasByLevel from "./helpers/sortAreasByLevel";
+import { geoYearFilter, makeGeoLevelFilter } from "./helpers/geoFilters";
+import { geoLevelsAllLookup } from "$lib/config/geo-levels";
 import readData from "$lib/data";
 
 const geoLatestYear = await readData("geo-latest-year");

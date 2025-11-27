@@ -1,5 +1,5 @@
-import { isValidAreaCode } from "../utils.js";
-import { addAreaNames } from "./helpers/areaCodesNames.js";
+import { isValidAreaCode } from "../utils";
+import { addAreaNames } from "./helpers/areaCodesNames";
 import readData from "$lib/data";
 
 const areasClusters = await readData("areas-clusters");

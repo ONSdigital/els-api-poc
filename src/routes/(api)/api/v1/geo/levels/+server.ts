@@ -1,6 +1,6 @@
 import { json } from "@sveltejs/kit";
-import { getParam } from "$lib/api/utils.js";
-import getGeoLevels from "$lib/api/geo/getGeoLevels.js";
+import { getParam } from "$lib/api/utils";
+import getGeoLevels from "$lib/api/geo/getGeoLevels";
 
 export function GET({ url }) {
   const year = getParam(url, "year", "latest");

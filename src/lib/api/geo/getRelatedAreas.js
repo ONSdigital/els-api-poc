@@ -1,9 +1,9 @@
-import { geoLevelsLookup } from "$lib/config/geo-levels.js";
-import getChildAreas from "./getChildAreas.js";
-import getParentAreas from "./getParentAreas.js";
-import getSiblingAreas from "./getSiblingAreas.js";
-import getSimilarAreas from "./getSimilarAreas.js";
-import { isValidAreaCode } from "../utils.js";
+import { geoLevelsLookup } from "$lib/config/geo-levels";
+import getChildAreas from "./getChildAreas";
+import getParentAreas from "./getParentAreas";
+import getSiblingAreas from "./getSiblingAreas";
+import getSimilarAreas from "./getSimilarAreas";
+import { isValidAreaCode } from "../utils";
 import readData from "$lib/data";
 
 const geoMetadata = await readData("geo-metadata");

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { scaleLinear } from "d3-scale";
   import { parseChartData, markerPaths, contrastColor } from "./chartHelpers";
-  import { ONSpalette } from "$lib/config.js";
+  import { ONSpalette } from "$lib/config";
 
   let {
     data,

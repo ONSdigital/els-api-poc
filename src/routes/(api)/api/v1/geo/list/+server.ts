@@ -1,5 +1,5 @@
 import { json } from "@sveltejs/kit";
-import { getParam } from "$lib/api/utils.js";
+import { getParam } from "$lib/api/utils";
 import getAreasList from "$lib/api/geo/getAreasList";
 
 export function GET({ url }) {

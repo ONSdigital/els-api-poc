@@ -1,6 +1,6 @@
 import type { PageLoad } from './$types';
 import { resolve } from "$app/paths";
-import { geoLevels } from "$lib/config/geo-levels.js";
+import { geoLevels } from "$lib/config/geo-levels";
 
 export const load: PageLoad = async ({ params, fetch }) => {
   const path = resolve(

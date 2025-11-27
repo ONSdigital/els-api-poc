@@ -1,5 +1,5 @@
 // Functions to filter JSON-Stat at a dataset level
-import { geoLevels } from "$lib/config/geo-levels.js";
+import { geoLevels } from "$lib/config/geo-levels";
 
 export function makeIndicatorFilter(indicator, topic) {
   if ((!indicator || indicator === "all") && topic === "all") return () => true;

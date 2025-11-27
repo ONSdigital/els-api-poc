@@ -1,6 +1,6 @@
 import { json, text } from "@sveltejs/kit";
 import { csvFormat } from "d3-dsv";
-import { geoLevels } from "$lib/config/geo-levels.js";
+import { geoLevels } from "$lib/config/geo-levels";
 import readData from "$lib/data";
 
 const cube = await readData("json-stat");

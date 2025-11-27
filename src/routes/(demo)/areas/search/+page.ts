@@ -1,5 +1,5 @@
 import { resolve } from '$app/paths';
-import { getParam, isValidPostcode } from "$lib/api/utils.js";
+import { getParam, isValidPostcode } from "$lib/api/utils";
 
 export const load = async ({ url, fetch }) => {
 	const query = getParam(url, "q", "");

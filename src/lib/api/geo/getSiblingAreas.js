@@ -1,7 +1,7 @@
-import { geoLevels, geoLevelsLookup } from "$lib/config/geo-levels.js";
-import getChildAreas from "./getChildAreas.js";
-import { isValidAreaCode } from "../utils.js";
-import { codeToArea } from "./helpers/areaCodesNames.js";
+import { geoLevels, geoLevelsLookup } from "$lib/config/geo-levels";
+import getChildAreas from "./getChildAreas";
+import { isValidAreaCode } from "../utils";
+import { codeToArea } from "./helpers/areaCodesNames";
 import readData from "$lib/data";
 
 const geoMetadata = await readData("geo-metadata");

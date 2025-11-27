@@ -1,6 +1,6 @@
-import { areaMetadataBase } from "../config.js";
-import { isValidAreaCode } from "../utils.js";
-import groupAreasByLevel from "./helpers/groupAreasByLevel.js";
+import { areaMetadataBase } from "../config";
+import { isValidAreaCode } from "../utils";
+import groupAreasByLevel from "./helpers/groupAreasByLevel";
 
 export default async function getAreaByCode(code) {
   code = code?.toUpperCase();

@@ -1,8 +1,8 @@
 import { Temporal } from "temporal-polyfill";
-import { geoLevels } from "$lib/config/geo-levels.js";
-import getChildAreas from "$lib/api/geo/getChildAreas.js";
-import hasObservation from "./hasObservation.js";
-import { isValidMonth, isValidYear } from "$lib/api/utils.js";
+import { geoLevels } from "$lib/config/geo-levels";
+import getChildAreas from "$lib/api/geo/getChildAreas";
+import hasObservation from "./hasObservation";
+import { isValidMonth, isValidYear } from "$lib/api/utils";
 import readData from "$lib/data";
 
 const areasClusters = await readData("areas-clusters");

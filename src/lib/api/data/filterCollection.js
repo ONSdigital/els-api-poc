@@ -1,9 +1,9 @@
-import filterAllDatasets from "./filterAllDatasets.js";
-import { makeFilter, makeGeoFilter } from "./helpers/dataFilters.js";
-import { toCSVW, csvSerialise } from "./helpers/dataFormatters.js";
-import { isValidDate } from "$lib/api/utils.js";
-import { makeDatasetGeoFilter } from "$lib/api/metadata/helpers/datasetFilters.js";
-import generateSpreadsheet from "./helpers/generateSpreadsheet.js";
+import filterAllDatasets from "./filterAllDatasets";
+import { makeFilter, makeGeoFilter } from "./helpers/dataFilters";
+import { toCSVW, csvSerialise } from "./helpers/dataFormatters";
+import { isValidDate } from "$lib/api/utils";
+import { makeDatasetGeoFilter } from "$lib/api/metadata/helpers/datasetFilters";
+import generateSpreadsheet from "./helpers/generateSpreadsheet";
 import readData from "$lib/data";
 
 const cube = await readData("json-stat");
