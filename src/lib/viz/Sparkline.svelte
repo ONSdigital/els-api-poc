@@ -20,8 +20,8 @@
   );
   $inspect(_selected);
 
-  let xScale = $derived(scaleLinear().domain(_data.dateDomain).range([0, 100]));
-  let yScale = $derived(scaleLinear().domain(_data.valueDomain).range([100, 0]));
+  let xScale = $derived(_data ? scaleLinear().domain(_data.dateDomain).range([0, 100]) : null);
+  let yScale = $derived(_data ? scaleLinear().domain(_data.valueDomain).range([100, 0]) : null);
 </script>
 
 {#snippet line(arr, width = 2, color = "grey")}
@@ -33,7 +33,7 @@
 
 <div class="sparkline-wrapper">
   <svg viewBox="0 0 100 100" class="sparkline-chart" preserveAspectRatio="none">
-    {#if _data}
+    {#if xScale && yScale}
       <g class="sparkline-lines">
         {#each _selected as arr, i}
           {@render line(arr, 2, ONSpalette[i])}

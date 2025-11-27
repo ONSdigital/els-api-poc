@@ -2,8 +2,7 @@
   // @ts-nocheck
   import { resolve } from "$app/paths";
   import { goto } from "$app/navigation";
-  import throttle from "throttleit";
-	import { makeCanonicalSlug } from '$lib/api/geo/helpers/areaSlugUtils';
+  import { makeCanonicalSlug } from "$lib/api/geo/helpers/areaSlugUtils";
   import {
     Breadcrumb,
     Hero,
@@ -20,41 +19,10 @@
     Select,
     Footer,
   } from "@onsvisual/svelte-components";
+  import AreaSearch from "$lib/components/nav/AreaSearch.svelte";
   import UKMap from "$lib/components/UKMap.svelte";
 
   let { data } = $props();
-
-  let selected = $state();
-
-  async function loadOptionsFn(query, populateResults) {
-    try {
-      const url = resolve(
-        `/api/v1/geo/search/${query.toLowerCase()}?searchPostcodes=true`
-      );
-      const results = await (await fetch(url)).json();
-      populateResults(
-        results.data.map((d) => {
-          if (!d.areanm) d.areanm = d.areacd;
-          return d;
-        })
-      );
-    } catch {
-      return populateResults([]);
-    }
-  }
-  const loadOptions = throttle(loadOptionsFn, 500);
-
-  function gotoSelected(e) {
-    e?.preventDefault();
-    if (selected)
-      goto(
-        resolve(
-          selected.lng
-            ? `/app/areas/search?q=${selected.areacd}`
-            : `/app/areas/${makeCanonicalSlug(selected.areacd, selected.areanm)}/`
-        )
-      );
-  }
 </script>
 
 <Hero title="Explore local statistics" background="#e9eff4" height={230}>
@@ -66,39 +34,15 @@
 
 <Grid marginTop id="nav-cards" colWidth="wide">
   <Card title="Find an area" mode="featured">
-    <p style:margin-bottom="28px">
-      <label for="search"
-        >Search for a postcode, local authority, region, parliamentary
-        constituency or other named area.</label
-      >
-    </p>
-    <form class="search-form" action={resolve("/app/areas/search")} onsubmit={gotoSelected}>
-      <div class="search-input">
-        <Select
-          id="search"
-          name="q"
-          {loadOptions}
-          label={null}
-          placeholder={`Eg. "Fareham" or "PO15 5RR"`}
-          on:change={(e) => {
-            selected = e.detail;
-            gotoSelected();
-          }}
-          labelKey="areanm"
-          mode="search"
-          autoClear={false}
-          renderFallback
-          clearable
-        />
-      </div>
-      <Button
-        type="submit"
-        text="Search"
-        icon="search"
-        small
-        hideLabel>{"Search"}</Button
-      >
-    </form>
+    <label for="search" style:display="block" style:margin-bottom="28px"
+      >Search for a postcode, local authority, region, parliamentary
+      constituency or other named area.</label
+    >
+    <AreaSearch
+      id="search"
+      onSelect={(area) =>
+        goto(resolve(`/app/areas/${makeCanonicalSlug(area.areacd, area.areanm)}`))}
+    />
   </Card>
 
   <Card title="Local indicators" mode="featured">
@@ -136,7 +80,9 @@
     <a href={resolve(`/app/areas/W92000004-wales`)}>Wales</a>,
     <a href={resolve(`/app/areas/S92000003-scotland`)}>Scotland</a>
     or
-    <a href={resolve(`/app/areas/N92000002-northern-ireland`)}>Northern Ireland</a>.
+    <a href={resolve(`/app/areas/N92000002-northern-ireland`)}
+      >Northern Ireland</a
+    >.
   </p>
 </Section>
 
@@ -217,16 +163,6 @@
 </Section>
 
 <style>
-  .search-form {
-    display: flex;
-    flex-direction: row;
-    align-items: end;
-    width: 100%;
-    gap: .5rem;
-  }
-  .search-input {
-    flex-grow: 1;
-  }
   .no-wrap {
     white-space: nowrap;
   }

@@ -3,6 +3,7 @@ import { resolve } from "$app/paths";
 import { format } from "d3-format";
 import { utcFormat } from "d3-time-format";
 import { geoLevels } from "./config/geo-levels.js";
+import { feature } from 'topojson-client';
 
 export function parseData(data) {
   const cols = Object.keys(data);
@@ -174,4 +175,8 @@ export function makeDataUrl(
 
   const url = `${base}?${chunks.map((ch) => `${ch.key}=${ch.value}`).join("&")}&includeNames=true`;
   return resolve(url);
+}
+
+export function makeGeoJSON(topojson, layer) {
+	return feature(topojson, layer);
 }

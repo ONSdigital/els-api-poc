@@ -1,5 +1,6 @@
 import { areaMetadataBase } from "../config.js";
 import { isValidAreaCode } from "../utils.js";
+import groupAreasByLevel from "./helpers/groupAreasByLevel.js";
 
 export default async function getAreaByCode(code) {
   code = code?.toUpperCase();
@@ -9,6 +10,7 @@ export default async function getAreaByCode(code) {
   try {
     const url = `${areaMetadataBase}/${code.slice(0, 3)}/${code}.json`;
     const json = await (await fetch(url)).json();
+    json.properties.children = groupAreasByLevel(json.properties.children);
     return json;
   } catch {
     return { error: 400, message: `Could not retreive metadata for ${code}.` };
