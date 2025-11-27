@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { Plot, BarX, RuleX } from "svelteplot";
 
   let {

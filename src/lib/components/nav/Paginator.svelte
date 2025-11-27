@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   let { offset, total, limit = 10, urlTemplate = "?page={i}" } = $props();
 
   let makeUrl = $derived((i) => urlTemplate.replace("{i}", i));

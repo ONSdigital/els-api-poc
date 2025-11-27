@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { scaleLinear, scaleBand } from "d3-scale";
   import { colours } from "$lib/config";
 

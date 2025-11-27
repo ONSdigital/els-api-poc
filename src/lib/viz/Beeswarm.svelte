@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { Plot, Dot, Text, jitterY } from "svelteplot";
 
   let { data, xKey = "value", yKey = "y", selected = null } = $props();

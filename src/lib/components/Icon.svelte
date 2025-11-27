@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	// @ts-nocheck
 	export let type = 'compass';
 	export let rotation = 0;

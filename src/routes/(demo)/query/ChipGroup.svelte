@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import ChipGroupItem from "./ChipGroupItem.svelte";
 
   let {

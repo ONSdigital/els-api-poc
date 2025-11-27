@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { Line, Pointer, AxisX, AxisY } from "svelteplot";
   import Plot from "svelteplot/core/Plot.svelte";
 

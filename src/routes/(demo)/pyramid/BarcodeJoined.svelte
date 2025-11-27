@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Chart from "./BarcodeChartJoined.svelte";
   export let data;
   export let selectedArea;

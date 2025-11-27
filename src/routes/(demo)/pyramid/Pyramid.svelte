@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import PyramidChart from "./PyramidChart.svelte";
 
   export let data;
