@@ -1,7 +1,4 @@
-/* Use this file for app specific CSS and overrides */
-.placeholder {
-		background: var(--ons-color-grey-10);
-		padding: 12px;
-		height: 300px;
-    width: 100%;
-	}
+/* Global CSS styles for ELS */
+.titleblock-transparent .ons-hero__details {
+	padding: 1.5rem 0 0.5rem;
+}

@@ -24,7 +24,7 @@
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<dt>
 						<a
-							href="{base}/areas/{makeCanonicalSlug(p.areacd, p.areanm)}{urlSuffix}"
+							href="{base}/areas/{makeCanonicalSlug(p)}{urlSuffix}"
 							on:click={() =>
 								analyticsEvent({
 									event: 'postcodeSelect',

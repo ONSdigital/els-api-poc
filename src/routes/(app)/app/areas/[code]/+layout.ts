@@ -18,7 +18,7 @@ export const load: LayoutLoad = async ({ params, url, fetch }) => {
 		error(404, { message: "Area not found" });
   }
 
-  const canonicalSlug = makeCanonicalSlug(area.properties.areacd, area.properties.areanm);
+  const canonicalSlug = makeCanonicalSlug(area.properties);
   if (params.code !== canonicalSlug) {
     const redirectPath = url.pathname.replace(params.code, canonicalSlug);
     redirect(301, resolve(redirectPath));

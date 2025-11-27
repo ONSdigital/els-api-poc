@@ -41,7 +41,7 @@
     <AreaSearch
       id="search"
       onSelect={(area) =>
-        goto(resolve(`/app/areas/${makeCanonicalSlug(area.areacd, area.areanm)}`))}
+        goto(resolve(`/app/areas/${makeCanonicalSlug(area)}`))}
     />
   </Card>
 

@@ -19,7 +19,6 @@ export const load: PageLoad = async ({ parent }) => {
           label: getName(p),
           href: resolve(`/app/areas/${p.areacd}`),
         })),
-    ],
-    breadcrumbBackground: "#eaeaea",
+    ]
   };
 };

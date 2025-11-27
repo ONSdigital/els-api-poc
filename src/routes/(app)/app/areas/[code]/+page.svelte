@@ -18,6 +18,7 @@
     Tabs,
     Tab,
   } from "@onsvisual/svelte-components";
+  import AreaLede from "./AreaLede.svelte";
   import AreaNavMap from "./AreaNavMap.svelte";
   import AreaSearch from "$lib/components/nav/AreaSearch.svelte";
 
@@ -31,7 +32,7 @@
   );
 
   function handleSelect(area) {
-    goto(resolve(`/app/areas/${makeCanonicalSlug(area.areacd, area.areanm)}`), {
+    goto(resolve(`/app/areas/${makeCanonicalSlug(area)}`), {
       noScroll: true,
     });
   }
@@ -45,27 +46,8 @@
     color: "#003c57",
   }}
   width="medium"
-  background="#eaeaea"
-  cls="titleblock-transparent"
->
-  <p class="ons-hero__text">
-    {#if areaProps.areacd === "K02000001"}
-      Explore areas within the United Kingdom.
-    {:else}
-      {@const parent = areaProps.parents[0]}
-      {capitalise(areaProps.typenm)}
-      in
-      {capitalise(areaProps.typenm)}
-      <a
-        href={resolve(
-          `/app/areas/${makeCanonicalSlug(parent.areacd, parent.areanm)}`
-        )}
-        data-sveltekit-noscroll
-      >
-        {getName(parent, "the")}</a
-      >
-    {/if}
-  </p>
+  cls="titleblock-transparent">
+  <AreaLede {areaProps}/>
 </Hero>
 
 <Grid marginTop>
@@ -91,7 +73,7 @@
           iconPosition="after"
           variant="ghost"
           href={resolve(
-            `/app/areas/${makeCanonicalSlug(areaProps.areacd)}/indicators`
+            `/app/areas/${makeCanonicalSlug(areaProps)}/indicators`
           )}
           small>Explore local indicators</Button
         >
@@ -120,7 +102,7 @@
                   <li>
                     <a
                       href={resolve(
-                        `/app/areas/${makeCanonicalSlug(child.areacd)}`
+                        `/app/areas/${makeCanonicalSlug(child)}`
                       )}
                       data-sveltekit-noscroll>{getName(child)}</a
                     >
