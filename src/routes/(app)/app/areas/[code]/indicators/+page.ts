@@ -2,7 +2,7 @@ import { error } from "@sveltejs/kit";
 import { resolve } from "$app/paths";
 import { pluralise, getName } from "@onsvisual/robo-utils";
 import summaryData from "$lib/data/json-stat-summary.json";
-import { geoLevels, geoLevelsLookup } from "$lib/config/geo-levels";
+import { geoLevels, geoLevelsLookup } from "$lib/config/geoLevels";
 import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ parent, fetch }) => {

@@ -1,5 +1,5 @@
 import { Temporal } from "temporal-polyfill";
-import { geoLevels } from "$lib/config/geo-levels";
+import { geoLevels } from "$lib/config/geoLevels";
 import getChildAreas from "$lib/api/geo/getChildAreas";
 import hasObservation from "./hasObservation";
 import { isValidMonth, isValidYear } from "$lib/api/utils";

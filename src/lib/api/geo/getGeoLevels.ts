@@ -1,4 +1,4 @@
-import { geoLevelsArray } from "$lib/config/geo-levels";
+import { geoLevelsArray } from "$lib/config/geoLevels";
 import { geoYearFilter } from "./helpers/geoFilters";
 import readData from "$lib/data";
 

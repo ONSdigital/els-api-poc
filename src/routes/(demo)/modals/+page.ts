@@ -1,5 +1,5 @@
 import { resolve } from "$app/paths";
-import { geoLevels } from "$lib/config/geo-levels";
+import { geoLevels } from "$lib/config/geoLevels";
 
 export const load = async ({ fetch }) => {
   const metadataPath = resolve(

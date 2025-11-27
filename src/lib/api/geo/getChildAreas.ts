@@ -1,4 +1,4 @@
-import { geoLevels } from "$lib/config/geo-levels";
+import { geoLevels } from "$lib/config/geoLevels";
 import { isValidAreaCode } from "../utils";
 import { addAreaNames } from "./helpers/areaCodesNames";
 import readData from "$lib/data";

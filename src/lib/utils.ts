@@ -2,7 +2,7 @@
 import { resolve } from "$app/paths";
 import { format } from "d3-format";
 import { utcFormat } from "d3-time-format";
-import { geoLevels } from "./config/geo-levels";
+import { geoLevels } from "./config/geoLevels";
 import { feature } from 'topojson-client';
 
 export function parseData(data) {

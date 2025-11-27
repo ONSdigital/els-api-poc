@@ -1,4 +1,4 @@
-import { geoLevels, geoLevelsLookup } from "$lib/config/geo-levels";
+import { geoLevels, geoLevelsLookup } from "$lib/config/geoLevels";
 import getChildAreas from "./getChildAreas";
 import { isValidAreaCode } from "../utils";
 import { codeToArea } from "./helpers/areaCodesNames";

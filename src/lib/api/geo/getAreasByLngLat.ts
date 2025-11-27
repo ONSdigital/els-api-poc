@@ -5,7 +5,7 @@ import { isValidLngLat } from "../utils";
 import groupAreasByLevel from "./helpers/groupAreasByLevel";
 import sortAreasByLevel from "./helpers/sortAreasByLevel";
 import { geoYearFilter, makeGeoLevelFilter } from "./helpers/geoFilters";
-import { geoLevelsAllLookup } from "$lib/config/geo-levels";
+import { geoLevelsAllLookup } from "$lib/config/geoLevels";
 import readData from "$lib/data";
 
 const geoLatestYear = await readData("geo-latest-year");

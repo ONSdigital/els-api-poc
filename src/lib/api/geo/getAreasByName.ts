@@ -1,6 +1,6 @@
 import { makeGeoLevelFilter, geoYearFilter } from "./helpers/geoFilters";
 import groupAreasByLevel from "./helpers/groupAreasByLevel";
-import { geoLevelsAllLookup } from "$lib/config/geo-levels";
+import { geoLevelsAllLookup } from "$lib/config/geoLevels";
 import readData from "$lib/data";
 
 const areasList = await readData("areas-list");

@@ -1,4 +1,4 @@
-import { geoLevelsLookup } from "$lib/config/geo-levels";
+import { geoLevelsLookup } from "$lib/config/geoLevels";
 import getChildAreas from "./getChildAreas";
 import getParentAreas from "./getParentAreas";
 import getSiblingAreas from "./getSiblingAreas";
