@@ -20,7 +20,6 @@
   let hovered = $state();
 
   let { areacd, bounds, groupcd } = $derived(area.properties);
-  let _areacd = areacd;
 
   function doSelect(e) {
     const props = e.detail.feature.properties;
@@ -35,10 +34,7 @@
   }
 
   function fitBounds(bounds) {
-    if (map && _areacd !== areacd) {
       map.fitBounds(bounds, { padding: 20 });
-      _areacd = areacd;
-    }
   }
   $effect(() => fitBounds(bounds));
 </script>

@@ -105,28 +105,34 @@
       <AreaSearch id="search" onSelect={handleSelect} />
     </div>
   </div>
-  <GridCell colspan={3}>
-    {#key areaProps}
-      <Tabs bind:selected={selectedChildGroupKey} compact>
-        {#each areaProps.children as childGroup, i}
-          <Tab title={capitalise(childGroup.label)} id={childGroup.key} hideTitle>
-            <ul class="list-columns">
-              {#each childGroup.areas as child}
-                <li>
-                  <a
-                    href={resolve(
-                      `/app/areas/${makeCanonicalSlug(child.areacd)}`
-                    )}
-                    data-sveltekit-noscroll>{getName(child)}</a
-                  >
-                </li>
-              {/each}
-            </ul>
-          </Tab>
-        {/each}
-      </Tabs>
-    {/key}
-  </GridCell>
+  {#if areaProps.children[0]}
+    <GridCell colspan={3}>
+      {#key areaProps}
+        <Tabs bind:selected={selectedChildGroupKey} compact>
+          {#each areaProps.children as childGroup, i}
+            <Tab
+              title={capitalise(childGroup.label)}
+              id={childGroup.key}
+              hideTitle
+            >
+              <ul class="list-columns">
+                {#each childGroup.areas as child}
+                  <li>
+                    <a
+                      href={resolve(
+                        `/app/areas/${makeCanonicalSlug(child.areacd)}`
+                      )}
+                      data-sveltekit-noscroll>{getName(child)}</a
+                    >
+                  </li>
+                {/each}
+              </ul>
+            </Tab>
+          {/each}
+        </Tabs>
+      {/key}
+    </GridCell>
+  {/if}
 </Grid>
 
 <style>
