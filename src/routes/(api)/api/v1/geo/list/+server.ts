@@ -1,8 +1,9 @@
+import type { RequestHandler } from "./$types";
 import { json } from "@sveltejs/kit";
 import { getParam } from "$lib/api/utils";
 import getAreasList from "$lib/api/geo/getAreasList";
 
-export function GET({ url }) {
+export const GET: RequestHandler = ({ url }) => {
   const geo = getParam(url, "geo", "all");
   const year = getParam(url, "year", "latest");
   const indicator = getParam(url, "indicator", "all");
@@ -22,8 +23,8 @@ export function GET({ url }) {
     includeParents,
     includeChildren,
     includeDates,
-    includeLevel
+    includeLevel,
   });
 
   return json(areasList);
-}
+};

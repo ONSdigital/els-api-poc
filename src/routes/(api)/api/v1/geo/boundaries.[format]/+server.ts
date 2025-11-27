@@ -1,8 +1,9 @@
+import type { RequestHandler } from "./$types";
 import { json, error } from "@sveltejs/kit";
 import { getParam } from "$lib/api/utils";
 import getBoundaries from "$lib/api/geo/getBoundaries";
 
-export function GET({ url, params }) {
+export const GET: RequestHandler = ({ url, params }) => {
   const format = params.format || "geojson";
   const year = getParam(url, "year", "latest");
   const country = getParam(url, "country", "all");
@@ -17,4 +18,4 @@ export function GET({ url, params }) {
   if (boundaries.error) error(boundaries.error, boundaries.message);
 
   return json(boundaries);
-}
+};

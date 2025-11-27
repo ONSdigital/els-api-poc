@@ -1,8 +1,9 @@
+import type { RequestHandler } from "./$types";
 import { json } from "@sveltejs/kit";
 import { getParam } from "$lib/api/utils";
 import getTaxonomy from "$lib/api/metadata/getTaxonomy";
 
-export function GET({url}) {
+export const GET: RequestHandler = ({ url }) => {
   const topic = getParam(url, "topic", "all");
   const excludeMultivariate = getParam(url, "excludeMultivariate", false);
   const hasGeo = getParam(url, "hasGeo", "all");
@@ -14,8 +15,8 @@ export function GET({url}) {
     excludeMultivariate,
     hasGeo,
     hasYear,
-    flat
+    flat,
   });
-  
+
   return json(taxonomy);
-}
+};

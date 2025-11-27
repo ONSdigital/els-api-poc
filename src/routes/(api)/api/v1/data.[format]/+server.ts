@@ -1,8 +1,9 @@
+import type { RequestHandler } from "./$types";
 import { json, text, error } from "@sveltejs/kit";
 import { getParam, getDimensionFilters } from "$lib/api/utils";
 import filterCollection from "$lib/api/data/filterCollection";
 
-export async function GET({ params, url }) {
+export const GET: RequestHandler = async ({ url, params }) => {
   const format = params.format || "cols";
   const topic = getParam(url, "topic", "all");
   const indicator = getParam(url, "indicator", "all");
@@ -50,4 +51,4 @@ export async function GET({ params, url }) {
     : datasets.format === "text"
       ? text(datasets.data, { headers })
       : json(datasets.data, { headers });
-}
+};

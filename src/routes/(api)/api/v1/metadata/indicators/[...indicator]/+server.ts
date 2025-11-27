@@ -1,8 +1,9 @@
+import type { RequestHandler } from "./$types";
 import { json, error } from "@sveltejs/kit";
 import { getParam } from "$lib/api/utils";
 import getIndicators from "$lib/api/metadata/getIndicators";
 
-export function GET({ params, url }) {
+export const GET: RequestHandler = ({ url, params }) => {
   const indicator = params.indicator || getParam(url, "indicator", null);
   const topic = getParam(url, "topic", "all");
   const excludeMultivariate = getParam(url, "excludeMultivariate", false);
@@ -25,4 +26,4 @@ export function GET({ params, url }) {
   if (metadata.error) error(400, metadata.error);
 
   return json(metadata);
-}
+};
