@@ -1,6 +1,6 @@
 import { writeFileSync } from "fs";
 import { csvParse, csvFormat, autoType } from "d3-dsv";
-import { geoLevels, geoLevelsNamed } from "../src/lib/config/geo-levels";
+import { geoLevels, geoLevelsNamed } from "../src/lib/config/geoLevels";
 
 const topoUrl =
   "https://raw.githubusercontent.com/ONSdigital/uk-topojson/refs/heads/main/output/topo.json";

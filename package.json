@@ -14,8 +14,8 @@
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "data:download": "tsx ./scripts/download-data.ts",
     "data:generate": "tsx ./scripts/generate-data.ts",
-    "data:geo": "node ./scripts/make-geo-data.js",
-    "data:clusters": "node ./scripts/make-clusters.js"
+    "data:geo": "tsx ./scripts/make-geo-data.ts",
+    "data:clusters": "tsx ./scripts/make-clusters.ts"
   },
   "author": "Ahmad Barclay",
   "license": "MIT",
