@@ -1,6 +1,6 @@
 <script lang="ts">
   //@ts-nocheck
-  import { base, assets } from "$app/paths";
+  import { base, assets, resolve } from "$app/paths";
   import { afterNavigate } from "$app/navigation";
   import { setContext } from "svelte";
   import {
@@ -12,6 +12,8 @@
     analyticsEvent,
     Header,
     LazyLoad,
+    List,
+    Li,
   } from "@onsvisual/svelte-components";
   import { capitalise } from "@onsvisual/robo-utils";
   import { fetchChartDataV1, makePeriodFormatter } from "$lib/utils";
@@ -62,7 +64,7 @@
   let pageState = $state({
     selectedAreas: [],
     selectedGeoLevel: data.geoLevels.find(
-      (g) => g.id === data.indicator.geography.initialLevel
+      (g) => g.id === data.indicator.geography.initialLevel,
     ),
     selectedPeriodRange: [
       data.periods[0],
@@ -82,8 +84,8 @@
       key: data.indicator.source.length === 1 ? "Data source" : "Data sources",
       value: arrayJoin(
         data.indicator.source.map(
-          (s) => `<a href="${s.href}" target="_blank">${s.name}</a>`
-        )
+          (s) => `<a href="${s.href}" target="_blank">${s.name}</a>`,
+        ),
       ),
     },
     {
@@ -105,7 +107,7 @@
   </p>
 </Hero>
 
-<NavSections>
+<NavSections marginTop>
   {#if data.indicator.standardised}
     <NavSection title="Map">
       <div class="row-container">
@@ -116,7 +118,7 @@
       </div>
       <LazyLoad>
         <div class="chart-container map-container">
-          {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange[1].slice(0, 10) } )}
+          {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange[1].slice(0, 10) }, )}
             Fetching chart data
           {:then chartData}
             <Map data={chartData} />
@@ -130,7 +132,7 @@
   <NavSection title="Line">
     <LazyLoad>
       <div class="chart-container">
-        {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange.map( (p) => p.slice(0, 10) ) } )}
+        {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange.map( (p) => p.slice(0, 10), ) }, )}
           Fetching chart data
         {:then chartData}
           <Line data={chartData} />
@@ -143,7 +145,7 @@
   <NavSection title="Bar">
     <LazyLoad>
       <div class="chart-container">
-        {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange[1].slice(0, 10) } )}
+        {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange[1].slice(0, 10) }, )}
           Fetching chart data
         {:then chartData}
           <Bar data={chartData} />
@@ -156,7 +158,7 @@
   <NavSection title="Table">
     <LazyLoad>
       <div class="chart-container">
-        {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: "all" } )}
+        {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: "all" }, )}
           Fetching chart data
         {:then chartData}
           <Table
@@ -170,6 +172,58 @@
         {/await}
       </div>
     </LazyLoad>
+  </NavSection>
+  <NavSection title="Get the data">
+    <p>The original data source for this indicator can be found here:</p>
+    <List mode="dash">
+      {#each data.indicator.source as s}
+        <Li><a href={s.href} target="_blank">{s.name}</a></Li>
+      {/each}
+    </List>
+    <p>
+      You can download this dataset in an <a
+        href={resolve(
+          `/api/v1/data.ods?indicator=${data.indicator.slug}&time=all`,
+        )}
+        download={`${data.indicator.slug}.ods`}>ODS</a
+      >,
+      <a
+        href={resolve(
+          `/api/v1/data.csv?indicator=${data.indicator.slug}&time=all`,
+        )}
+        download={`${data.indicator.slug}.csv`}>CSV</a
+      >,
+      <a
+        href={resolve(
+          `/api/v1/data.csvw?indicator=${data.indicator.slug}&time=all`,
+        )}
+        download={`${data.indicator.slug}.csv-metadata.json`}>CSVW</a
+      >
+      or
+      <a
+        href={resolve(
+          `/api/v1/data.json?indicator=${data.indicator.slug}&time=all`,
+        )}
+        download={`${data.indicator.slug}.json`}>JSON-Stat</a
+      >
+      format, or download
+      <a
+        href={resolve(`/api/v1/data.ods?excludeMultivariate=true&time=all`)}
+        download="datasets.ods">all available datasets (ODS, ~10MB)</a
+      >.
+    </p>
+    <p>
+      Quality and Methodology Information for the Explore Local Statistics
+      service details the strengths and limitations of the service, methods
+      used, data uses and users.
+    </p>
+  </NavSection>
+  <NavSection title="Other indicators">
+    <p>
+      {data.indicator.label} is one of {data.taxonomy.meta.count} local indicators
+      on the <a href={resolve("/")}>Explore local statistics</a> service. See
+      the <a href={resolve("/indicators")}>full list of local indicators</a>.
+    </p>
   </NavSection>
 </NavSections>
 

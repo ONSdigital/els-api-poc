@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import accessibleSpreadsheetCreator from "accessible-spreadsheet-creator";
+import accessibleSpreadsheetCreator from "@onsvisual/accessible-spreadsheet-creator";
 
 // This function grabs the metadata from the JSON-Stat required to populate the ODS spreadsheet
 export function getSpreadsheetMetadata(ds) {

@@ -35,7 +35,7 @@
   </p>
 {/snippet}
 
-<NavSections cls="nav-sections">
+<NavSections cls="nav-sections" marginTop>
   {#each data.taxonomy.data as theme}
     <NavSection title={theme.label} id={theme.slug}>
       {#each theme.children as child}
@@ -62,9 +62,9 @@
     position: sticky;
     top: 0; /* Value that defines the threshold at which the element becomes sticky */
   }
-    :global(.nav-sections section + section) {
+  :global(.nav-sections section + section) {
     border-top: 1px solid #ddd;
     margin-top: 1.5em;
-    padding-top: 1em; 
+    padding-top: 1em;
   }
 </style>
