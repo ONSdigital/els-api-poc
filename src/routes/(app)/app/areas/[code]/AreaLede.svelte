@@ -19,9 +19,7 @@
     {/if}
     {getName(parent, "in", "prefix")}
     <a
-      href={resolve(
-        `/areas/${makeCanonicalSlug(parent)}`
-      )}
+      href={resolve(`/app/areas/${makeCanonicalSlug(parent)}`)}
       data-sveltekit-noscroll>{getName(parent)}</a
     >
     {#if ["E02", "W02"].includes(areaProps.typecd)}
@@ -37,9 +35,7 @@
             ? "the previous"
             : getName(rep, "the", "prefix")}
           <a
-            href={resolve(
-              `/areas/${makeCanonicalSlug(rep)}`
-            )}
+            href={resolve(`/app/areas/${makeCanonicalSlug(rep)}`)}
             data-sveltekit-noscroll>{getName(rep)}</a
           >
           ({rep.areacd})
@@ -59,9 +55,7 @@
           ? "the new"
           : getName(areaProps.successor, "the", "prefix")}
         <a
-          href={resolve(
-            `/areas/${makeCanonicalSlug(areaProps)}`
-          )}
+          href={resolve(`/app/areas/${makeCanonicalSlug(areaProps)}`)}
           data-sveltekit-noscroll>{getName(areaProps.successor)}</a
         >
         ({areaProps.areacd})
