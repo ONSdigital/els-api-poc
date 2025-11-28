@@ -40,8 +40,13 @@
     >
     <AreaSearch
       id="search"
-      onSelect={(area) =>
-        goto(resolve(`/app/areas/${makeCanonicalSlug(area)}`))}
+      onSelect={(area) => {
+        const url =
+          area.type === "postcode"
+            ? `/app/areas/search?q=${area.areacd}`
+            : `/app/areas/${makeCanonicalSlug(area)}`;
+        goto(resolve(url));
+      }}
     />
   </Card>
 
@@ -50,13 +55,13 @@
       Explore {data.taxonomy.meta.count} indicators, including
       <a
         href={resolve(
-          `/app/indicators/gross-disposable-household-income-per-head`
+          `/app/indicators/gross-disposable-household-income-per-head`,
         )}
         class="no-wrap">household income</a
       >,
       <a
         href={resolve(
-          `/app/indicators/further-education-and-skills-participation`
+          `/app/indicators/further-education-and-skills-participation`,
         )}>further education participation</a
       >
       and
