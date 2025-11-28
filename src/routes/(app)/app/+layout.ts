@@ -1,19 +1,12 @@
 // @ts-nocheck
-import type { LayoutLoad } from './$types';
-import { Breadcrumb } from '@onsvisual/svelte-components';
-// import coreMetadata from '../../data/insights/core-metadata.json';
+import type { LayoutLoad } from "./$types";
+import { resolve } from "$app/paths";
 
-export const load: LayoutLoad = async () => {
-	return {
-		// coreMetadata,
-		title: `Explore local statistics - ONS`,
-		description: `Find, compare and visualise statistics about communities in the United Kingdom. Includes data on population, economy and health.`,
-		pageType: `home page`,
-		component: Breadcrumb,
-		breadcrumbLinks: [
-			{ label: 'Home', href: `/`, refresh: true },
-			{ label: 'Explore local statistics' }
-		],
-		background: '#e9eff4'
-	};
+export const load: LayoutLoad = async ({ fetch }) => {
+  const path = resolve("/api/v1/metadata/taxonomy?excludeMultivariate=true");
+  const taxonomy = await (await fetch(path)).json();
+
+  return {
+    taxonomy,
+  };
 };

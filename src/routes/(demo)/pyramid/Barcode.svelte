@@ -1,9 +1,9 @@
-<script>
+<script lang="ts">
   import Chart from "./BarcodeChart.svelte";
   export let data;
   export let selectedArea;
   export let groupKey = "areacd";
-  import { colours } from "$lib/config.js";
+  import { colours } from "$lib/config";
 
   let hoveredArea;
   const keyedData = keyData(data, groupKey);

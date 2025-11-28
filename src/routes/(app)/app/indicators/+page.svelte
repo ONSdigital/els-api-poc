@@ -15,16 +15,11 @@
   import { capitalise } from "@onsvisual/robo-utils";
 
   export let data;
-  $: console.log(data);
 </script>
-
-<PhaseBanner phase="prototype" />
-<!-- update this link when app homepage built -->
-<Breadcrumb links={[{ label: "ELS API experiments", href: resolve("/") }]} />
 
 <Hero width="medium" title="Local indicators" cls="titleblock-transparent">
   <p class="ons-hero__text">
-    Explore our {data.taxonomy.count} local indicators, including
+    Explore our {data.taxonomy.meta.count} local indicators, including
     <b>disposable household income</b>,
     <b>participation in further education</b>
     and
@@ -40,7 +35,7 @@
   </p>
 {/snippet}
 
-<NavSections cls="nav-sections">
+<NavSections cls="nav-sections" marginTop>
   {#each data.taxonomy.data as theme}
     <NavSection title={theme.label} id={theme.slug}>
       {#each theme.children as child}
@@ -67,9 +62,9 @@
     position: sticky;
     top: 0; /* Value that defines the threshold at which the element becomes sticky */
   }
-    :global(.nav-sections section + section) {
+  :global(.nav-sections section + section) {
     border-top: 1px solid #ddd;
     margin-top: 1.5em;
-    padding-top: 1em; 
+    padding-top: 1em;
   }
 </style>

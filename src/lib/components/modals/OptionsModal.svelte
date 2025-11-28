@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { page } from "$app/state";
   import { getContext } from "svelte";
   import { Checkbox } from "@onsvisual/svelte-components";

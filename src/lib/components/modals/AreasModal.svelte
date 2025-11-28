@@ -1,9 +1,9 @@
-<script>
+<script lang="ts">
   import { page } from "$app/state";
   import { getContext } from "svelte";
   import { Button, Dropdown, Select } from "@onsvisual/svelte-components";
   import Modal from "./Modal.svelte";
-  import { ONSpalette } from "$lib/config.js";
+  import { ONSpalette } from "$lib/config";
 
   let pageState = getContext("pageState");
   let mode = $derived(page.params?.code?.match(/^[EKNSW]{1}\d{8}$/) ? "area" : "indicator");

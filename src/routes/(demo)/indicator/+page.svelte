@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { base } from "$app/paths";
   import {
     PhaseBanner,
@@ -11,12 +11,12 @@
     Divider,
     NavSections,
     NavSection,
-    LazyLoad
+    LazyLoad,
   } from "@onsvisual/svelte-components";
-  import Map from "$lib/viz/Map.svelte";
-  import Bar from "$lib/viz/Bar.svelte";
-  import Line from "$lib/viz/Line.svelte";
-  import { fetchChartData } from "$lib/utils.ts";
+  import Map from "$lib/components/charts/Map.svelte";
+  import Bar from "$lib/components/charts/Bar.svelte";
+  import Line from "$lib/components/charts/Line.svelte";
+  import { fetchChartData } from "$lib/utils";
 
   export let data;
 
@@ -28,22 +28,32 @@
   }
 </script>
 
-<PhaseBanner phase="prototype"/>
+<PhaseBanner phase="prototype" />
 <Header compact title="Single indicator demo" />
-<Breadcrumb links={[{label: "ELS API experiments", href: `${base}/`}]}/>
+<Breadcrumb links={[{ label: "ELS API experiments", href: `${base}/` }]} />
 
 <Section>
   <p style:margin="12px 0 32px">
-    Select an indicator to view data as a map, bar and line chart. Chart data for each indicator will be lazy loaded when the chart comes into view on the page.
+    Select an indicator to view data as a map, bar and line chart. Chart data
+    for each indicator will be lazy loaded when the chart comes into view on the
+    page.
   </p>
-  <form class="select-container" on:submit|preventDefault={() => selectIndicator(selected)}>
-    <Select options={data.indicators} bind:value={selected} label="Select an indicator" placeholder="Eg. Household income"/>
+  <form
+    class="select-container"
+    on:submit|preventDefault={() => selectIndicator(selected)}
+  >
+    <Select
+      options={data.indicators}
+      bind:value={selected}
+      label="Select an indicator"
+      placeholder="Eg. Household income"
+    />
     <Button small type="sumbit">Select area</Button>
   </form>
 </Section>
 
 {#if indicator}
-  <Divider/>
+  <Divider />
   <NavSections>
     <NavSection title="Map">
       <LazyLoad>
@@ -51,7 +61,7 @@
           {#await fetchChartData(indicator.slug)}
             Fetching chart data
           {:then chartData}
-            <Map data={chartData}/>
+            <Map data={chartData} />
           {:catch}
             Failed to load chart data
           {/await}
@@ -64,7 +74,7 @@
           {#await fetchChartData(indicator.slug, "rgn")}
             Fetching chart data
           {:then chartData}
-            <Bar data={chartData}/>
+            <Bar data={chartData} />
           {:catch}
             Failed to load chart data
           {/await}
@@ -77,7 +87,7 @@
           {#await fetchChartData(indicator.slug, "ltla", "all")}
             Fetching chart data
           {:then chartData}
-            <Line data={chartData}/>
+            <Line data={chartData} />
           {:catch}
             Failed to load chart data
           {/await}

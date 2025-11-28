@@ -1,6 +1,9 @@
 <script lang="ts">
   // @ts-nocheck
   import { resolve } from "$app/paths";
+  import { goto, afterNavigate } from "$app/navigation";
+  import { getName, capitalise } from "@onsvisual/robo-utils";
+  import { makeCanonicalSlug } from "$lib/api/geo/helpers/areaSlugUtils";
   import {
     analyticsEvent,
     Hero,
@@ -15,108 +18,55 @@
     Tabs,
     Tab,
   } from "@onsvisual/svelte-components";
-  import { getName, capitalise } from "@onsvisual/robo-utils";
-  import topojson from "$lib/data/topo.json";
-  import { base } from "$app/paths";
-  import { makeCanonicalSlug } from "$lib/utils.ts";
-  import throttle from "throttleit";
-  import { goto } from "$app/navigation";
+  import AreaLede from "./AreaLede.svelte";
+  import AreaNavMap from "./AreaNavMap.svelte";
+  import AreaSearch from "$lib/components/nav/AreaSearch.svelte";
+
   let { data } = $props();
-  let selected = $state();
+  let areaProps = $derived(data.area.properties);
+
   let clientWidth = $state();
-  $inspect(data);
+  let selectedChildGroupKey = $derived(areaProps.children[0]?.key || null);
+  let selectedChildGroup = $derived(
+    areaProps.children.find((c) => c.key === selectedChildGroupKey),
+  );
 
-  async function loadOptionsFn(query, populateResults) {
-    try {
-      const url = resolve(
-        `/api/v1/geo/search/${query.toLowerCase()}?searchPostcodes=true`
-      );
-      const results = await (await fetch(url)).json();
-      populateResults(
-        results.data.map((d) => {
-          if (!d.areanm) d.areanm = d.areacd;
-          return d;
-        })
-      );
-    } catch {
-      return populateResults([]);
-    }
+  function handleSelect(area) {
+    const isPostcode = area.type === "postcode";
+    const url = isPostcode
+      ? `/app/areas/search?q=${area.areacd}`
+      : `/app/areas/${makeCanonicalSlug(area)}`;
+    goto(resolve(url), { noScroll: !isPostcode });
   }
-  const loadOptions = throttle(loadOptionsFn, 500);
-
-  function gotoSelected(e) {
-    e.preventDefault();
-    if (selected)
-      goto(
-        resolve(
-          selected.lng
-            ? `/app/areas/search?q=${selected.areacd}`
-            : `/app/areas/${selected.areacd}/`
-        )
-      );
-  }
-  $inspect(selected);
-
-  let childTypes = $derived(data.area.properties.child_typecds);
-  let childType = $derived(data.area.properties.child_typecds[0]);
-  console.log("Child types:");
-  $inspect(childTypes);
-  console.log("Current child type:");
-  $inspect(childType);
-
-  let grouped = {};
-  for (const child of data.area.properties.children) {
-    const type = child.areacd.slice(0, 3);
-    if (!grouped[type]) grouped[type] = [];
-    grouped[type].push(child);
-  }
-  $inspect(grouped);
 </script>
 
-<PhaseBanner phase="prototype" />
-<Breadcrumb links={[{ label: "ELS API experiments", href: resolve("/") }]} />
-
 <Hero
-  title={data.area.properties.areanm}
+  title={areaProps.areanm}
   titleBadge={{
-    label: data.area.properties.areacd,
-    ariaLabel: `Area code: ${data.area.properties.areacd}`,
+    label: areaProps.areacd,
+    ariaLabel: `Area code: ${areaProps.areacd}`,
     color: "#003c57",
   }}
   width="medium"
-  background="#eaeaea"
   cls="titleblock-transparent"
 >
-  <p class="ons-hero__text">
-    {#if data.area.properties.areacd === "K02000001"}
-      Explore areas within the United Kingdom.
-    {:else}
-      {capitalise(data.area.properties.typenm)}
-      in
-      <!-- {data.related.parents[0].areanm} -->
-      <a
-        href="{base}/app/areas/{makeCanonicalSlug(
-          data.area.properties.parents[0].areacd
-        )}"
-        data-sveltekit-noscroll
-      >
-        {getName(data.area.properties.parents[0])}</a
-      >
-      <!-- do we want the URLS to be just the code or the code-name? -->
-    {/if}
-  </p>
+  <AreaLede {areaProps} />
 </Hero>
 
-<Grid>
+<Grid marginTop>
   <GridCell colspan={2}>
-    <h2>Area nav map here for {data.area.properties.areanm}</h2>
+    <AreaNavMap
+      area={data.area}
+      children={selectedChildGroup}
+      onSelect={handleSelect}
+      mapDescription={"Map of " + getName(areaProps, "the")}
+    />
   </GridCell>
-
   <div class="ons-grid__col ons-col-4@l grid-cell-flex">
-    {#if data.area.properties.areacd !== "K02000001"}
+    {#if areaProps.areacd !== "K02000001"}
       <div class="local-indicators-card">
         <h2 class="ons-card__title ons-u-fs-m" style:margin-bottom="12px">
-          Local indicators for {data.area.properties.areanm}
+          Local indicators for {areaProps.areanm}
         </h2>
         <p style:margin-bottom="20px">
           Health, education, economy, life satisfaction and more.
@@ -125,9 +75,9 @@
           icon="arrow"
           iconPosition="after"
           variant="ghost"
-          href="{base}/app/areas/{makeCanonicalSlug(
-            data.area.properties.areacd
-          )}/indicators"
+          href={resolve(
+            `/app/areas/${makeCanonicalSlug(areaProps)}/indicators`,
+          )}
           small>Explore local indicators</Button
         >
       </div>
@@ -137,51 +87,35 @@
       <label for="search" style:display="block" style:margin-bottom="8px"
         >Search for a place name or postcode</label
       >
-      <form class="form-select" onsubmit={gotoSelected}>
-        <div class="select-wrapper">
-          <Select
-            {loadOptions}
-            label=""
-            placeholder="Eg. `Fareham` or `Newport`"
-            on:change={(e) => (selected = e.detail)}
-            labelKey="areanm"
-            mode="search"
-            autoClear={false}
-            clearable
-          />
-        </div>
-        <Button
-          type="submit"
-          text="Search"
-          icon="search"
-          small
-          hideLabel
-          disabled={!selected}>{"Search"}</Button
-        >
-      </form>
+      <AreaSearch id="search" onSelect={handleSelect} />
     </div>
   </div>
-  <GridCell colspan={3}>
-    <!-- <div style:margin-top="10px" class="ons-u-d-b@s" bind:clientWidth={tabsWidth}></div> -->
-    <!-- {#key childType} -->
-    <Tabs selected={childType} compact>
-      {#each childTypes as type, i}
-        <Tab title={capitalise(type)} id={type} hideTitle>
-          <ul class="list-columns">
-            {#each grouped[type] as child}
-              <li>
-                <a
-                  href="{base}/app/areas/{makeCanonicalSlug(child.areacd)}"
-                  data-sveltekit-noscroll>{getName(child)}</a
-                >
-              </li>
-            {/each}
-          </ul>
-        </Tab>
-      {/each}
-    </Tabs>
-    <!-- {/key} -->
-  </GridCell>
+  {#if areaProps.children[0]}
+    <GridCell colspan={3}>
+      {#key areaProps}
+        <Tabs bind:selected={selectedChildGroupKey} compact>
+          {#each areaProps.children as childGroup, i}
+            <Tab
+              title={capitalise(childGroup.label)}
+              id={childGroup.key}
+              hideTitle
+            >
+              <ul class="list-columns">
+                {#each childGroup.areas as child}
+                  <li>
+                    <a
+                      href={resolve(`/app/areas/${makeCanonicalSlug(child)}`)}
+                      data-sveltekit-noscroll>{getName(child)}</a
+                    >
+                  </li>
+                {/each}
+              </ul>
+            </Tab>
+          {/each}
+        </Tabs>
+      {/key}
+    </GridCell>
+  {/if}
 </Grid>
 
 <style>

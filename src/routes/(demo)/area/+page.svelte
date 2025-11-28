@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { base } from "$app/paths";
   import {
     PhaseBanner,
@@ -11,10 +11,10 @@
     Divider,
     NavSections,
     NavSection,
-    LazyLoad
+    LazyLoad,
   } from "@onsvisual/svelte-components";
-  import Beeswarm from "$lib/viz/Beeswarm.svelte";
-  import { fetchTopicsData } from "$lib/utils.ts";
+  import Beeswarm from "$lib/components/charts/Beeswarm.svelte";
+  import { fetchTopicsData } from "$lib/utils";
 
   export let data;
 
@@ -27,28 +27,39 @@
       area = null;
       topics = null;
       return;
-    };
+    }
     topics = await fetchTopicsData(selected);
     area = selected;
   }
 </script>
 
-<PhaseBanner phase="prototype"/>
+<PhaseBanner phase="prototype" />
 <Header compact title="Area chart demo" />
-<Breadcrumb links={[{label: "ELS API experiments", href: `${base}/`}]}/>
+<Breadcrumb links={[{ label: "ELS API experiments", href: `${base}/` }]} />
 
 <Section>
   <p style:margin="12px 0 32px">
-    Select an area to display indicators. Chart data for all indicators will be loaded at once. (Note: Charts are rendered lazily as the performance of SveltePlot does not seem to be optimised for this use case).
+    Select an area to display indicators. Chart data for all indicators will be
+    loaded at once. (Note: Charts are rendered lazily as the performance of
+    SveltePlot does not seem to be optimised for this use case).
   </p>
-  <form class="select-container" on:submit|preventDefault={() => selectArea(selected)}>
-    <Select options={data.areaList} bind:value={selected} labelKey="areanm" label="Select a local authority" placeholder="Eg. Fareham or Newport"/>
+  <form
+    class="select-container"
+    on:submit|preventDefault={() => selectArea(selected)}
+  >
+    <Select
+      options={data.areaList}
+      bind:value={selected}
+      labelKey="areanm"
+      label="Select a local authority"
+      placeholder="Eg. Fareham or Newport"
+    />
     <Button small type="sumbit">Select area</Button>
   </form>
 </Section>
 
 {#if topics && area}
-  <Divider/>
+  <Divider />
   {#key topics}
     <NavSections>
       {#each topics as topic}
@@ -57,7 +68,7 @@
             <h3>{ind.meta.label}</h3>
             <div class="chart-container">
               <LazyLoad>
-                <Beeswarm data={ind.data} selected={area}/>
+                <Beeswarm data={ind.data} selected={area} />
               </LazyLoad>
             </div>
           {/each}

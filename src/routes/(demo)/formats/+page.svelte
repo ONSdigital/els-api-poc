@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { base } from "$app/paths";
   import {
     PhaseBanner,
@@ -9,7 +9,7 @@
     Grid,
     DataCard
   } from "@onsvisual/svelte-components";
-  import { makeValueFormatter, makePeriodFormatter } from "$lib/utils.ts";
+  import { makeValueFormatter, makePeriodFormatter } from "$lib/utils";
 
   let { data } = $props();
 

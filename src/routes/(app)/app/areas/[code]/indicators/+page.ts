@@ -1,13 +1,15 @@
 import { error } from "@sveltejs/kit";
 import { resolve } from "$app/paths";
-import { pluralise, formatName } from "@onsvisual/robo-utils";
+import { pluralise, getName } from "@onsvisual/robo-utils";
 import summaryData from "$lib/data/json-stat-summary.json";
-import { geoLevels, geoLevelsLookup } from "$lib/config/geo-levels.js";
+import { geoLevels, geoLevelsLookup } from "$lib/config/geoLevels";
 import type { PageLoad } from "./$types";
 
-export const load: PageLoad = async ({ params, parent, fetch }) => {
+export const load: PageLoad = async ({ parent, fetch }) => {
   const { area } = await parent();
-  const geoLevel = geoLevelsLookup[area.properties.areacd.slice(0, 3)];
+  const code = area.properties.areacd;
+
+  const geoLevel = geoLevelsLookup[code.slice(0, 3)];
   const parentLevel =
     geoLevels[["ctry", "rgn"].includes(geoLevel?.key) ? "ctry" : "rgn"];
   const areaParent = area.properties.parents.find((p) =>
@@ -15,13 +17,13 @@ export const load: PageLoad = async ({ params, parent, fetch }) => {
   );
 
   const taxonomyPath = resolve(
-    `/api/v1/metadata/taxonomy?hasGeo=${params.code}&excludeMultivariate=true`
+    `/api/v1/metadata/taxonomy?hasGeo=${code}&excludeMultivariate=true`
   );
   const metadataPath = resolve(
-    `/api/v1/metadata/indicators?hasGeo=${params.code}&excludeMultivariate=true&asLookup=true`
+    `/api/v1/metadata/indicators?hasGeo=${code}&excludeMultivariate=true&asLookup=true`
   );
   const areasPath = resolve(`/api/v1/geo/list?year=latest`);
-  const relatedPath = resolve(`/api/v1/geo/related/${params.code}`);
+  const relatedPath = resolve(`/api/v1/geo/related/${code}`);
 
   try {
     const taxonomy = await (await fetch(taxonomyPath)).json();
@@ -30,18 +32,26 @@ export const load: PageLoad = async ({ params, parent, fetch }) => {
       a.areanm.localeCompare(b.areanm)
     );
     const related = await (await fetch(relatedPath)).json();
-    const geoGroups = [{ id: "level", label: `All ${pluralise(geoLevel.label)}`, geoLevel: geoLevel.key }];
-		if (geoLevel && related?.siblings?.parent) geoGroups.push({
-			id: "siblings",
-			label: `All ${pluralise(geoLevel.label)} ${formatName(related.siblings.parent.areanm, "in")}`,
-			geoLevel: geoLevel.key,
-			geoExtent: related.siblings.parent.areacd,
-		});
-		if (related.similar?.[2]?.cluster) geoGroups.push({
-			id: "cluster",
-			label: `Similar demographics to ${formatName(area.properties.areanm, "the")}`,
-			geoCluster: `demographic_${related.similar[2].cluster.key}`,
-		});
+    const geoGroups = [
+      {
+        id: "level",
+        label: `All ${pluralise(geoLevel.label)}`,
+        geoLevel: geoLevel.key,
+      },
+    ];
+    if (geoLevel && related?.siblings?.parent)
+      geoGroups.push({
+        id: "siblings",
+        label: `All ${pluralise(geoLevel.label)} ${getName(related.siblings.parent, "in")}`,
+        geoLevel: geoLevel.key,
+        geoExtent: related.siblings.parent.areacd,
+      });
+    if (related.similar?.[2]?.cluster)
+      geoGroups.push({
+        id: "cluster",
+        label: `Similar demographics to ${getName(area.properties, "the")}`,
+        geoCluster: `demographic_${related.similar[2].cluster.key}`,
+      });
 
     return {
       taxonomy: taxonomy.data,
@@ -51,9 +61,22 @@ export const load: PageLoad = async ({ params, parent, fetch }) => {
       related,
       geoGroups,
       periods: summaryData.years,
+
+      // Page metadata
+      title: `${getName(area.properties)} (${area.properties.areacd}) - ONS`,
+      description: `Find facts and figures from across the ONS on ${getName(area.properties, "the")} (${area.properties.typenm}).`,
+      pageType: `area page`,
+      breadcrumbLinks: [
+        { label: "Home", href: resolve("/") },
+        { label: "Explore local statistics", href: resolve("/app") },
+        ...[...area.properties.parents].reverse().map((p) => ({
+          label: getName(p),
+          href: resolve(`/app/areas/${p.areacd}`),
+        })),
+      ],
     };
-  } catch(err) {
-		console.log(err);
+  } catch (err) {
+    console.log(err);
     error(404, { message: "Could not retrieve metadata" });
   }
 };

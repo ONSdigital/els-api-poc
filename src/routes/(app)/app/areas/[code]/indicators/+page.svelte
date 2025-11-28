@@ -7,7 +7,7 @@
     Details,
     NavSections,
     NavSection,
-    Dropdown
+    Dropdown,
   } from "@onsvisual/svelte-components";
   import { formatName } from "@onsvisual/robo-utils";
   import BigNumber from "./BigNumber.svelte";
@@ -17,7 +17,9 @@
 
   let { data } = $props();
 
-  let defaultComparisonArea = $derived(data.areas.find(a => a.areacd === data.parent.areacd));
+  let defaultComparisonArea = $derived(
+    data.areas.find((a) => a.areacd === data.parent.areacd),
+  );
 
   let pageState = $state({
     selectedAreas: [defaultComparisonArea],
@@ -56,22 +58,27 @@
     <strong>{item.label}</strong>
     <IndicatorRow
       indicator={item.slug}
+      metadata={data.metadata[item.slug]}
       timeRange={pageState.selectedPeriodRange}
-      selected={[data.area.properties.areacd, ...pageState.selectedAreas.map(a => a.areacd)]}
+      selected={[
+        data.area.properties.areacd,
+        ...pageState.selectedAreas.map((a) => a.areacd),
+      ]}
       geoGroup={pageState.selectedGeoGroup}
-      bind:hovered/>
+      bind:hovered
+    />
   {/if}
 {/snippet}
 
 <NavSections>
   {#snippet before()}
-		<div class="modals-sticky">
+    <div class="modals-sticky">
       <div>
         <AreasModal />
         <OptionsModal />
       </div>
     </div>
-	{/snippet}
+  {/snippet}
   <NavSection title="Topics" />
   {#each data.taxonomy as topic}
     <NavSection title={topic.label} subsection>
@@ -83,9 +90,24 @@
   <NavSection title="Select an indicator" />
   {#if data.related.similar[0]}
     <NavSection title="Similar areas">
-      <p>See which areas are similar to {formatName(data.area.properties.areanm, "the")} based on specific groups of indicators. These clusters of areas are based on an analysis carried out by the ONS.</p>
-      <Dropdown label="Select a group of indicators" options={data.related.similar} bind:value={pageState.selectedCluster}/>
-      <Details title="Show the 20 most similar areas to {formatName(data.area.properties.areanm, "the")}">
+      <p>
+        See which areas are similar to {formatName(
+          data.area.properties.areanm,
+          "the",
+        )} based on specific groups of indicators. These clusters of areas are based
+        on an analysis carried out by the ONS.
+      </p>
+      <Dropdown
+        label="Select a group of indicators"
+        options={data.related.similar}
+        bind:value={pageState.selectedCluster}
+      />
+      <Details
+        title="Show the 20 most similar areas to {formatName(
+          data.area.properties.areanm,
+          'the',
+        )}"
+      >
         <ol>
           {#each pageState.selectedCluster.similar as area}
             <li>{area.areanm}</li>
@@ -96,19 +118,31 @@
   {/if}
   <NavSection title="Get the data">
     <p>
-      Download all datasets that include {formatName(data.area.properties.areanm, "the")} in a
+      Download all datasets that include {formatName(
+        data.area.properties.areanm,
+        "the",
+      )} in an
       <a
-        href={resolve(`/api/v1/data.csv?hasGeo=${data.area.properties.areacd}&time=all&excludeMultivariate=true`)}
+        href={resolve(
+          `/api/v1/data.ods?hasGeo=${data.area.properties.areacd}&excludeMultivariate=true&time=all`,
+        )}
+        download="data.ods">ODS</a
+      >
+      <a
+        href={resolve(
+          `/api/v1/data.csv?hasGeo=${data.area.properties.areacd}&excludeMultivariate=true&time=all`,
+        )}
         download="data.csv">CSV</a
       >,
       <a
-        href={resolve(`/api/v1/data.ods?hasGeo=${data.area.properties.areacd}&time=all&excludeMultivariate=true`)}
-        download="data.ods">ODS</a
-      >
-      or
+        href={resolve(
+          `/api/v1/data.csv?hasGeo=${data.area.properties.areacd}&excludeMultivariate=true&time=all`,
+        )}
+        download="data.csv-metadata.json">CSVW</a
+      >, or
       <a
         href={resolve(
-          `/api/v1/data.json?hasGeo=${data.area.properties.areacd}&time=all&excludeMultivariate=true`
+          `/api/v1/data.json?hasGeo=${data.area.properties.areacd}&excludeMultivariate=true&time=all`,
         )}
         download="data.json">JSON-Stat</a
       > format.
@@ -137,6 +171,6 @@
     position: sticky;
     top: 0;
     background: var(--ons-color-page-light);
-    padding: .5em 0;
+    padding: 0.5em 0;
   }
 </style>

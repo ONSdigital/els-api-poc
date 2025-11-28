@@ -2,14 +2,14 @@
   // @ts-nocheck
   import { resolve } from "$app/paths";
   import { goto } from "$app/navigation";
-  import { page } from '$app/stores';
-  import throttle from "throttleit";
+  import { makeCanonicalSlug } from "$lib/api/geo/helpers/areaSlugUtils";
   import {
     Breadcrumb,
     Hero,
     Section,
     Divider,
     List,
+    Li,
     Grid,
     Card,
     Button,
@@ -19,35 +19,13 @@
     Select,
     Footer,
   } from "@onsvisual/svelte-components";
-  import UKMap from "$lib/components/UKMap.svelte";
+  import AreaSearch from "$lib/components/nav/AreaSearch.svelte";
+  import UKMap from "$lib/components/visuals/UKMap.svelte";
 
- let selected = $state();
-
-  async function loadOptionsFn(query, populateResults) {
-    try {
-      const url = resolve(`/api/v1/geo/search/${query.toLowerCase()}?searchPostcodes=true`);
-      const results = await (await fetch(url)).json();
-      populateResults(results.data.map((d) => {
-        if (!d.areanm) d.areanm = d.areacd;
-        return d;
-      }));
-    } catch {
-      return populateResults([]);
-    }
-	}
-  const loadOptions = throttle(loadOptionsFn, 500);
-
-  function gotoSelected(e) {
-    e.preventDefault();
-    if (selected) goto(resolve(selected.lng ? `/app/areas/search?q=${selected.areacd}` : `/app/areas/${selected.areacd}/`))
-  }
+  let { data } = $props();
 </script>
 
-<PhaseBanner phase="prototype" />
-<Header />
-<Breadcrumb links={[{ label: "ELS API experiments", href: resolve("/") }]} />
-
-<Hero title="Explore local statistics" background="#e9eff4">
+<Hero title="Explore local statistics" background="#e9eff4" height={230}>
   <UKMap />
   <p class="ons-hero__text">
     Find, compare and visualise statistics about places in the United Kingdom.
@@ -56,57 +34,60 @@
 
 <Grid marginTop id="nav-cards" colWidth="wide">
   <Card title="Find an area" mode="featured">
-    <p style:margin-bottom="28px">
-      <label for="search"
-        >Search for a postcode, local authority, region, parliamentary
-        constituency or other named area.</label
-      >
-    </p>
-    <form class="form-select" onsubmit={gotoSelected}>
-        <div class="select-wrapper">
-            <Select
-                {loadOptions}
-                label=""
-                placeholder='Eg. "Fareham" or "Newport"'
-                on:change={(e) => (selected = e.detail)}
-                labelKey="areanm"
-                mode="search"
-                autoClear={false}
-                clearable
-            />
-      </div>
-      <Button type="submit" text="Search" icon="search" small hideLabel disabled={!selected}>{"Search"}</Button>
-    </form>
+    <label for="search" style:display="block" style:margin-bottom="28px"
+      >Search for a postcode, local authority, region, parliamentary
+      constituency or other named area.</label
+    >
+    <AreaSearch
+      id="search"
+      onSelect={(area) => {
+        const url =
+          area.type === "postcode"
+            ? `/app/areas/search?q=${area.areacd}`
+            : `/app/areas/${makeCanonicalSlug(area)}`;
+        goto(resolve(url));
+      }}
+    />
   </Card>
 
   <Card title="Local indicators" mode="featured">
     <p style:margin-bottom="28px">
-      Explore {$page.data.taxonomy.count} indicators, including
+      Explore {data.taxonomy.meta.count} indicators, including
       <a
-        href={resolve(`/app/indicators/gross-disposable-household-income-per-head`)}
+        href={resolve(
+          `/app/indicators/gross-disposable-household-income-per-head`,
+        )}
         class="no-wrap">household income</a
       >,
-      <a href={resolve(`/app/indicators/further-education-and-skills-participation`)}
-        >further education participation</a
+      <a
+        href={resolve(
+          `/app/indicators/further-education-and-skills-participation`,
+        )}>further education participation</a
       >
       and
-      <a href={resolve(`/app/indicators/wellbeing-satisfaction`)}>life satisfaction</a>.
+      <a href={resolve(`/app/indicators/wellbeing-satisfaction`)}
+        >life satisfaction</a
+      >.
     </p>
-    <Button icon="arrow" iconPosition="after" href={resolve(`/app/indicators`)} small
-      >Explore indicators</Button
+    <Button
+      icon="arrow"
+      iconPosition="after"
+      href={resolve(`/app/indicators`)}
+      small>Explore indicators</Button
     >
   </Card>
 </Grid>
 
 <Section>
   <p>
-    You can also start your search from 
-    <a href={resolve(`/areas/E92000001-england`)}
-      >England</a
-    >,
-    <a href={resolve(`/areas/W92000004-wales`)}>Wales</a>,
-    <a href={resolve(`/areas/S92000003-scotland`)}>Scotland</a>
-    or <a href={resolve(`/areas/N92000002-northern-ireland`)}>Northern Ireland</a>.
+    You can also start your search from
+    <a href={resolve(`/app/areas/E92000001-england`)}>England</a>,
+    <a href={resolve(`/app/areas/W92000004-wales`)}>Wales</a>,
+    <a href={resolve(`/app/areas/S92000003-scotland`)}>Scotland</a>
+    or
+    <a href={resolve(`/app/areas/N92000002-northern-ireland`)}
+      >Northern Ireland</a
+    >.
   </p>
 </Section>
 
@@ -119,7 +100,7 @@
   </p>
 
   <List mode="dash">
-    <li>
+    <Li>
       <a
         href="https://statswales.gov.wales/Catalogue"
         target="_blank"
@@ -129,8 +110,8 @@
       <span class="ons-external-link__new-window-description ons-u-vh"
         >(opens in a new tab)</span
       >
-    </li>
-    <li>
+    </Li>
+    <Li>
       <a
         href="https://statistics.gov.scot/home"
         target="_blank"
@@ -140,8 +121,8 @@
       <span class="ons-external-link__new-window-description ons-u-vh"
         >(opens in a new tab)</span
       >
-    </li>
-    <li>
+    </Li>
+    <Li>
       <a href="https://data.nisra.gov.uk/" target="_blank" rel="noreferrer"
         >Northern Ireland Statistics and Research Agency</a
       >
@@ -149,7 +130,7 @@
       <span class="ons-external-link__new-window-description ons-u-vh"
         >(opens in a new tab)</span
       >
-    </li>
+    </Li>
   </List>
 </Section>
 <Section title="About these pages">
@@ -185,7 +166,6 @@
     >.
   </p>
 </Section>
-<Footer />
 
 <style>
   .no-wrap {

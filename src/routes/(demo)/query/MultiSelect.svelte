@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { Select, Button } from "@onsvisual/svelte-components";
 
   let { id, label, items, idKey = "id", labelKey="label", selected = $bindable([]) } = $props();

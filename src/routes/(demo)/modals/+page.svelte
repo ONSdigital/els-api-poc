@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { base } from "$app/paths";
   import { setContext } from "svelte";
   import {
@@ -10,7 +10,7 @@
   } from "@onsvisual/svelte-components";
   import AreasModal from "$lib/components/modals/AreasModal.svelte";
   import OptionsModal from "$lib/components/modals/OptionsModal.svelte";
-  import { makePeriodFormatter } from "$lib/utils.ts";
+  import { makePeriodFormatter } from "$lib/utils";
 
   let { data } = $props();
 

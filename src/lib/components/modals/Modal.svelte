@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { Button } from "@onsvisual/svelte-components";
 
   let { title, label, icon = null, children } = $props();

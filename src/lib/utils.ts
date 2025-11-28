@@ -1,10 +1,13 @@
-//@ts-nocheck
 import { resolve } from "$app/paths";
 import { format } from "d3-format";
 import { utcFormat } from "d3-time-format";
-import { geoLevels } from "./config/geo-levels.js";
+import { geoLevels } from "./config/geoLevels";
+import { feature } from 'topojson-client';
 
-export function parseData(data) {
+type jsonDataColumns = { [key: string]: any[] };
+type jsonDataRows = { [key: string]: any }[];
+
+export function parseData(data: jsonDataColumns): jsonDataRows {
   const cols = Object.keys(data);
   const rows = [];
 
@@ -23,7 +26,7 @@ export function parseDataKeyed(data, zKey, rowTemplate = {}) {
   const array = [];
   const cols = Object.keys(data);
   for (let i = 0; i < data[cols[0]].length; i++) {
-    const row = {...rowTemplate};
+    const row = { ...rowTemplate };
     for (const col of cols) row[col] = data[col][i];
     row.time = new Date(data.period[i].split("/")[0]);
     if (!keyed[data[zKey][i]]) keyed[data[zKey][i]] = [];
@@ -112,19 +115,19 @@ export function makePeriodFormatter(periodFormat) {
           ? utcFormat("%Y")
           : periodFormat === "academic-year"
             ? (d) => {
-                const year = d.getFullYear();
-                return `AY ${year}-${(year + 1) % 100}`;
-              }
+              const year = d.getFullYear();
+              return `AY ${year}-${(year + 1) % 100}`;
+            }
             : periodFormat === "financial-year"
               ? (d) => {
-                  const year = d.getFullYear();
-                  return `FY ${year}-${(year + 1) % 100}`;
-                }
+                const year = d.getFullYear();
+                return `FY ${year}-${(year + 1) % 100}`;
+              }
               : range
                 ? (d) => {
-                    const year = d.getFullYear();
-                    return `${year}-${(year + range) % 100}`;
-                  }
+                  const year = d.getFullYear();
+                  return `${year}-${(year + range) % 100}`;
+                }
                 : utcFormat("%-d %b %Y");
   return (p) => formatter(parsePeriod(p));
 }
@@ -142,23 +145,6 @@ export function slugify(text: string) {
 
   return matches ? matches.join("-") : "";
 }
-
-export const makeCanonicalSlug = (code: string, name?: string) => {
-  if (!code) {
-    throw "No area code was given";
-  }
-
-  if (name === undefined) {
-    return code;
-  }
-
-  if (!name) {
-    throw "No area name was given";
-  }
-
-  const slugifiedName = slugify(name);
-  return `${code}-${slugifiedName}`;
-};
 
 export function makeDataUrl(
   indicator,
@@ -191,4 +177,8 @@ export function makeDataUrl(
 
   const url = `${base}?${chunks.map((ch) => `${ch.key}=${ch.value}`).join("&")}&includeNames=true`;
   return resolve(url);
+}
+
+export function makeGeoJSON(topojson, layer) {
+  return feature(topojson, layer);
 }
