@@ -6,16 +6,17 @@
     Section,
     Footer,
     Grid,
-    Card
+    Card,
   } from "@onsvisual/svelte-components";
 </script>
 
-<PhaseBanner phase="prototype"/>
+<PhaseBanner phase="prototype" />
 <Header compact title="ELS API experiments" />
 
-<Section marginTop="{true}">
+<Section marginTop={true}>
   <p>
-    This prototype is being developed as a sandbox for exploring and testing new ways to serve data to the Explore Local Statistics (ELS) service.
+    This prototype is being developed as a sandbox for exploring and testing new
+    ways to serve data to the Explore Local Statistics (ELS) service.
   </p>
 </Section>
 
@@ -32,7 +33,7 @@
   <Card title="Lazy charts demo" mode="featured" href="{base}/charts">
     Same as charts demo, but with data lazy loaded per chart.
   </Card>
-  <Card title="Explore areas demo" mode="featured" href="{base}/areas">
+  <!-- <Card title="Explore areas demo" mode="featured" href="{base}/areas">
     API-driven navigation through areas within the UK.
   </Card>
   <Card title="Explore indicators demo" mode="featured" href="{base}/indicators">
@@ -40,7 +41,7 @@
   </Card>
   <Card title="Single indicator demo" mode="featured" href="{base}/indicator">
     Indicator page demo, with data lazy loaded per chart/map.
-  </Card>
+  </Card> -->
   <Card title="Formats and units" mode="featured" href="{base}/formats">
     Adding automatic units, dates and descriptions to data.
   </Card>
