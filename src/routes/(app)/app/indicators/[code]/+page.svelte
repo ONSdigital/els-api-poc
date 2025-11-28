@@ -19,9 +19,9 @@
   import { fetchChartDataV1, makePeriodFormatter } from "$lib/utils";
   import AreasModal from "$lib/components/modals/AreasModal.svelte";
   import OptionsModal from "$lib/components/modals/OptionsModal.svelte";
-  import Map from "$lib/viz/Map.svelte";
-  import Bar from "$lib/viz/Bar.svelte";
-  import Line from "$lib/viz/Line.svelte";
+  import Map from "$lib/components/charts/Map.svelte";
+  import Bar from "$lib/components/charts/Bar.svelte";
+  import Line from "$lib/components/charts/Line.svelte";
 
   let { data } = $props();
   $inspect(data);

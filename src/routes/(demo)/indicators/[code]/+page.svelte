@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { resolve } from '$app/paths';
+  import { resolve } from "$app/paths";
   import {
     PhaseBanner,
     Header,
@@ -8,19 +8,24 @@
     Footer,
     NavSections,
     NavSection,
-    LazyLoad
+    LazyLoad,
   } from "@onsvisual/svelte-components";
-  import Map from "$lib/viz/Map.svelte";
-  import Bar from "$lib/viz/Bar.svelte";
-  import Line from "$lib/viz/Line.svelte";
+  import Map from "$lib/components/charts/Map.svelte";
+  import Bar from "$lib/components/charts/Bar.svelte";
+  import Line from "$lib/components/charts/Line.svelte";
   import { fetchChartData } from "$lib/utils";
 
   export let data;
 </script>
 
-<PhaseBanner phase="prototype"/>
-<Header compact title="{data.indicator.label}" />
-<Breadcrumb links={[{label: "ELS API experiments", href: resolve("/")}, {label: "Explore indicators demo", href: resolve("/indicators")}]}/>
+<PhaseBanner phase="prototype" />
+<Header compact title={data.indicator.label} />
+<Breadcrumb
+  links={[
+    { label: "ELS API experiments", href: resolve("/") },
+    { label: "Explore indicators demo", href: resolve("/indicators") },
+  ]}
+/>
 
 <Section>
   <p style:margin="12px 0 32px">
@@ -35,7 +40,7 @@
         {#await fetchChartData(data.indicator.slug, "ltla")}
           Fetching chart data
         {:then chartData}
-          <Map data={chartData}/>
+          <Map data={chartData} />
         {:catch}
           Failed to load chart data
         {/await}
@@ -48,7 +53,7 @@
         {#await fetchChartData(data.indicator.slug, "rgn")}
           Fetching chart data
         {:then chartData}
-          <Bar data={chartData}/>
+          <Bar data={chartData} />
         {:catch}
           Failed to load chart data
         {/await}
@@ -61,7 +66,7 @@
         {#await fetchChartData(data.indicator.slug, "ltla", "all")}
           Fetching chart data
         {:then chartData}
-          <Line data={chartData}/>
+          <Line data={chartData} />
         {:catch}
           Failed to load chart data
         {/await}

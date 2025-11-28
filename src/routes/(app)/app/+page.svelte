@@ -20,7 +20,7 @@
     Footer,
   } from "@onsvisual/svelte-components";
   import AreaSearch from "$lib/components/nav/AreaSearch.svelte";
-  import UKMap from "$lib/components/UKMap.svelte";
+  import UKMap from "$lib/components/visuals/UKMap.svelte";
 
   let { data } = $props();
 </script>
