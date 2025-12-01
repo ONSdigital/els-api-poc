@@ -22,7 +22,7 @@
   import Map from "$lib/components/charts/Map.svelte";
   import Bar from "$lib/components/charts/Bar.svelte";
   import Line from "$lib/components/charts/Line.svelte";
-  import LineNew from "$lib/viz/LineNew.svelte";
+  import LineNew from "$lib/components/charts/LineNew.svelte";
   import IndicatorChart from "./IndicatorChart.svelte";
 
   let { data } = $props();
@@ -119,7 +119,7 @@
           <OptionsModal />
         </div>
       </div>
-      <LazyLoad>
+      <!-- <LazyLoad>
         <div class="chart-container map-container">
           {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange[1].slice(0, 10) } )}
             Fetching chart data
@@ -129,23 +129,41 @@
             Failed to load chart data
           {/await}
         </div>
-      </LazyLoad>
+      </LazyLoad> -->
     </NavSection>
   {/if}
-  <NavSection title="Line">
+  <!-- <NavSection title="Line">
     <LazyLoad>
       <div class="chart-container">
         {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange.map( (p) => p.slice(0, 10) ) } )}
           Fetching chart data
         {:then chartData}
+          {JSON.stringify(chartData)}
           <LineNew data={chartData} />
         {:catch}
           Failed to load chart data
         {/await}
       </div>
     </LazyLoad>
+  </NavSection> -->
+  <NavSection title="Line">
+    <IndicatorChart
+      indicator={data.indicator.slug}
+      timeRange={pageState.selectedPeriodRange}
+      selected={pageState.selectedAreas.map((a) => a.areacd)}
+      geoLevel={pageState.selectedGeoLevel}
+      bind:hovered
+    />
+    {data.indicator.slug}
+    <br />
+    {pageState.selectedPeriodRange}
+    <br />
+    {pageState.selectedAreas.map((a) => a.areacd)}
+    <br />
+    {JSON.stringify(pageState.selectedGeoLevel)}
   </NavSection>
-  <NavSection title="Line Old">
+
+  <!-- <NavSection title="Line Old">
     <LazyLoad>
       <div class="chart-container">
         {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange.map( (p) => p.slice(0, 10) ) } )}
@@ -240,7 +258,7 @@
       on the <a href={resolve("/")}>Explore local statistics</a> service. See
       the <a href={resolve("/indicators")}>full list of local indicators</a>.
     </p>
-  </NavSection>
+  </NavSection> -->
 </NavSections>
 
 <style>

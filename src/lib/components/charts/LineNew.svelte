@@ -14,19 +14,19 @@
     selected = [],
   } = $props();
 
-  let _data = $derived(parseChartData(data, yKey, xKey, idKey));
-  let _selected = $derived(
-    _data ? selected.map((cd) => _data.keyed[cd]).filter((d) => d) : []
-  );
+  // let _data = $derived(parseChartData(data, yKey, xKey, idKey));
+  // let _selected = $derived(
+  //   _data ? selected.map((cd) => _data.keyed[cd]).filter((d) => d) : []
+  // );
 
   $inspect(data);
 
-  let xScale = $derived(
-    _data ? scaleLinear().domain(_data.dateDomain).range([0, 100]) : null
-  );
-  let yScale = $derived(
-    _data ? scaleLinear().domain(_data.valueDomain).range([100, 0]) : null
-  );
+  // let xScale = $derived(
+  //   _data ? scaleLinear().domain(_data.dateDomain).range([0, 100]) : null
+  // );
+  // let yScale = $derived(
+  //   _data ? scaleLinear().domain(_data.valueDomain).range([100, 0]) : null
+  // );
 </script>
 
 {#snippet line(arr, width = 2, color = "grey")}
@@ -39,7 +39,7 @@
   />
 {/snippet}
 
-<div>
+<!-- <div>
   {#if xScale && yScale}
     <g>
       {#each Object.values(_data.keyed) as arr, i}
@@ -47,4 +47,4 @@
       {/each}
     </g>
   {/if}
-</div>
+</div> -->

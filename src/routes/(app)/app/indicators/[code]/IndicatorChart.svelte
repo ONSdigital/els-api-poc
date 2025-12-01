@@ -5,7 +5,8 @@
     makeValueFormatter,
     makePeriodFormatter,
   } from "$lib/utils";
-  import Line from "$lib/viz/LineNew.svelte";
+  import Line from "$lib/components/charts/LineNew.svelte";
+  import { onMount } from "svelte";
 
   let {
     indicator,
@@ -20,9 +21,10 @@
   //   let formatPeriod = $derived(makePeriodFormatter(indicator.periodFormat));
 
   let loadedChartUrl = $state();
-  let chartData = $state();
+  let chartData = $state(null);
 
   async function fetchData(indicator, timeRange, selected, visible) {
+    if (!visible) return;
     const chartUrl = makeDataUrl(indicator, timeRange, null, selected);
     console.log(chartUrl);
     if (chartUrl !== loadedChartUrl) {
@@ -38,14 +40,17 @@
   $effect(async () => {
     fetchData(indicator, timeRange, selected, visible);
   });
+
+  $inspect(chartData);
+  onMount(() => (visible = true));
 </script>
 
 <div class="line-chart">
-  <Line
+  <!-- <Line
     data={chartData || { message: "No data" }}
     {formatValue}
     {visible}
     {selected}
     bind:hovered
-  />
+  /> -->
 </div>

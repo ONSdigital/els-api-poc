@@ -171,7 +171,7 @@ export function makeDataUrl(
   if (geoExtent) chunks.push({ key: "geoExtent", value: geoExtent });
   if (geoCluster) chunks.push({ key: "geoCluster", value: geoCluster });
 
-  const time = Array.isArray(timeRange) ? timeRange.join(",") : timeRange;
+  const time = Array.isArray(timeRange) ? timeRange.map(p => p.slice(0,10)).join(",") : timeRange.slice(0,10);
   if (time) chunks.push({ key: "time", value: time });
   if (timeNearest) chunks.push({ key: "timeNearest", value: timeNearest });
 
