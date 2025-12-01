@@ -93,7 +93,12 @@
       />
     </div>
     <div class="indicator-sparkline">
-      <Sparkline data={sparklineData || { message: "No data" }} {selected} />
+      <Sparkline
+        data={sparklineData || { message: "No data" }}
+        {formatPeriod}
+        {formatValue}
+        {selected}
+      />
     </div>
   </div>
 </Observe>
