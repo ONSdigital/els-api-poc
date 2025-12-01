@@ -20,6 +20,8 @@
   import Map from "$lib/viz/Map.svelte";
   import Bar from "$lib/viz/Bar.svelte";
   import Line from "$lib/viz/Line.svelte";
+  import LineNew from "$lib/viz/LineNew.svelte";
+  import IndicatorChart from "./IndicatorChart.svelte";
 
   let { data } = $props();
   $inspect(data);
@@ -72,6 +74,7 @@
     formatPeriod: () => formatPeriod,
   });
   setContext("pageState", pageState);
+  let hovered = $state();
 </script>
 
 <Hero
@@ -128,6 +131,19 @@
     </NavSection>
   {/if}
   <NavSection title="Line">
+    <LazyLoad>
+      <div class="chart-container">
+        {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange.map( (p) => p.slice(0, 10) ) } )}
+          Fetching chart data
+        {:then chartData}
+          <LineNew data={chartData} />
+        {:catch}
+          Failed to load chart data
+        {/await}
+      </div>
+    </LazyLoad>
+  </NavSection>
+  <NavSection title="Line Old">
     <LazyLoad>
       <div class="chart-container">
         {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange.map( (p) => p.slice(0, 10) ) } )}

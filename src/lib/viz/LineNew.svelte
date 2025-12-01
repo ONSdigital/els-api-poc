@@ -18,7 +18,8 @@
   let _selected = $derived(
     _data ? selected.map((cd) => _data.keyed[cd]).filter((d) => d) : []
   );
-  $inspect(_selected);
+
+  $inspect(data);
 
   let xScale = $derived(
     _data ? scaleLinear().domain(_data.dateDomain).range([0, 100]) : null
@@ -38,45 +39,12 @@
   />
 {/snippet}
 
-<div class="sparkline-wrapper">
-  <svg viewBox="0 0 100 100" class="sparkline-chart" preserveAspectRatio="none">
-    {#if xScale && yScale}
-      <g class="sparkline-lines">
-        {#each _selected as arr, i}
-          {@render line(arr, 2, ONSpalette[i])}
-        {/each}
-      </g>
-    {/if}
-  </svg>
-  <!-- {#if _data}
-    {#each _selected as d, i}
-      {@render label(d, ONSpalette[i], false)}
-    {/each}
-  {/if} -->
+<div>
+  {#if xScale && yScale}
+    <g>
+      {#each Object.values(_data.keyed) as arr, i}
+        {@render line(arr, 2, ONSpalette[i])}
+      {/each}
+    </g>
+  {/if}
 </div>
-
-<style>
-  .sparkline-wrapper {
-    display: block;
-    position: relative;
-  }
-  .sparkline-chart {
-    width: 100%;
-    height: 70px;
-    margin-top: 30px;
-    overflow: visible;
-  }
-  .sparkline-chart polyline {
-    vector-effect: non-scaling-stroke;
-    fill: none;
-  }
-  .sparkline-label {
-    position: absolute;
-    top: 0;
-    transform: translateX(-50%);
-    padding: 4px 6px;
-    border-radius: 4px;
-    font-weight: bold;
-    line-height: 1.2;
-  }
-</style>
