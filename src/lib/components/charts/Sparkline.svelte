@@ -26,6 +26,8 @@
   let yScale = $derived(
     _data ? scaleLinear().domain(_data.valueDomain).range([100, 0]) : null,
   );
+
+  let yTickWidth = $state({});
 </script>
 
 {#snippet line(arr, width = 2, color = "grey")}
@@ -40,8 +42,9 @@
 
 <div
   class="sparkline-wrapper"
-  style:padding-left="50px"
-  style:padding-bottom="20px"
+  style:padding-left="{(yTickWidth[1] ?? 40) + 10}px"
+  style:padding-top="10px"
+  style:padding-bottom="25px"
 >
   <div class="sparkline-container">
     {#if xScale && yScale}
@@ -49,6 +52,7 @@
         viewBox="0 0 100 100"
         class="sparkline-chart"
         preserveAspectRatio="none"
+        style:height="75px"
       >
         <g class="sparkline-lines">
           {#each _selected as arr, i}
@@ -65,9 +69,14 @@
         {/each}
       </div>
       <div class="sparkline-y-axis">
-        {#each _data.valueDomain as yTick}
+        <div class="sparkline-y-baseline"></div>
+        {#each _data.valueDomain as yTick, i}
           <div class="sparkline-y-tick" style:top="{yScale(yTick)}%"></div>
-          <div class="sparkline-y-tick-label" style:top="{yScale(yTick)}%">
+          <div
+            class="sparkline-y-tick-label"
+            style:top="{yScale(yTick)}%"
+            bind:clientWidth={yTickWidth[i]}
+          >
             {formatValue(yTick)}
           </div>
         {/each}
@@ -84,7 +93,6 @@
   .sparkline-container {
     display: block;
     position: relative;
-    border-left: 1px solid grey;
   }
   .sparkline-x-axis,
   .sparkline-y-axis {
@@ -107,6 +115,13 @@
     font-size: 14px;
     white-space: nowrap;
   }
+  .sparkline-y-baseline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    border-left: 1px solid grey;
+  }
   .sparkline-y-tick {
     position: absolute;
     right: 100%;
@@ -122,8 +137,6 @@
   }
   .sparkline-chart {
     width: 100%;
-    height: 70px;
-    margin-top: 30px;
     overflow: visible;
   }
   .sparkline-chart polyline {

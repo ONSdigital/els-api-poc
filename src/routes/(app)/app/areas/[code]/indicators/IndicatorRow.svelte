@@ -107,7 +107,7 @@
   .indicator-row {
     display: flex;
     flex-direction: row;
-    gap: 1rem;
+    gap: 2rem;
     width: 100%;
     height: 150px;
   }
@@ -117,7 +117,7 @@
   }
   .indicator-sparkline {
     flex-shrink: 1;
-    width: 170px;
+    width: 200px;
   }
   .indicator-row :global(svg) {
     overflow: visible;
