@@ -29,33 +29,37 @@ export function medMad(xs, constant = 1.4826) {
 }
 
 export function parseChartData(data, valueKey = "value", periodKey = "period", idKey = "areacd") {
-	if (data.message) return null;
-	if (!data[valueKey] || !data[periodKey] || !data[idKey]) throw new Error("Columns missing from data.");
+  console.log("data", data)
+  if (data.message) return null;
+  if (!data[valueKey] || !data[periodKey] || !data[idKey]) throw new Error("Columns missing from data.");
+  console.log("processing data");
 
-	const array = [];
-	const keyed = {};
-	const valueDomain = [Infinity, -Infinity];
-	const dateDomain = [Infinity, -Infinity];
+  const array = [];
+  const keyed = {};
+  const valueDomain = [Infinity, -Infinity];
+  const dateDomain = [Infinity, -Infinity];
 
-	const cols = Object.keys(data);
-	for (let i = 0; i < data[cols[0]].length; i ++) {
-		if (data[valueKey][i] == null) continue;
+  const cols = Object.keys(data);
+  for (let i = 0; i < data[cols[0]].length; i++) {
+    if (data[valueKey][i] == null) continue;
 
-		const row = {};
-		for (const col of cols) row[col] = data[col][i];
-		row.date = new Date(row[periodKey].slice(0, 10));
+    const row = {};
+    for (const col of cols) row[col] = data[col][i];
+    row.date = new Date(row[periodKey].slice(0, 10));
 
-		if (row[valueKey] < valueDomain[0]) valueDomain[0] = row[valueKey];
-		if (row[valueKey] > valueDomain[1]) valueDomain[1] = row[valueKey];
-		if (row.date < dateDomain[0]) dateDomain[0] = row.date;
-		if (row.date > dateDomain[1]) dateDomain[1] = row.date;
+    if (row[valueKey] < valueDomain[0]) valueDomain[0] = row[valueKey];
+    if (row[valueKey] > valueDomain[1]) valueDomain[1] = row[valueKey];
+    if (row.date < dateDomain[0]) dateDomain[0] = row.date;
+    if (row.date > dateDomain[1]) dateDomain[1] = row.date;
 
-		if (!keyed[row[idKey]]) keyed[row[idKey]] = [];
-		keyed[row[idKey]].push(row);
-		array.push(row);
-	}
+    if (!keyed[row[idKey]]) keyed[row[idKey]] = [];
+    keyed[row[idKey]].push(row);
+    array.push(row);
+  }
 
-	return { array, keyed, valueDomain, dateDomain};
+  console.log({ array, keyed, valueDomain, dateDomain })
+
+  return { array, keyed, valueDomain, dateDomain };
 }
 
 export function parseBeeswarmData(

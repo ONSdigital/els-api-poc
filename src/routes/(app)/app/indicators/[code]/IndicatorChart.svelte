@@ -1,56 +1,55 @@
 <script lang="ts">
-  import { Observe } from "@onsvisual/svelte-components";
   import {
     makeDataUrl,
     makeValueFormatter,
     makePeriodFormatter,
   } from "$lib/utils";
   import Line from "$lib/components/charts/LineNew.svelte";
-  import { onMount } from "svelte";
 
   let {
     indicator,
+    metadata,
     timeRange,
     selected = [],
     geoLevel,
     hovered = $bindable(),
   } = $props();
 
-  let visible = $state();
-  let formatValue = $derived(makeValueFormatter(indicator.decimalPlaces));
-  //   let formatPeriod = $derived(makePeriodFormatter(indicator.periodFormat));
+  let formatValue = $derived(makeValueFormatter(metadata.decimalPlaces));
+  let formatPeriod = $derived(makePeriodFormatter(metadata.periodFormat));
 
-  let loadedChartUrl = $state();
-  let chartData = $state(null);
-
-  async function fetchData(indicator, timeRange, selected, visible) {
-    if (!visible) return;
-    const chartUrl = makeDataUrl(indicator, timeRange, null, selected);
-    console.log(chartUrl);
-    if (chartUrl !== loadedChartUrl) {
-      try {
-        chartData = await (await fetch(chartUrl)).json();
-      } catch {
-        console.log("Failed to load chart data");
-      }
-      loadedChartUrl = chartUrl;
+  async function fetchData(indicator, timeRange, selected, geoLevel) {
+    const chartUrl = makeDataUrl(
+      indicator,
+      timeRange,
+      null,
+      selected,
+      geoLevel.id,
+    );
+    console.log({ chartUrl });
+    try {
+      const response = await fetch(chartUrl);
+      const chartData = await response.json();
+      return chartData;
+    } catch {
+      console.log("Failed to load chart data");
+      return { message: "Failed" };
     }
   }
-
-  $effect(async () => {
-    fetchData(indicator, timeRange, selected, visible);
-  });
-
-  $inspect(chartData);
-  onMount(() => (visible = true));
 </script>
 
 <div class="line-chart">
-  <!-- <Line
-    data={chartData || { message: "No data" }}
-    {formatValue}
-    {visible}
-    {selected}
-    bind:hovered
-  /> -->
+  {#await fetchData(indicator, timeRange, selected, geoLevel)}
+    Fetching chart data
+  {:then chartData}
+    Data loaded!
+    <Line
+      data={chartData || { message: "No data" }}
+      {formatValue}
+      {selected}
+      bind:hovered
+    />
+  {:catch}
+    Failed to load chart data
+  {/await}
 </div>

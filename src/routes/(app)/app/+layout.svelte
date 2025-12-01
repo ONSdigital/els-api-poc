@@ -1,7 +1,7 @@
 <script lang="ts">
-    // @ts-nocheck
-	import { page } from '$app/state';
-	import { afterNavigate } from '$app/navigation';
+	// @ts-nocheck
+	import { page } from "$app/state";
+	import { afterNavigate } from "$app/navigation";
 	import {
 		AnalyticsBanner,
 		analyticsEvent,
@@ -9,35 +9,35 @@
 		Header,
 		Breadcrumb,
 		Main,
-		Footer
-	} from '@onsvisual/svelte-components';
+		Footer,
+	} from "@onsvisual/svelte-components";
 
-	const analyticsId = 'GTM-MBCBVQS';
+	const analyticsId = "GTM-MBCBVQS";
 	const analyticsProps = {
-		contentTitle: 'Explore local statistics',
-		releaseDate: '20240326',
-		contentType: 'exploratory'
+		contentTitle: "Explore local statistics",
+		releaseDate: "20240326",
+		contentType: "exploratory",
 	};
 
-	afterNavigate(() => {
-		const eventData = {
-			event: 'pageView',
-			pageUrl: page.url.href,
-			contentTitle: page.data.title,
-			contentType: page.data.pageType
-		};
-		if (['area page', 'area data page'].includes(page.data.pageType) && page.data.place) {
-			eventData.areaCode = page.data.place.areacd;
-			eventData.areaName = page.data.place.areanm || page.data.place.areacd;
-			eventData.areaType = page.data.place.typenm;
-		} else if (page.data.pageType === 'indicator data page' && page.data.indicator) {
-			eventData.indicatorCode = page.data.indicator.metadata.slug;
-			eventData.indicatorName = page.data.indicator.metadata.label;
-			eventData.contentGroup = page.data.indicator.topic;
-			eventData.contentSubgroup = page.data.indicator.subTopic;
-		}
-		analyticsEvent(eventData);
-	});
+	// afterNavigate(() => {
+	// 	const eventData = {
+	// 		event: 'pageView',
+	// 		pageUrl: page.url.href,
+	// 		contentTitle: page.data.title,
+	// 		contentType: page.data.pageType
+	// 	};
+	// 	if (['area page', 'area data page'].includes(page.data.pageType) && page.data.place) {
+	// 		eventData.areaCode = page.data.place.areacd;
+	// 		eventData.areaName = page.data.place.areanm || page.data.place.areacd;
+	// 		eventData.areaType = page.data.place.typenm;
+	// 	} else if (page.data.pageType === 'indicator data page' && page.data.indicator) {
+	// 		eventData.indicatorCode = page.data.indicator.metadata.slug;
+	// 		eventData.indicatorName = page.data.indicator.metadata.label;
+	// 		eventData.contentGroup = page.data.indicator.topic;
+	// 		eventData.contentSubgroup = page.data.indicator.subTopic;
+	// 	}
+	// 	analyticsEvent(eventData);
+	// });
 </script>
 
 <svelte:head>
@@ -54,14 +54,14 @@
 </svelte:head>
 
 <AnalyticsBanner {analyticsId} {analyticsProps} pageViewEnabled={false} />
-<PhaseBanner phase="prototype"/>
+<PhaseBanner phase="prototype" />
 <Header bilingual={false}></Header>
-	{#if page.data.breadcrumbLinks}
-		<Breadcrumb
-			links={page.data.breadcrumbLinks}
-			background={page.data.breadcrumbBackground || null}
-		/>
-	{/if}
+{#if page.data.breadcrumbLinks}
+	<Breadcrumb
+		links={page.data.breadcrumbLinks}
+		background={page.data.breadcrumbBackground || null}
+	/>
+{/if}
 <Main>
 	<slot />
 </Main>
