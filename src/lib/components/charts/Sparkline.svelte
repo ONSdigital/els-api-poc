@@ -50,7 +50,7 @@
     {#if xScale && yScale}
       <svg
         viewBox="0 0 100 100"
-        class="sparkline-chart"
+        class="sparkline-svg"
         preserveAspectRatio="none"
         style:height="75px"
       >
@@ -135,21 +135,13 @@
     font-size: 14px;
     white-space: nowrap;
   }
-  .sparkline-chart {
+  .sparkline-svg {
+    display: block;
     width: 100%;
     overflow: visible;
   }
-  .sparkline-chart polyline {
+  .sparkline-svg polyline {
     vector-effect: non-scaling-stroke;
     fill: none;
-  }
-  .sparkline-label {
-    position: absolute;
-    top: 0;
-    transform: translateX(-50%);
-    padding: 4px 6px;
-    border-radius: 4px;
-    font-weight: bold;
-    line-height: 1.2;
   }
 </style>
