@@ -28,13 +28,15 @@
   let clientWidth = $state();
   let selectedChildGroupKey = $derived(areaProps.children[0]?.key || null);
   let selectedChildGroup = $derived(
-    areaProps.children.find((c) => c.key === selectedChildGroupKey)
+    areaProps.children.find((c) => c.key === selectedChildGroupKey),
   );
 
   function handleSelect(area) {
-    goto(resolve(`/app/areas/${makeCanonicalSlug(area)}`), {
-      noScroll: true,
-    });
+    const isPostcode = area.type === "postcode";
+    const url = isPostcode
+      ? `/app/areas/search?q=${area.areacd}`
+      : `/app/areas/${makeCanonicalSlug(area)}`;
+    goto(resolve(url), { noScroll: !isPostcode });
   }
 </script>
 
@@ -46,8 +48,9 @@
     color: "#003c57",
   }}
   width="medium"
-  cls="titleblock-transparent">
-  <AreaLede {areaProps}/>
+  cls="titleblock-transparent"
+>
+  <AreaLede {areaProps} />
 </Hero>
 
 <Grid marginTop>
@@ -73,7 +76,7 @@
           iconPosition="after"
           variant="ghost"
           href={resolve(
-            `/app/areas/${makeCanonicalSlug(areaProps)}/indicators`
+            `/app/areas/${makeCanonicalSlug(areaProps)}/indicators`,
           )}
           small>Explore local indicators</Button
         >
@@ -101,9 +104,7 @@
                 {#each childGroup.areas as child}
                   <li>
                     <a
-                      href={resolve(
-                        `/app/areas/${makeCanonicalSlug(child)}`
-                      )}
+                      href={resolve(`/app/areas/${makeCanonicalSlug(child)}`)}
                       data-sveltekit-noscroll>{getName(child)}</a
                     >
                   </li>

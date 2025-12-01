@@ -11,9 +11,9 @@
     Divider,
     NavSections,
     NavSection,
-    LazyLoad
+    LazyLoad,
   } from "@onsvisual/svelte-components";
-  import Beeswarm from "$lib/viz/Beeswarm.svelte";
+  import Beeswarm from "$lib/components/charts/Beeswarm.svelte";
   import { fetchChartDataV1 } from "$lib/utils";
 
   export let data;
@@ -27,55 +27,72 @@
       area = null;
       topics = null;
       return;
-    };
+    }
     area = selected;
 
     const exclude = ["population-by-age-and-sex"];
 
-    const indicators = await (await fetch(resolve(`/api/v1/metadata/indicators?hasGeo=${selected.areacd}`))).json();
-    topics = Array.from(new Set(indicators.map(ind => ind.topic)))
-      .map(topic => ({
+    const indicators = await (
+      await fetch(
+        resolve(`/api/v1/metadata/indicators?hasGeo=${selected.areacd}`),
+      )
+    ).json();
+    topics = Array.from(new Set(indicators.map((ind) => ind.topic))).map(
+      (topic) => ({
         key: topic,
         label: `${topic[0].toUpperCase()}${topic.slice(1)}`,
-        indicators: indicators.filter(ind => ind.topic === topic && !exclude.includes(ind.slug))
-      }));
+        indicators: indicators.filter(
+          (ind) => ind.topic === topic && !exclude.includes(ind.slug),
+        ),
+      }),
+    );
   }
 </script>
 
-<PhaseBanner phase="prototype"/>
+<PhaseBanner phase="prototype" />
 <Header compact title="Lazy charts demo" />
-<Breadcrumb links={[{label: "ELS API experiments", href: resolve("/")}]}/>
+<Breadcrumb links={[{ label: "ELS API experiments", href: resolve("/") }]} />
 
 <Section>
   <p style:margin="12px 0 32px">
-    Select an area to display indicators. Chart data for each indicator will be lazy loaded when the chart comes into view on the page.
+    Select an area to display indicators. Chart data for each indicator will be
+    lazy loaded when the chart comes into view on the page.
   </p>
-  <form class="select-container" on:submit|preventDefault={() => selectArea(selected)}>
-    <Select options={data.areaList} bind:value={selected} labelKey="areanm" label="Select a local authority" placeholder="Eg. Fareham or Newport"/>
+  <form
+    class="select-container"
+    on:submit|preventDefault={() => selectArea(selected)}
+  >
+    <Select
+      options={data.areaList}
+      bind:value={selected}
+      labelKey="areanm"
+      label="Select a local authority"
+      placeholder="Eg. Fareham or Newport"
+    />
     <Button small type="sumbit">Select area</Button>
   </form>
 </Section>
 
 {#if topics}
-  <Divider/>
+  <Divider />
   <NavSections>
     {#each topics as topic}
       <NavSection title={topic.label}>
         {#each topic.indicators as ind}
-        <h3>{ind.label}</h3>
-        <LazyLoad>
-          <div class="chart-container">
-            {#await fetchChartDataV1(ind.slug)}
-              Fetching chart data
-            {:then chartData}
-              <Beeswarm data={chartData} selected={area}/>
-              {console.log({chartData})}
-            {:catch}
-              Failed to load chart data
-            {/await}
-          </div>
-        </LazyLoad>
-      {/each}
+          <h3>{ind.label}</h3>
+          <LazyLoad>
+            <div class="chart-container">
+              {#await fetchChartDataV1(ind.slug)}
+                Fetching chart data
+              {:then chartData}
+                <Beeswarm data={chartData} selected={area} />
+                {console.log({ chartData })}
+              {:catch}
+                Failed to load chart data
+              {/await}
+            </div>
+          </LazyLoad>
+        {/each}
       </NavSection>
     {/each}
   </NavSections>
