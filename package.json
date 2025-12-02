@@ -35,6 +35,7 @@
     "accurate-beeswarm-plot": "^1.0.12",
     "arquero": "^8.0.3",
     "cross-env": "^7.0.3",
+    "d3-array": "^3.2.4",
     "d3-dsv": "^3.0.1",
     "d3-format": "^3.1.0",
     "d3-scale": "^4.0.2",
