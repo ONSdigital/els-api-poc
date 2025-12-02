@@ -24,7 +24,7 @@
       timeRange,
       null,
       selected,
-      geoLevel.id,
+      geoLevel.id
     );
     console.log({ chartUrl });
     try {
@@ -42,7 +42,6 @@
   {#await fetchData(indicator, timeRange, selected, geoLevel)}
     Fetching chart data
   {:then chartData}
-    Data loaded!
     <Line
       data={chartData || { message: "No data" }}
       {formatValue}
