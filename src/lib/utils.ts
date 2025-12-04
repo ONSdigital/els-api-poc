@@ -121,12 +121,12 @@ export function makePeriodFormatter(periodFormat) {
             : periodFormat === "financial-year"
               ? (d) => {
                 const year = d.getFullYear();
-                return `FY ${year}-${(year + 1) % 100}`;
+                return `FY ${year}-${String((year + 1) % 100).padStart(2, "0")}`;
               }
               : range
                 ? (d) => {
                   const year = d.getFullYear();
-                  return `${year}-${(year + range) % 100}`;
+                  return `${year}-${String((year + range) % 100).padStart(2, "0")}`;
                 }
                 : utcFormat("%-d %b %Y");
   return (p) => formatter(parsePeriod(p));
