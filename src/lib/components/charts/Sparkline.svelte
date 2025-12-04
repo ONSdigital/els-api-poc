@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { scaleLinear } from "d3-scale";
+  import { scaleLinear, scaleTime } from "d3-scale";
   import { nice } from "d3-array";
   import { format } from "d3-format";
   import { parseChartData, contrastColor } from "./chartHelpers";
@@ -20,12 +20,17 @@
 
   let _data = $derived(parseChartData(data, yKey, xKey, idKey));
   let _selected = $derived(
-    _data ? selected.map((cd) => _data.keyed[cd]).filter((d) => d) : [],
+    _data
+      ? selected
+          .map((cd, i) => ({ i, data: _data.keyed[cd] }))
+          .filter((d) => d.data && d.data.length > 1)
+          .reverse()
+      : [],
   );
   $inspect(_selected);
 
   let xScale = $derived(
-    _data ? scaleLinear().domain(_data.dateDomain).range([0, 100]) : null,
+    _data ? scaleTime().domain(_data.dateDomain).range([0, 100]) : null,
   );
   let yDomain = $derived(_data ? nice(..._data.valueDomain, 2) : null);
   let yScale = $derived(
@@ -51,6 +56,7 @@
     viewBox="-4 -4 8 8"
     class="sparkline-marker"
     style:top="{yScale(d[yKey])}%"
+    style:left="{xScale(d.date)}%"
   >
     <path
       d={markerPathsArray[i]}
@@ -81,7 +87,7 @@
   style:padding-bottom="25px"
 >
   <div class="sparkline-container">
-    {#if xScale && yScale && _selected[0].length > 1}
+    {#if xScale && yScale && _selected.length > 0}
       <svg
         viewBox="0 0 100 100"
         class="sparkline-svg"
@@ -89,8 +95,8 @@
         style:height="90px"
       >
         <g class="sparkline-lines">
-          {#each _selected as arr, i}
-            {@render line(arr, 2, ONSpalette[i])}
+          {#each _selected as d}
+            {@render line(d.data, 2, ONSpalette[d.i])}
           {/each}
         </g>
       </svg>
@@ -116,11 +122,11 @@
         {/each}
       </div>
       <div class="sparkline-annotations">
-        {#each _selected as arr, i}
-          {@const d = arr[arr.length - 1]}
-          {@const diff = d[yKey] - arr[0][yKey]}
-          {@render marker(d, i)}
-          {#if i === 0}{@render label(d, diff, i)}{/if}
+        {#each _selected as d}
+          {@const datum = d.data[d.data.length - 1]}
+          {@const diff = datum[yKey] - d.data[0][yKey]}
+          {@render marker(datum, d.i)}
+          {#if d.i === 0}{@render label(datum, diff, d.i)}{/if}
         {/each}
       </div>
     {:else}
@@ -197,7 +203,6 @@
   .sparkline-marker {
     width: 18px;
     height: 18px;
-    left: 100%;
     transform: translate(-50%, -50%);
     stroke: white;
     stroke-width: 1px;
@@ -207,6 +212,7 @@
     transform: translateY(-50%);
     padding: 4px 6px;
     border-radius: 4px;
+    font-size: 14px;
     font-weight: bold;
     line-height: 1.2;
   }
