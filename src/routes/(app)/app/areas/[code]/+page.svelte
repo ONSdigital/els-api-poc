@@ -21,6 +21,7 @@
   import AreaLede from "./AreaLede.svelte";
   import AreaNavMap from "./AreaNavMap.svelte";
   import AreaSearch from "$lib/components/nav/AreaSearch.svelte";
+  import ESSMap from "$lib/components/visuals/ESSMap.svelte";
 
   let { data } = $props();
   let areaProps = $derived(data.area.properties);
@@ -117,6 +118,36 @@
     </GridCell>
   {/if}
 </Grid>
+
+{#if data.productLinks.length > 0}
+  <Grid title="Explore statistics about {getName(areaProps, 'the')}">
+    {#each data.productLinks as link}
+      {#if link.title === "Local indicators"}
+        <Card
+          title={link.title}
+          mode="featured"
+          href={link.href}
+          headingTag="h3"
+        >
+          <div slot="image" style:display="contents">
+            <ESSMap geometry={data.area.geometry} />
+          </div>
+          {@html link.description}
+        </Card>
+      {:else}
+        <Card
+          title={link.title}
+          mode="featured"
+          image={link.image}
+          href={link.href}
+          headingTag="h3"
+        >
+          {@html link.description}
+        </Card>
+      {/if}
+    {/each}
+  </Grid>
+{/if}
 
 <style>
   .link-parent {
