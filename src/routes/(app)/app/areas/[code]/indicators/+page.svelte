@@ -8,6 +8,7 @@
     NavSections,
     NavSection,
     Dropdown,
+    Button,
   } from "@onsvisual/svelte-components";
   import { getName, formatName } from "@onsvisual/robo-utils";
   import BigNumber from "./BigNumber.svelte";
@@ -15,6 +16,8 @@
   import OptionsModal from "$lib/components/modals/OptionsModal.svelte";
   import IndicatorRow from "./IndicatorRow.svelte";
   import AreasLegend from "$lib/components/modals/AreasLegend.svelte";
+
+  const maxIndicators = 3;
 
   let { data } = $props();
 
@@ -36,9 +39,13 @@
   });
   setContext("pageState", pageState);
 
+  let expandedTopics = $state(
+    Object.fromEntries(data.taxonomy.map((t) => [t?.slug, false])),
+  );
+
   let hovered = $state();
 
-  $inspect(data.geoGroups);
+  $inspect(data.taxonomy);
 </script>
 
 <Hero title="Local indicators for {getName(areaProps, 'the')}" />
@@ -53,13 +60,15 @@
   {/each}
 </Grid>
 
-{#snippet indicator(item)}
+{#snippet indicator(item, topic)}
   {#if item.children}
-    <h4>{item.label}</h4>
-    {#each item.children as child}
-      {@render indicator(child)}
-    {/each}
-  {:else}
+    {#if expandedTopics[topic.slug] || item.children[0].index < maxIndicators}
+      <h4>{item.label}</h4>
+      {#each item.children as child}
+        {@render indicator(child, topic)}
+      {/each}
+    {/if}
+  {:else if expandedTopics[topic.slug] || item.index < maxIndicators}
     <strong>{item.label}</strong>
     <IndicatorRow
       indicator={item.slug}
@@ -77,7 +86,7 @@
 
 <NavSections cls="wider-nav-sections">
   {#snippet before()}
-    <div class="modals-sticky">
+    <div class="legend-sticky">
       <AreasLegend
         selectedAreas={[areaProps, ...pageState.selectedAreas]}
         selectedGeoGroup={pageState.selectedGeoGroup}
@@ -92,9 +101,24 @@
   {#each data.taxonomy as topic}
     <NavSection title={topic.label} subsection>
       {#each topic.children as child}
-        {@render indicator(child)}
+        {@render indicator(child, topic)}
       {/each}
     </NavSection>
+    {#if topic.count > maxIndicators}
+      <Button
+        variant="secondary"
+        icon="carret"
+        iconRotation={expandedTopics[topic.slug] ? 180 : 0}
+        small
+        on:click={() =>
+          (expandedTopics[topic.slug] = !expandedTopics[topic.slug])}
+        >Show {expandedTopics[topic.slug]
+          ? "fewer"
+          : `${topic.count - maxIndicators} more`}
+        {topic?.label.toLowerCase()} indicators</Button
+      >
+    {/if}
+    <div style:margin-bottom="2rem"></div>
   {/each}
   <NavSection title="Select an indicator" />
   {#if data.related.similar[0]}
@@ -166,7 +190,7 @@
 </NavSections>
 
 <style>
-  .modals-sticky {
+  .legend-sticky {
     z-index: 1;
     display: flex;
     flex-direction: row;

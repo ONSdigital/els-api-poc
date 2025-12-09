@@ -27,7 +27,6 @@
           .reverse()
       : [],
   );
-  $inspect(_selected);
 
   let xScale = $derived(
     _data ? scaleTime().domain(_data.dateDomain).range([0, 100]) : null,
