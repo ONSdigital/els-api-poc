@@ -35,6 +35,35 @@
         ? "Lower than"
         : "Similar to";
   });
+
+  const labels = $state({});
+  function labelDodge(el, params) {
+    const rect = el.getBoundingClientRect();
+    const parent = el.parentElement.getBoundingClientRect();
+    const toPercent = (val) => (100 * val) / parent.width;
+
+    const leftDiff = parent.left - rect.left;
+    const rightDiff = parent.right - rect.right;
+    let offset =
+      leftDiff > 0
+        ? toPercent(leftDiff)
+        : rightDiff < 0
+          ? toPercent(rightDiff)
+          : 0;
+    let x = params.d.x + offset;
+
+    if (params.i > 0 && labels[0]) {
+      const sibling = labels[0].rect;
+      const overlap = sibling.left < rect.right && sibling.right > rect.left;
+      if (overlap) {
+        const sibX = labels[0].x;
+        const labelsOffset = toPercent((rect.width + sibling.width) / 2);
+        x = x > sibX ? sibX + labelsOffset : sibX - labelsOffset;
+      }
+    }
+    labels[params.i] = { x, rect };
+    return { destroy: () => (labels[params.i] = null) };
+  }
 </script>
 
 {#snippet point(d, radius = 8, color)}
@@ -54,12 +83,13 @@
   </g>
 {/snippet}
 
-{#snippet line(d, color)}
+{#snippet line(d, i, color)}
+  {@const offsetX = labels?.[i]?.x ?? d.x}
   <polyline
-    points="0,0 0,{100 - d.y}"
+    points="{d.x},{100 - d.y} {d.x},{(100 - d.y) / 3} {offsetX},{(100 - d.y) /
+      3} {offsetX},0"
     stroke={color}
     stroke-width="2"
-    transform="translate({d.x},0)"
   />
 {/snippet}
 
@@ -69,17 +99,20 @@
   </svg>
 {/snippet}
 
-{#snippet label(d, color, showName = false)}
-  <div
-    class="beeswarm-label"
-    style:background={color}
-    style:color={contrastColor(color)}
-    style:left="{d.x}%"
-  >
-    {showName
-      ? `${d[labelKey]}, ${formatValue(d[xKey])}`
-      : formatValue(d[xKey])}
-  </div>
+{#snippet label(d, i, color, showName = false)}
+  {#key d[idKey]}
+    <div
+      class="beeswarm-label"
+      style:background={color}
+      style:color={contrastColor(color)}
+      style:left="{labels?.[i]?.x ?? d.x}%"
+      use:labelDodge={{ i, d }}
+    >
+      {showName
+        ? `${d[labelKey]}, ${formatValue(d[xKey])}`
+        : formatValue(d[xKey])}
+    </div>
+  {/key}
 {/snippet}
 
 <div class="beeswarm-wrapper">
@@ -96,17 +129,17 @@
           {/each}
         </g>
         <g class="beeswarm-selected">
-          {#each _selected as sel}
+          {#each _selected as sel, i}
             {@const d = { ...sel.datum, y: 0 }}
-            {#if !hovered}
-              {@render line(d, ONSpalette[sel.i])}
+            {#if !hovered && i < 2}
+              {@render line(d, i, ONSpalette[sel.i])}
             {/if}
           {/each}
         </g>
         <g class="beeswarm-hovered">
           {#if _hovered}
             {@const d = _hovered}
-            {@render line(d, "orange")}
+            {@render line(d, 0, "orange")}
             {@render point(d, 14, "orange")}
           {/if}
         </g>
@@ -115,10 +148,10 @@
     <div class="beeswarm-annotations">
       {#if _data}
         {#if _hovered}
-          {@render label(_hovered, "orange", true)}
+          {@render label(_hovered, 0, "orange", true)}
         {:else}
-          {#each _selected as d}
-            {@render label(d.datum, ONSpalette[d.i], false)}
+          {#each _selected as d, i}
+            {#if i < 2}{@render label(d.datum, i, ONSpalette[d.i], false)}{/if}
             {@render marker(d.datum, markerPathsArray[d.i], ONSpalette[d.i])}
           {/each}
         {/if}
@@ -157,6 +190,7 @@
   .beeswarm-chart polyline {
     stroke-linecap: round;
     vector-effect: non-scaling-stroke;
+    fill: none;
   }
   .beeswarm-selected,
   .beeswarm-hovered,
