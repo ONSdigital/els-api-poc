@@ -4,18 +4,18 @@
   import {
     Hero,
     Grid,
-    Details,
     NavSections,
     NavSection,
     Dropdown,
     Button,
   } from "@onsvisual/svelte-components";
-  import { getName, formatName } from "@onsvisual/robo-utils";
-  import BigNumber from "./BigNumber.svelte";
+  import { getName } from "@onsvisual/robo-utils";
   import AreasModal from "$lib/components/modals/AreasModal.svelte";
   import OptionsModal from "$lib/components/modals/OptionsModal.svelte";
-  import IndicatorRow from "./IndicatorRow.svelte";
   import AreasLegend from "$lib/components/modals/AreasLegend.svelte";
+  import BigNumber from "./BigNumber.svelte";
+  import IndicatorRow from "./IndicatorRow.svelte";
+  import SimilarAreas from "./SimilarAreas.svelte";
 
   const maxIndicators = 3;
 
@@ -120,28 +120,27 @@
       <div style:margin-bottom="2rem"></div>
     {/each}
   </div>
-  <NavSection title="Select an indicator" />
+  <NavSection title="Select an indicator">
+    <div
+      style="display: block; height: 400px; background: var(--ons-color-banner-bg);"
+      class="ons-u-mb-l ons-u-p-m"
+    >
+      Indicator section to be added.
+    </div>
+  </NavSection>
   {#if data.related.similar[0]}
     <NavSection title="Similar areas">
       <p>
-        See which areas are similar to {getName(areaProps, "the")} based on specific
-        groups of indicators. These clusters of areas are based on an analysis carried
-        out by the ONS.
+        See which areas are statistically similar to {getName(areaProps, "the")}
+        based on specific groups of indicators. These clusters of areas are based
+        on an analysis carried out by the ONS.
       </p>
       <Dropdown
         label="Select a group of indicators"
         options={data.related.similar}
         bind:value={pageState.selectedCluster}
       />
-      <Details
-        title="Show the 20 most similar areas to {getName(areaProps, 'the')}"
-      >
-        <ol>
-          {#each pageState.selectedCluster.similar as area}
-            <li>{area.areanm}</li>
-          {/each}
-        </ol>
-      </Details>
+      <SimilarAreas {areaProps} selectedCluster={pageState.selectedCluster} />
     </NavSection>
   {/if}
   <NavSection title="Get the data">
