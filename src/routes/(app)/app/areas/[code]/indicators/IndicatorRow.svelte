@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { resolve } from "$app/paths";
   import { Observe } from "@onsvisual/svelte-components";
   import {
     makeDataUrl,
@@ -80,7 +81,34 @@
   });
 </script>
 
-<Observe bind:visible>
+<Observe bind:visible rootMargin={200}>
+  <details class="indicator-header">
+    <summary class="indicator-title"
+      ><strong>{metadata.label}</strong>{metadata.subText
+        ? `, ${metadata.subText}`
+        : ""}</summary
+    >
+    <div class="indicator-description">
+      <p><strong>Definition:</strong> {metadata.description}</p>
+      <p>
+        <strong>Data source:</strong>
+        {#each metadata.source as s}
+          <a href={s.href} target="_blank">{s.name}</a>
+        {/each}
+      </p>
+      <p>
+        <strong>Published on:</strong>
+        {metadata.source
+          .map((s) => s.date.split("-").reverse().join("/"))
+          .join(", ")}
+      </p>
+      <p>
+        For more data and charts, visit our page on <a
+          href={resolve(`/app/indicators/${metadata.slug}`)}>{metadata.label}</a
+        >.
+      </p>
+    </div>
+  </details>
   <div id={indicator} class="indicator-row">
     <div class="indicator-beeswarm">
       <Beeswarm
@@ -121,5 +149,44 @@
   }
   .indicator-row :global(svg) {
     overflow: visible;
+  }
+  .indicator-title {
+    cursor: pointer;
+    list-style-type: none;
+  }
+  .indicator-title::after {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    content: "i";
+    width: 20px;
+    height: 20px;
+    margin-left: 6px;
+    font-weight: bold;
+    font-size: 14px;
+    color: var(--ons-color-text-link);
+    border: 2px solid currentColor;
+    border-radius: 50%;
+  }
+  .indicator-title:focus::after,
+  .indicator-title:hover::after {
+    transform: scale(1.2);
+    color: var(--ons-color-text-hover);
+  }
+  .indicator-description {
+    margin: 10px 5px 20px;
+    padding: 10px;
+    background-color: var(--ons-color-banner-bg);
+    border-left: solid;
+    border-left-color: var(--ons-color-borders);
+    border-left-width: 4px;
+    line-height: 20px;
+  }
+  .indicator-description > p {
+    font-size: 16px;
+    margin: 0;
+  }
+  .indicator-description > p + p {
+    margin-top: 1rem;
   }
 </style>

@@ -53,7 +53,8 @@
 <Grid>
   {#each ["population-count", "five-year-population-change", "median-age"].filter((slug) => slug in data.metadata) as slug}
     <BigNumber
-      indicator={data.metadata[slug]}
+      indicator={slug}
+      metadata={data.metadata[slug]}
       geography={areaProps.areacd}
       period={pageState.selectedPeriodRange[1]}
     />
@@ -69,7 +70,6 @@
       {/each}
     {/if}
   {:else if expandedTopics[topic.slug] || item.index < maxIndicators}
-    <strong>{item.label}</strong>
     <IndicatorRow
       indicator={item.slug}
       metadata={data.metadata[item.slug]}
@@ -85,7 +85,7 @@
 {/snippet}
 
 <NavSections cls="wider-nav-sections">
-  {#snippet before()}
+  <div class="indicators-nav-sections">
     <div class="legend-sticky">
       <AreasLegend
         selectedAreas={[areaProps, ...pageState.selectedAreas]}
@@ -96,30 +96,30 @@
         <OptionsModal />
       </div>
     </div>
-  {/snippet}
-  <NavSection title="Topics" />
-  {#each data.taxonomy as topic}
-    <NavSection title={topic.label} subsection>
-      {#each topic.children as child}
-        {@render indicator(child, topic)}
-      {/each}
-    </NavSection>
-    {#if topic.count > maxIndicators}
-      <Button
-        variant="secondary"
-        icon="carret"
-        iconRotation={expandedTopics[topic.slug] ? 180 : 0}
-        small
-        on:click={() =>
-          (expandedTopics[topic.slug] = !expandedTopics[topic.slug])}
-        >Show {expandedTopics[topic.slug]
-          ? "fewer"
-          : `${topic.count - maxIndicators} more`}
-        {topic?.label.toLowerCase()} indicators</Button
-      >
-    {/if}
-    <div style:margin-bottom="2rem"></div>
-  {/each}
+    <NavSection title="Topics" />
+    {#each data.taxonomy as topic}
+      <NavSection title={topic.label} subsection>
+        {#each topic.children as child}
+          {@render indicator(child, topic)}
+        {/each}
+      </NavSection>
+      {#if topic.count > maxIndicators}
+        <Button
+          variant="secondary"
+          icon="carret"
+          iconRotation={expandedTopics[topic.slug] ? 180 : 0}
+          small
+          on:click={() =>
+            (expandedTopics[topic.slug] = !expandedTopics[topic.slug])}
+          >Show {expandedTopics[topic.slug]
+            ? "fewer"
+            : `${topic.count - maxIndicators} more`}
+          {topic?.label.toLowerCase()} indicators</Button
+        >
+      {/if}
+      <div style:margin-bottom="2rem"></div>
+    {/each}
+  </div>
   <NavSection title="Select an indicator" />
   {#if data.related.similar[0]}
     <NavSection title="Similar areas">
@@ -199,5 +199,8 @@
     top: 0;
     background: var(--ons-color-page-light);
     padding: 0.5em 0;
+  }
+  .indicators-nav-sections > :global(section) {
+    scroll-margin-top: 116px;
   }
 </style>
