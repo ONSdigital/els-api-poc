@@ -57,7 +57,7 @@
       const overlap = sibling.left < rect.right && sibling.right > rect.left;
       if (overlap) {
         const sibX = labels[0].x;
-        const labelsOffset = toPercent((rect.width + sibling.width) / 2);
+        const labelsOffset = toPercent((rect.width + sibling.width + 6) / 2);
         x = x > sibX ? sibX + labelsOffset : sibX - labelsOffset;
       }
     }

@@ -18,8 +18,6 @@
     hovered = $bindable(),
   } = $props();
 
-  console.log("periodFormat", metadata.periodFormat);
-
   let visible = $state();
   let formatValue = $derived(makeValueFormatter(metadata.decimalPlaces));
   let formatPeriod = $derived(makePeriodFormatter(metadata.periodFormat));
