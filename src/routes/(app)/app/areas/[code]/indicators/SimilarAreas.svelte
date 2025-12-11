@@ -37,7 +37,7 @@
         <p></p>
     {/if}
     <Details
-        title="Show the 20 most similar areas to {getName(areaProps, 'the')}"
+        title="Show the 20 areas most similar to {getName(areaProps, 'the')}"
     >
         <ol>
             {#each selectedCluster.similar as area}
