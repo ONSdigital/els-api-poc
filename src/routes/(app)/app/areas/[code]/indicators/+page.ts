@@ -74,6 +74,7 @@ export const load: PageLoad = async ({ parent, fetch }) => {
           href: resolve(`/app/areas/${p.areacd}`),
         }))
       ],
+      breadcrumbBackground: "var(--ons-color-banner-bg)"
     };
   } catch (err) {
     console.log(err);

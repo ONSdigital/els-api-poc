@@ -8,6 +8,7 @@
     name = "q",
     placeholder = `Eg. "Fareham" or "PO15 5RR"`,
     action = "/app/areas/search",
+    allAreas = true,
     onSelect,
   } = $props();
 
@@ -21,7 +22,9 @@
   async function loadOptionsFunction(query, populateResults) {
     try {
       const url = resolve(
-        `/api/v1/geo/search/${query.toLowerCase()}?searchPostcodes=true`,
+        allAreas
+          ? `/api/v1/geo/search/${query.toLowerCase()}?searchPostcodes=true`
+          : `/api/v1/geo/search/${query.toLowerCase()}?geoLevel=ctry,rgn,cauth,utla,ltla`,
       );
       const results = await (await fetch(url)).json();
       console.log(results);

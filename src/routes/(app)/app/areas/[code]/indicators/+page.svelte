@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import { goto } from "$app/navigation";
   import { setContext } from "svelte";
   import {
     Hero,
@@ -8,8 +9,12 @@
     NavSection,
     Dropdown,
     Button,
+    Details,
   } from "@onsvisual/svelte-components";
   import { getName } from "@onsvisual/robo-utils";
+  import { makeCanonicalSlug } from "$lib/api/geo/helpers/areaSlugUtils";
+  import AreaLocMap from "./AreaLocMap.svelte";
+  import AreaSearch from "$lib/components/nav/AreaSearch.svelte";
   import AreasModal from "$lib/components/modals/AreasModal.svelte";
   import OptionsModal from "$lib/components/modals/OptionsModal.svelte";
   import AreasLegend from "$lib/components/modals/AreasLegend.svelte";
@@ -45,12 +50,54 @@
 
   let hovered = $state();
 
-  $inspect(data.taxonomy);
+  function handleSelect(area) {
+    const url = `/app/areas/${makeCanonicalSlug(area)}/indicators`;
+    goto(resolve(url));
+  }
 </script>
 
-<Hero title="Local indicators for {getName(areaProps, 'the')}" />
+<div class="titleblock-container">
+  <Hero
+    width="medium"
+    title="Local indicators for {getName(areaProps, 'the')}"
+    background="var(--ons-color-banner-bg)"
+  >
+    <p class="ons-hero__text">
+      Local indicators, trends and data for {getName(
+        areaProps,
+        "the",
+        "prefix",
+      )}
+      <a href={resolve(`/areas/${makeCanonicalSlug(areaProps)}`)}
+        >{getName(areaProps)}</a
+      >
+      ({areaProps.areacd})
+      {#if areaProps.end}
+        <span class="inactive-badge">Inactive</span>
+      {/if}
+    </p>
+    <div style:margin="20px 0 -36px" style:max-width="450px" style:z-index={1}>
+      <Details title="Find another area">
+        <label for="search" style:display="block" style:margin-bottom="8px"
+          >Search for a place name</label
+        >
+        <AreaSearch
+          id="search"
+          placeholder={`Eg. "Newport" or "Fareham"`}
+          allAreas={false}
+          onSelect={handleSelect}
+        />
+      </Details>
+    </div>
+  </Hero>
+  <AreaLocMap
+    geometry={data.area.geometry}
+    bounds={areaProps.bounds}
+    mapDescription={"Map of " + getName(areaProps, "the")}
+  />
+</div>
 
-<Grid>
+<Grid marginTop>
   {#each ["population-count", "five-year-population-change", "median-age"].filter((slug) => slug in data.metadata) as slug}
     <BigNumber
       indicator={slug}
@@ -205,5 +252,8 @@
   }
   .indicators-nav-sections > :global(section) {
     scroll-margin-top: 116px;
+  }
+  .titleblock-container {
+    position: relative;
   }
 </style>
