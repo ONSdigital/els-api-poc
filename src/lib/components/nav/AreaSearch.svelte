@@ -8,7 +8,7 @@
     name = "q",
     placeholder = `Eg. "Fareham" or "PO15 5RR"`,
     action = "/app/areas/search",
-    onSelect
+    onSelect,
   } = $props();
 
   let selected = $state(null);
@@ -21,14 +21,16 @@
   async function loadOptionsFunction(query, populateResults) {
     try {
       const url = resolve(
-        `/api/v1/geo/search/${query.toLowerCase()}?searchPostcodes=true`
+        `/api/v1/geo/search/${query.toLowerCase()}?searchPostcodes=true`,
       );
       const results = await (await fetch(url)).json();
+      console.log(results);
       populateResults(
         results.data.map((d) => {
           if (!d.areanm) d.areanm = d.areacd;
+          d.description = `${d.type || ""}${d.parent ? ` in ${d.parent}` : ""}`;
           return d;
-        })
+        }),
       );
     } catch {
       return populateResults([]);
@@ -50,6 +52,7 @@
         onSelect(selected);
       }}
       labelKey="areanm"
+      groupKey="description"
       mode="search"
       autoClear={false}
       renderFallback
@@ -67,7 +70,7 @@
     flex-direction: row;
     align-items: end;
     width: 100%;
-    gap: .5rem;
+    gap: 0.5rem;
   }
   .search-input {
     flex-grow: 1;

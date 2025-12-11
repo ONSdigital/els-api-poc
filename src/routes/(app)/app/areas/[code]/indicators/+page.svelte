@@ -8,17 +8,23 @@
     NavSections,
     NavSection,
     Dropdown,
+    Button,
   } from "@onsvisual/svelte-components";
-  import { formatName } from "@onsvisual/robo-utils";
+  import { getName, formatName } from "@onsvisual/robo-utils";
   import BigNumber from "./BigNumber.svelte";
   import AreasModal from "$lib/components/modals/AreasModal.svelte";
   import OptionsModal from "$lib/components/modals/OptionsModal.svelte";
   import IndicatorRow from "./IndicatorRow.svelte";
+  import AreasLegend from "$lib/components/modals/AreasLegend.svelte";
+
+  const maxIndicators = 3;
 
   let { data } = $props();
 
-  let defaultComparisonArea = $derived(
-    data.areas.find((a) => a.areacd === data.parent.areacd),
+  let areaProps = $derived(data.area.properties);
+
+  let defaultComparisonArea = data.areas.find(
+    (a) => a.areacd === data.parent.areacd,
   );
 
   let pageState = $state({
@@ -33,35 +39,43 @@
   });
   setContext("pageState", pageState);
 
+  let expandedTopics = $state(
+    Object.fromEntries(data.taxonomy.map((t) => [t?.slug, false])),
+  );
+
   let hovered = $state();
+
+  $inspect(data.taxonomy);
 </script>
 
-<Hero title="Local indicators for {data.area.properties.areanm}" />
+<Hero title="Local indicators for {getName(areaProps, 'the')}" />
 
 <Grid>
   {#each ["population-count", "five-year-population-change", "median-age"].filter((slug) => slug in data.metadata) as slug}
     <BigNumber
       indicator={data.metadata[slug]}
-      geography={data.area.properties.areacd}
+      geography={areaProps.areacd}
       period={pageState.selectedPeriodRange[1]}
     />
   {/each}
 </Grid>
 
-{#snippet indicator(item)}
+{#snippet indicator(item, topic)}
   {#if item.children}
-    <h4>{item.label}</h4>
-    {#each item.children as child}
-      {@render indicator(child)}
-    {/each}
-  {:else}
+    {#if expandedTopics[topic.slug] || item.children[0].index < maxIndicators}
+      <h4>{item.label}</h4>
+      {#each item.children as child}
+        {@render indicator(child, topic)}
+      {/each}
+    {/if}
+  {:else if expandedTopics[topic.slug] || item.index < maxIndicators}
     <strong>{item.label}</strong>
     <IndicatorRow
       indicator={item.slug}
       metadata={data.metadata[item.slug]}
       timeRange={pageState.selectedPeriodRange}
       selected={[
-        data.area.properties.areacd,
+        areaProps.areacd,
         ...pageState.selectedAreas.map((a) => a.areacd),
       ]}
       geoGroup={pageState.selectedGeoGroup}
@@ -70,9 +84,13 @@
   {/if}
 {/snippet}
 
-<NavSections>
+<NavSections cls="wider-nav-sections">
   {#snippet before()}
-    <div class="modals-sticky">
+    <div class="legend-sticky">
+      <AreasLegend
+        selectedAreas={[areaProps, ...pageState.selectedAreas]}
+        selectedGeoGroup={pageState.selectedGeoGroup}
+      />
       <div>
         <AreasModal />
         <OptionsModal />
@@ -83,19 +101,32 @@
   {#each data.taxonomy as topic}
     <NavSection title={topic.label} subsection>
       {#each topic.children as child}
-        {@render indicator(child)}
+        {@render indicator(child, topic)}
       {/each}
     </NavSection>
+    {#if topic.count > maxIndicators}
+      <Button
+        variant="secondary"
+        icon="carret"
+        iconRotation={expandedTopics[topic.slug] ? 180 : 0}
+        small
+        on:click={() =>
+          (expandedTopics[topic.slug] = !expandedTopics[topic.slug])}
+        >Show {expandedTopics[topic.slug]
+          ? "fewer"
+          : `${topic.count - maxIndicators} more`}
+        {topic?.label.toLowerCase()} indicators</Button
+      >
+    {/if}
+    <div style:margin-bottom="2rem"></div>
   {/each}
   <NavSection title="Select an indicator" />
   {#if data.related.similar[0]}
     <NavSection title="Similar areas">
       <p>
-        See which areas are similar to {formatName(
-          data.area.properties.areanm,
-          "the",
-        )} based on specific groups of indicators. These clusters of areas are based
-        on an analysis carried out by the ONS.
+        See which areas are similar to {getName(areaProps, "the")} based on specific
+        groups of indicators. These clusters of areas are based on an analysis carried
+        out by the ONS.
       </p>
       <Dropdown
         label="Select a group of indicators"
@@ -103,10 +134,7 @@
         bind:value={pageState.selectedCluster}
       />
       <Details
-        title="Show the 20 most similar areas to {formatName(
-          data.area.properties.areanm,
-          'the',
-        )}"
+        title="Show the 20 most similar areas to {getName(areaProps, 'the')}"
       >
         <ol>
           {#each pageState.selectedCluster.similar as area}
@@ -118,31 +146,28 @@
   {/if}
   <NavSection title="Get the data">
     <p>
-      Download all datasets that include {formatName(
-        data.area.properties.areanm,
-        "the",
-      )} in an
+      Download all datasets that include {getName(areaProps, "the")} in an
       <a
         href={resolve(
-          `/api/v1/data.ods?hasGeo=${data.area.properties.areacd}&excludeMultivariate=true&time=all`,
+          `/api/v1/data.ods?hasGeo=${areaProps.areacd}&excludeMultivariate=true&time=all`,
         )}
         download="data.ods">ODS</a
       >
       <a
         href={resolve(
-          `/api/v1/data.csv?hasGeo=${data.area.properties.areacd}&excludeMultivariate=true&time=all`,
+          `/api/v1/data.csv?hasGeo=${areaProps.areacd}&excludeMultivariate=true&time=all`,
         )}
         download="data.csv">CSV</a
       >,
       <a
         href={resolve(
-          `/api/v1/data.csv?hasGeo=${data.area.properties.areacd}&excludeMultivariate=true&time=all`,
+          `/api/v1/data.csv?hasGeo=${areaProps.areacd}&excludeMultivariate=true&time=all`,
         )}
         download="data.csv-metadata.json">CSVW</a
       >, or
       <a
         href={resolve(
-          `/api/v1/data.json?hasGeo=${data.area.properties.areacd}&excludeMultivariate=true&time=all`,
+          `/api/v1/data.json?hasGeo=${areaProps.areacd}&excludeMultivariate=true&time=all`,
         )}
         download="data.json">JSON-Stat</a
       > format.
@@ -165,9 +190,11 @@
 </NavSections>
 
 <style>
-  .modals-sticky {
+  .legend-sticky {
     z-index: 1;
-    display: block;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
     position: sticky;
     top: 0;
     background: var(--ons-color-page-light);

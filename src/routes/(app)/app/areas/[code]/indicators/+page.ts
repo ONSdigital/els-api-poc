@@ -69,10 +69,10 @@ export const load: PageLoad = async ({ parent, fetch }) => {
       breadcrumbLinks: [
         { label: "Home", href: resolve("/") },
         { label: "Explore local statistics", href: resolve("/app") },
-        ...[...area.properties.parents].reverse().map((p) => ({
+        ...[...[...area.properties.parents].reverse(), area.properties].map((p) => ({
           label: getName(p),
           href: resolve(`/app/areas/${p.areacd}`),
-        })),
+        }))
       ],
     };
   } catch (err) {
