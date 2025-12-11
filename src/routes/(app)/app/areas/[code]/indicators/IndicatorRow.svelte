@@ -89,16 +89,18 @@
     <div class="indicator-description">
       <p><strong>Definition:</strong> {metadata.description}</p>
       <p>
-        <strong>Data source:</strong>
-        {#each metadata.source as s}
+        <strong
+          >{metadata.source.length > 1
+            ? "Data sources"
+            : "Data source"}:</strong
+        >
+        {#each metadata.source as s, i}
           <a href={s.href} target="_blank">{s.name}</a>
+          ({s.date.split("-").reverse().join("/")}){i ===
+          metadata.source.length - 1
+            ? ""
+            : ", "}
         {/each}
-      </p>
-      <p>
-        <strong>Published on:</strong>
-        {metadata.source
-          .map((s) => s.date.split("-").reverse().join("/"))
-          .join(", ")}
       </p>
       <p>
         For more data and charts, visit our page on <a
@@ -111,9 +113,10 @@
     <div class="indicator-beeswarm">
       <Beeswarm
         data={beeswarmData || { message: "No data" }}
-        {formatValue}
         {formatPeriod}
-        {visible}
+        {formatValue}
+        valuePrefix={metadata.prefix}
+        valueSuffix={metadata.suffix}
         {selected}
         bind:hovered
       />
@@ -123,6 +126,8 @@
         data={sparklineData || { message: "No data" }}
         {formatPeriod}
         {formatValue}
+        valuePrefix={metadata.prefix}
+        valueSuffix={metadata.suffix}
         {selected}
       />
     </div>

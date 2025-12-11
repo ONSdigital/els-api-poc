@@ -8,8 +8,10 @@
     idKey = "areacd",
     labelKey = "areanm",
     periodKey = "period",
-    formatValue = (d) => d,
     formatPeriod = (d) => d,
+    formatValue = (d) => d,
+    valuePrefix = null,
+    valueSuffix = null,
     selected = [],
     hovered = $bindable(),
   } = $props();
@@ -108,9 +110,8 @@
       style:left="{labels?.[i]?.x ?? d.x}%"
       use:labelDodge={{ i, d }}
     >
-      {showName
-        ? `${d[labelKey]}, ${formatValue(d[xKey])}`
-        : formatValue(d[xKey])}
+      {#if showName}{d[labelKey]},{/if}
+      {valuePrefix}{formatValue(d[xKey])}{valueSuffix}
     </div>
   {/key}
 {/snippet}
