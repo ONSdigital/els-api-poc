@@ -9,26 +9,68 @@
     let { areaProps, selectedCluster } = $props();
 </script>
 
-<ClusterMap {selectedCluster} />
-{#if selectedCluster.cluster}
-    <p>
-        <Em mode="badge" color={ONSpalette[0]}>
-            {getName(areaProps)} is in {selectedCluster.key} cluster {selectedCluster
-                .cluster.label}
-        </Em>
-    </p>
-    <p>{selectedCluster.cluster.description}</p>
-{/if}
-<Details title="Show the 20 most similar areas to {getName(areaProps, 'the')}">
-    <ol>
-        {#each selectedCluster.similar as area}
-            <li>
-                <a
-                    href={resolve(
-                        `/app/areas/${makeCanonicalSlug(area)}/indicators`,
-                    )}>{getName(area)}</a
-                >
-            </li>
-        {/each}
-    </ol>
-</Details>
+<div class="ons-u-mb-l">
+    <ul class="map-legend">
+        <li>
+            <span
+                class="map-legend-marker"
+                style:color={ONSpalette[0]}
+                style:background={ONSpalette[0]}
+            ></span>
+            Areas in {selectedCluster.key} cluster {selectedCluster.cluster
+                .label}
+        </li>
+        <li>
+            <span class="map-legend-marker" style:background="#eee"></span>
+            20 areas most similar to {getName(areaProps, "the")}
+        </li>
+    </ul>
+    <ClusterMap {selectedCluster} />
+    {#if selectedCluster.cluster}
+        <p>
+            <strong>{getName(areaProps)}</strong> is in
+            <Em color={ONSpalette[0]}>
+                {selectedCluster.key} cluster {selectedCluster.cluster.label}
+            </Em>.
+            {selectedCluster.cluster.description}
+        </p>
+        <p></p>
+    {/if}
+    <Details
+        title="Show the 20 most similar areas to {getName(areaProps, 'the')}"
+    >
+        <ol>
+            {#each selectedCluster.similar as area}
+                <li>
+                    <a
+                        href={resolve(
+                            `/app/areas/${makeCanonicalSlug(area)}/indicators`,
+                        )}>{getName(area)}</a
+                    >
+                </li>
+            {/each}
+        </ol>
+    </Details>
+</div>
+
+<style>
+    .map-legend {
+        list-style: none;
+        padding: 0;
+        margin-top: 0.5em;
+    }
+    .map-legend > li {
+        display: inline;
+        margin-right: 0.5em;
+    }
+    .map-legend-marker {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        margin-right: 0.1em;
+        border: 2px solid currentColor;
+        background: none;
+        border-radius: 50%;
+        transform: translateY(2px);
+    }
+</style>

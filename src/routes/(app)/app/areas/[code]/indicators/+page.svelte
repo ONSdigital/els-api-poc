@@ -133,7 +133,11 @@
       <p>
         See which areas are statistically similar to {getName(areaProps, "the")}
         based on specific groups of indicators. These clusters of areas are based
-        on an analysis carried out by the ONS.
+        on
+        <a
+          href="https://www.ons.gov.uk/peoplepopulationandcommunity/wellbeing/methodologies/clusteringsimilarlocalauthoritiesandstatisticalnearestneighboursintheukmethodology"
+          target="_blank">an analysis carried out by the ONS</a
+        >.
       </p>
       <Dropdown
         label="Select a group of indicators"

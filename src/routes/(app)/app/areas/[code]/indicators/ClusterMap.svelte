@@ -20,6 +20,8 @@
         return features;
     })();
 
+    const fitBoundsOptions = { padding: 10 };
+
     let { selectedCluster } = $props();
 
     let similarAreas = $derived(
@@ -30,20 +32,29 @@
             ? selectedCluster.cluster.areas.map((area) => features[area.areacd])
             : [],
     );
-    const bounds = bbox({
-        type: "FeatureCollection",
-        features: [...similarAreas, ...clusterAreas],
-    });
+    let bounds = $derived(
+        bbox({
+            type: "FeatureCollection",
+            features: [...similarAreas, ...clusterAreas],
+        }),
+    );
 
+    let map = $state();
     let hovered = $state();
+
+    function fitBounds(bounds) {
+        if (map) map.fitBounds(bounds, fitBoundsOptions);
+    }
+    $effect(() => fitBounds(bounds));
 </script>
 
 <div class="map-container">
     <Map
+        bind:map
         style={resolve("/data/mapstyle.json")}
         location={{ bounds }}
         options={{
-            fitBoundsOptions: { padding: 10 },
+            fitBoundsOptions,
             maxBounds: [-19, 48, 12, 62],
             cooperativeGestures: true,
             preserveDrawingBuffer: true,
@@ -112,5 +123,6 @@
         display: block;
         width: 100%;
         height: 500px;
+        margin: 1rem 0;
     }
 </style>
