@@ -61,6 +61,7 @@
     }
     .map-legend > li {
         display: inline;
+        white-space: nowrap;
         margin-right: 0.5em;
     }
     .map-legend-marker {
