@@ -22,7 +22,7 @@
 
     const fitBoundsOptions = { padding: 10 };
 
-    let { selectedCluster } = $props();
+    let { selectedCluster, mapDescription } = $props();
 
     let similarAreas = $derived(
         selectedCluster.similar.map((area) => features[area.areacd]),
@@ -60,6 +60,7 @@
             preserveDrawingBuffer: true,
         }}
         controls
+        {mapDescription}
     >
         {#if clusterAreas.length > 0}
             <MapSource
