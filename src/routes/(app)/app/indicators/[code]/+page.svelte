@@ -22,7 +22,7 @@
   import Map from "$lib/components/charts/Map.svelte";
   import Bar from "$lib/components/charts/Bar.svelte";
   import Line from "$lib/components/charts/Line.svelte";
-  // import LineNew from "$lib/components/charts/LineNew.svelte";
+  import ContentBlock from "$lib/components/charts/ContentBlock.svelte";
   import IndicatorChart from "./IndicatorChart.svelte";
 
   let { data } = $props();
@@ -62,6 +62,25 @@
   }
 
   let formatPeriod = $derived(makePeriodFormatter(data.indicator.periodFormat));
+
+  const countryLookup = {
+    N: "N92000002",
+    E: "E92000001",
+    W: "W92000004",
+    S: "S92000003",
+  };
+
+  let initialSelected = $derived(
+    data.indicator.standardised === false
+      ? []
+      : data.areas.map((d) => d.areacd).includes("K02000001")
+        ? ["K02000001"]
+        : data.areas.map((d) => d.areacd).includes("K03000001")
+          ? ["K03000001"]
+          : data.indicator.geography.countries.length == 1
+            ? data.indicator.geography.countries.map((d) => countryLookup[d])
+            : []
+  );
 
   let pageState = $state({
     selectedAreas: [],
@@ -110,83 +129,101 @@
 </Hero>
 
 <NavSections marginTop>
+  <div class="row-container">
+    <div class="content-dropdowns" data-html2canvas-ignore>
+      <AreasModal />
+      <OptionsModal />
+    </div>
+  </div>
   {#if data.indicator.standardised}
     <NavSection title="Map">
-      <div class="row-container">
-        <div class="content-dropdowns" data-html2canvas-ignore>
-          <AreasModal />
-          <OptionsModal />
-        </div>
-      </div>
+      <ContentBlock title={data.indicator.label} source={data.indicator.source}>
+        <p class="subtitle">
+          {data.indicator.subtitle}, {pageState.selectedPeriodRange.map((p) =>
+            p.slice(0, 4)
+          )}
+        </p>
+        <LazyLoad>
+          <div class="chart-container map-container">
+            {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange[1].slice(0, 10) } )}
+              Fetching chart data
+            {:then chartData}
+              <Map data={chartData} />
+            {:catch}
+              Failed to load chart data
+            {/await}
+          </div>
+        </LazyLoad>
+      </ContentBlock>
+    </NavSection>
+  {/if}
+
+  <NavSection title="Line chart">
+    <ContentBlock title={data.indicator.label} source={data.indicator.source}>
+      <p class="subtitle">
+        {data.indicator.subtitle}, {pageState.selectedPeriodRange.map((p) =>
+          p.slice(0, 4)
+        )}
+      </p>
       <LazyLoad>
-        <div class="chart-container map-container">
+        <IndicatorChart
+          indicator={data.indicator.slug}
+          metadata={data.indicator}
+          timeRange={pageState.selectedPeriodRange}
+          selected={initialSelected.concat(
+            pageState.selectedAreas.map((a) => a.areacd)
+          )}
+          geoLevel={pageState.selectedGeoLevel}
+          {formatPeriod}
+        />
+      </LazyLoad>
+    </ContentBlock>
+  </NavSection>
+
+  <NavSection title="Bar chart">
+    <ContentBlock title={data.indicator.label} source={data.indicator.source}>
+      <p class="subtitle">
+        {data.indicator.subtitle}, {pageState.selectedPeriodRange.map((p) =>
+          p.slice(0, 4)
+        )}
+      </p>
+      <LazyLoad>
+        <div class="chart-container">
           {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange[1].slice(0, 10) } )}
             Fetching chart data
           {:then chartData}
-            <Map data={chartData} />
+            <Bar data={chartData} />
           {:catch}
             Failed to load chart data
           {/await}
         </div>
       </LazyLoad>
-    </NavSection>
-  {/if}
-  <!-- <NavSection title="Line">
-    <LazyLoad>
-      <div class="chart-container">
-        {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange.map( (p) => p.slice(0, 10), ) }, )}
-          Fetching chart data
-        {:then chartData}
-          {JSON.stringify(chartData)}
-          <LineNew data={chartData} />
-        {:catch}
-          Failed to load chart data
-        {/await}
-      </div>
-    </LazyLoad>
-  </NavSection> -->
-  <NavSection title="Line chart">
-    <LazyLoad>
-      <IndicatorChart
-        indicator={data.indicator.slug}
-        metadata={data.indicator}
-        timeRange={pageState.selectedPeriodRange}
-        selected={pageState.selectedAreas.map((a) => a.areacd)}
-        geoLevel={pageState.selectedGeoLevel}
-      />
-    </LazyLoad>
-  </NavSection>
-
-  <NavSection title="Bar">
-    <LazyLoad>
-      <div class="chart-container">
-        {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange[1].slice(0, 10) } )}
-          Fetching chart data
-        {:then chartData}
-          <Bar data={chartData} />
-        {:catch}
-          Failed to load chart data
-        {/await}
-      </div>
-    </LazyLoad>
+    </ContentBlock>
   </NavSection>
   <NavSection title="Table">
-    <LazyLoad>
-      <div class="chart-container">
-        {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: "all" } )}
-          Fetching chart data
-        {:then chartData}
-          <Table
-            data={pivotData(chartData, formatPeriod)}
-            sortable
-            compact
-            height={400}
-          />
-        {:catch}
-          Failed to load chart data
-        {/await}
-      </div>
-    </LazyLoad>
+    <ContentBlock title={data.indicator.label} source={data.indicator.source}>
+      <p class="subtitle">
+        {data.indicator.subtitle}, {pageState.selectedPeriodRange.map((p) =>
+          p.slice(0, 4)
+        )}
+      </p>
+      <LazyLoad>
+        <div class="chart-container">
+          {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: "all" } )}
+            Fetching chart data
+          {:then chartData}
+            <Table
+              data={pivotData(chartData, formatPeriod)}
+              sortable
+              compact
+              height={400}
+            />
+          {:catch}
+            Failed to load chart data
+          {/await}
+        </div>
+      </LazyLoad>
+    </ContentBlock>
   </NavSection>
   <NavSection title="Get the data">
     <p>The original data source for this indicator can be found here:</p>

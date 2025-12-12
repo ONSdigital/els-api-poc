@@ -13,10 +13,10 @@
     selected = [],
     geoLevel,
     hovered = $bindable(),
+    formatPeriod,
   } = $props();
 
   let formatValue = $derived(makeValueFormatter(metadata.decimalPlaces));
-  let formatPeriod = $derived(makePeriodFormatter(metadata.periodFormat));
 
   async function fetchData(indicator, timeRange, selected, geoLevel) {
     const chartUrl = makeDataUrl(
@@ -47,6 +47,7 @@
       {formatValue}
       {selected}
       bind:hovered
+      {formatPeriod}
     />
   {:catch}
     Failed to load chart data
