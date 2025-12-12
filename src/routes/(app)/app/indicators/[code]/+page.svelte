@@ -128,7 +128,7 @@
   </p>
 </Hero>
 
-<NavSections marginTop>
+<NavSections cls="wider-nav-sections" marginTop>
   <div class="row-container">
     <div class="content-dropdowns" data-html2canvas-ignore>
       <AreasModal />

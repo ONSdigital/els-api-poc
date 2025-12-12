@@ -1,8 +1,9 @@
 <script lang="ts">
   import { scaleLinear, scaleTime } from "d3-scale";
-  import { ticks } from "d3-array";
-  import { parseChartData, markerPaths, contrastColor } from "./chartHelpers";
-  import { ONSpalette } from "$lib/config";
+  import { ticks, nice } from "d3-array";
+  import { format } from "d3-format";
+  import { parseChartData, contrastColor } from "./chartHelpers";
+  import { markerPaths, ONSpalette } from "$lib/config";
 
   let {
     data,
@@ -27,8 +28,10 @@
   let xScale = $derived(
     _data ? scaleTime().domain(_data.dateDomain).range([0, width]) : null
   );
+
+  let yDomain = $derived(_data ? nice(..._data.valueDomain, 2) : null);
   let yScale = $derived(
-    _data ? scaleLinear().domain(_data.valueDomain).range([height, 0]) : null
+    _data ? scaleLinear().domain(yDomain).range([height, 0]) : null
   );
 
   let linesCount = $derived(Object.values(_data.keyed).length);
@@ -41,46 +44,32 @@
 
   let yTickWidth = $state({});
 
-  // let xTicks = $derived.by(() => {
-  //   if (!xScale) return [];
-  //   const initialTicks = xScale.ticks(5);
-  //   const tickDiff =
-  //     _data.dateDomain[1] - initialTicks[initialTicks.length - 1];
-  //   return initialTicks.map((d) => new Date(+d + tickDiff));
-  // });
+  const formatYTick = format(",.0f");
+  let leftMargin = $state(0);
+  function updateLeftMargin(el) {
+    const width = el.getBoundingClientRect().width;
+    if (width > leftMargin) leftMargin = width;
+  }
 
-  let xDistance = $derived(Math.abs(_data.dateDomain[1] - _data.dateDomain[0]));
-
-  $inspect(xDistance);
+  const maxTickGap = 100; // in pixels
+  let nXTicks = $derived(Math.floor(width / maxTickGap));
 
   let xTicks = $derived.by(() => {
-    if (!_data || !xScale) return [];
-
-    const ticks = [];
-    const anchorMonth = _data.dateDomain[0].getMonth();
-
-    let year = _data.dateDomain[0].getFullYear();
-    let firstMonth = new Date(year, anchorMonth, 1);
-    if (firstMonth < _data.dateDomain[0]) {
-      year += 1;
-      firstMonth = new Date(year, anchorMonth, 1);
-    }
-
-    const step = 4;
-
-    for (
-      let d = firstMonth;
-      d <= _data.dateDomain[1];
-      d = new Date(d.getFullYear() + step, anchorMonth, 1)
-    ) {
-      ticks.push(d);
-    }
-
-    return ticks;
+    if (!xScale) return [];
+    const initialTicks = xScale.ticks(nXTicks);
+    const tickDiff =
+      _data.dateDomain[1] - initialTicks[initialTicks.length - 1];
+    // fix gap appearing on left hand side
+    // STILL TO FIX - LEAP YEARS ISSUE
+    const newTicks = initialTicks.map((d) => new Date(+d + tickDiff));
+    const tickGap = newTicks[1] - newTicks[0];
+    const firstGap = newTicks[0] - _data.dateDomain[0];
+    if (firstGap > tickGap) newTicks.unshift(new Date(newTicks[0] - tickGap));
+    return newTicks;
   });
 
   $inspect(_selected);
-  $inspect(_data.keyed);
+  $inspect(_data.keyed[hoveredArea]);
 </script>
 
 {#snippet line(arr, width = 1, color = "#b0b0b0", opacity = 1, id = "")}
@@ -126,39 +115,43 @@
 
 <div
   class="line-wrapper"
-  style:padding-left="{(yTickWidth[1] ?? 40) + 10}px"
+  style:padding-left="{leftMargin + 10}px"
   style:padding-top="0px"
   style:padding-bottom="25px"
-  style:padding-right="50px"
+  style:padding-right="150px"
 >
   <div class="line-inner" bind:clientWidth={width}>
+    <div class="line-x-axis">
+      {#if yDomain?.[0] <= 0 && yDomain?.[1] >= 0}
+        <div class="x-baseline" style:top="{yScale(0)}px"></div>
+      {/if}
+      {#each xTicks as xTick}
+        <div class="line-x-tick" style:left="{xScale(xTick)}px"></div>
+        <div class="line-x-tick-label" style:left="{xScale(xTick)}px">
+          {formatPeriod(xTick.toISOString())}
+        </div>
+      {/each}
+    </div>
+    <div class="line-y-axis">
+      <div class="y-baseline"></div>
+      {#each yScale.ticks(5) as yTick, i}
+        <div class="line-y-tick" style:top="{yScale(yTick)}px"></div>
+        <div
+          class="line-y-tick-label"
+          style:top="{yScale(yTick)}px"
+          use:updateLeftMargin
+        >
+          {formatYTick(yTick)}
+        </div>
+      {/each}
+    </div>
     <svg
       viewBox="0 0 {width} {height}"
       class="line-chart"
       preserveAspectRatio="none"
     >
-      <g class="y-axis-container">
-        <line
-          x1="0"
-          x2="0"
-          y1={yScale(_data.valueDomain[0])}
-          y2={yScale(_data.valueDomain[1])}
-          stroke={"black"}
-          stroke-width={1}
-        ></line>
-      </g>
-      <g class="x-axis-container">
-        <line
-          y1={yScale(_data.valueDomain[0])}
-          y2={yScale(_data.valueDomain[0])}
-          x1={xScale(_data.dateDomain[0])}
-          x2={xScale(_data.dateDomain[1])}
-          stroke={"black"}
-          stroke-width={1}
-        ></line>
-      </g>
       {#if _data && xScale && yScale}
-        <g>
+        <g opacity={hoveredArea ? 0.2 : 1}>
           {#each Object.values(_data.keyed) as arr, i}
             {@render line(
               arr,
@@ -169,21 +162,22 @@
             )}
           {/each}
 
-          {#if !hoveredArea}
-            {#each _selected as arr, i}
-              {@render line(arr, 3, ONSpalette[i], 1, arr[0][idKey])}
-            {/each}
-            {#each Object.values(_selected) as c, i}
+          {#each _selected as arr, i}
+            {@render line(arr, 3, ONSpalette[i], 1, arr[0][idKey])}
+          {/each}
+          {#each _selected as s, sIndex}
+            {#each s as c}
               <circle
                 cx={xScale(c.date)}
                 cy={yScale(c[yKey])}
                 r="5"
-                fill={ONSpalette[i]}
+                fill={ONSpalette[sIndex]}
                 stroke="white"
               ></circle>
             {/each}
-          {/if}
-
+          {/each}
+        </g>
+        <g>
           {#if hoveredArea}
             {@render line(
               _data.keyed[hoveredArea],
@@ -205,24 +199,6 @@
         </g>
       {/if}
     </svg>
-    <div class="line-x-axis">
-      {#each xTicks as xTick}
-        <div class="line-x-tick" style:left="{xScale(xTick)}px"></div>
-        <div class="line-x-tick-label" style:left="{xScale(xTick)}px">
-          {formatPeriod(xTick.toISOString())}
-        </div>
-      {/each}
-    </div>
-    <div class="line-x-axis">
-      {#each _data.valueDomain as yTick, i}
-        <div class="line-y-tick" style:top="{yScale(yTick)}%"></div>
-        <div class="line-y-tick-label" style:top="{yScale(yTick)}%">
-          <!-- bind:clientWidth={yTickWidth[i]}
-        > -->
-          {formatValue(yTick)}
-        </div>
-      {/each}
-    </div>
   </div>
 </div>
 
@@ -283,10 +259,39 @@
     border-left: 1px solid grey;
   }
 
+  .y-baseline {
+    position: absolute;
+    height: 100%;
+    left: 0%;
+    border-left: 1px solid grey;
+  }
+
+  .x-baseline {
+    position: absolute;
+    width: 100%;
+    border-bottom: 2px solid grey;
+    transform: translateY(-1px);
+  }
+
+  .line-y-tick {
+    position: absolute;
+    right: 100%;
+    width: 8px;
+    border-top: 1px solid grey;
+  }
+
   .line-x-tick-label {
     position: absolute;
     top: calc(100% + 10px);
     transform: translateX(-50%);
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .line-y-tick-label {
+    position: absolute;
+    right: calc(100% + 10px);
+    transform: translateY(-50%);
     font-size: 14px;
     white-space: nowrap;
   }
