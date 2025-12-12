@@ -32,7 +32,7 @@ export function makeGeoFilter(param) {
 }
 
 export function makeGeoLevelFilter(levels) {
-  const codes = new Set([levels].flat().map(l => geoLevelsAll[l].codes).flat());
+  const codes = new Set([levels].flat().map(l => geoLevelsAll?.[l]?.codes).flat());
   return (cd) => codes.has(cd.slice(0, 3));
 }
 

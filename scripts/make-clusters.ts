@@ -1,10 +1,10 @@
-import { readFileSync, writeFileSync } from "fs";
+import { writeFileSync } from "fs";
 
-const config_path = "./src/lib/data/config.json";
+const config_url = "https://raw.githubusercontent.com/ONSdigital/explore-local-statistics-app/refs/heads/develop/static/insights/config.json";
 const output_clusters = "./src/lib/data/areas-clusters.json";
 const output_similar = "./src/lib/data/areas-similar.json";
 
-const config = JSON.parse(readFileSync(config_path));
+const config = await (await fetch(config_url)).json();
 
 const similar = config.neighbourLookup;
 writeFileSync(output_similar, JSON.stringify(similar));
@@ -28,7 +28,7 @@ for (const type of clusters.types) {
   for (const key of keys) {
     clusters.descriptions[type][key] = rawClusters.descriptions
       .filter(d => d.type === type && d.letter === key)
-      .map(d => d.text);
+      .map(d => d.text)[0];
     clusters.clusters[type][key] = rawClusters.data.areacd.filter((d, i) => rawClusters.data[type][i] === key);
 
     for (const cd of clusters.clusters[type][key]) {

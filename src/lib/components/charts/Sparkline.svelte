@@ -11,8 +11,10 @@
     yKey = "value",
     idKey = "areacd",
     labelKey = "areanm",
-    formatValue = (d) => d,
     formatPeriod = (d) => d,
+    formatValue = (d) => d,
+    valuePrefix = null,
+    valueSuffix = null,
     selected = [],
   } = $props();
 
@@ -74,7 +76,7 @@
     style:top="{yScale(d[yKey])}%"
     bind:clientWidth={labelWidth[i]}
   >
-    {`${diff > 0 ? "+" : ""}${formatValue(diff)}`}
+    {diff > 0 ? "+" : ""}{valuePrefix}{formatValue(diff)}{valueSuffix}
   </div>
 {/snippet}
 
@@ -198,6 +200,7 @@
   .sparkline-marker,
   .sparkline-label {
     position: absolute;
+    white-space: nowrap;
   }
   .sparkline-marker {
     width: 18px;
