@@ -1,24 +1,35 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import { goto } from "$app/navigation";
   import { setContext } from "svelte";
   import {
     Hero,
     Grid,
-    Details,
     NavSections,
     NavSection,
     Dropdown,
+    Button,
+    Details,
   } from "@onsvisual/svelte-components";
-  import { formatName } from "@onsvisual/robo-utils";
-  import BigNumber from "./BigNumber.svelte";
+  import { getName } from "@onsvisual/robo-utils";
+  import { makeCanonicalSlug } from "$lib/api/geo/helpers/areaSlugUtils";
+  import AreaLocMap from "./AreaLocMap.svelte";
+  import AreaSearch from "$lib/components/nav/AreaSearch.svelte";
   import AreasModal from "$lib/components/modals/AreasModal.svelte";
   import OptionsModal from "$lib/components/modals/OptionsModal.svelte";
+  import AreasLegend from "$lib/components/modals/AreasLegend.svelte";
+  import BigNumber from "./BigNumber.svelte";
   import IndicatorRow from "./IndicatorRow.svelte";
+  import SimilarAreas from "./SimilarAreas.svelte";
+
+  const maxIndicators = 3;
 
   let { data } = $props();
 
-  let defaultComparisonArea = $derived(
-    data.areas.find((a) => a.areacd === data.parent.areacd),
+  let areaProps = $derived(data.area.properties);
+
+  let defaultComparisonArea = data.areas.find(
+    (a) => a.areacd === data.parent.areacd,
   );
 
   let pageState = $state({
@@ -33,35 +44,85 @@
   });
   setContext("pageState", pageState);
 
+  let expandedTopics = $state(
+    Object.fromEntries(data.taxonomy.map((t) => [t?.slug, false])),
+  );
+
   let hovered = $state();
+
+  function handleSelect(area) {
+    const url = `/app/areas/${makeCanonicalSlug(area)}/indicators`;
+    goto(resolve(url));
+  }
 </script>
 
-<Hero title="Local indicators for {data.area.properties.areanm}" />
+<div class="titleblock-container">
+  <Hero
+    width="medium"
+    title="Local indicators for {getName(areaProps, 'the')}"
+    background="var(--ons-color-banner-bg)"
+  >
+    <p class="ons-hero__text">
+      Local indicators, trends and data for {getName(
+        areaProps,
+        "the",
+        "prefix",
+      )}
+      <a href={resolve(`/areas/${makeCanonicalSlug(areaProps)}`)}
+        >{getName(areaProps)}</a
+      >
+      ({areaProps.areacd})
+      {#if areaProps.end}
+        <span class="inactive-badge">Inactive</span>
+      {/if}
+    </p>
+    <div style:margin="20px 0 -36px" style:max-width="450px" style:z-index={1}>
+      <Details title="Find another area">
+        <label for="search" style:display="block" style:margin-bottom="8px"
+          >Search for a place name</label
+        >
+        <AreaSearch
+          id="search"
+          placeholder={`Eg. "Newport" or "Fareham"`}
+          allAreas={false}
+          onSelect={handleSelect}
+        />
+      </Details>
+    </div>
+  </Hero>
+  <AreaLocMap
+    geometry={data.area.geometry}
+    bounds={areaProps.bounds}
+    mapDescription={"Map of " + getName(areaProps, "the")}
+  />
+</div>
 
-<Grid>
+<Grid marginTop>
   {#each ["population-count", "five-year-population-change", "median-age"].filter((slug) => slug in data.metadata) as slug}
     <BigNumber
-      indicator={data.metadata[slug]}
-      geography={data.area.properties.areacd}
+      indicator={slug}
+      metadata={data.metadata[slug]}
+      geography={areaProps.areacd}
       period={pageState.selectedPeriodRange[1]}
     />
   {/each}
 </Grid>
 
-{#snippet indicator(item)}
+{#snippet indicator(item, topic)}
   {#if item.children}
-    <h4>{item.label}</h4>
-    {#each item.children as child}
-      {@render indicator(child)}
-    {/each}
-  {:else}
-    <strong>{item.label}</strong>
+    {#if expandedTopics[topic.slug] || item.children[0].index < maxIndicators}
+      <h4>{item.label}</h4>
+      {#each item.children as child}
+        {@render indicator(child, topic)}
+      {/each}
+    {/if}
+  {:else if expandedTopics[topic.slug] || item.index < maxIndicators}
     <IndicatorRow
       indicator={item.slug}
       metadata={data.metadata[item.slug]}
       timeRange={pageState.selectedPeriodRange}
       selected={[
-        data.area.properties.areacd,
+        areaProps.areacd,
         ...pageState.selectedAreas.map((a) => a.areacd),
       ]}
       geoGroup={pageState.selectedGeoGroup}
@@ -70,79 +131,93 @@
   {/if}
 {/snippet}
 
-<NavSections>
-  {#snippet before()}
-    <div class="modals-sticky">
+<NavSections cls="wider-nav-sections">
+  <div class="indicators-nav-sections">
+    <div class="legend-sticky">
+      <AreasLegend
+        selectedAreas={[areaProps, ...pageState.selectedAreas]}
+        selectedGeoGroup={pageState.selectedGeoGroup}
+      />
       <div>
         <AreasModal />
         <OptionsModal />
       </div>
     </div>
-  {/snippet}
-  <NavSection title="Topics" />
-  {#each data.taxonomy as topic}
-    <NavSection title={topic.label} subsection>
-      {#each topic.children as child}
-        {@render indicator(child)}
-      {/each}
-    </NavSection>
-  {/each}
-  <NavSection title="Select an indicator" />
+    <NavSection title="Topics" />
+    {#each data.taxonomy as topic}
+      <NavSection title={topic.label} subsection>
+        {#each topic.children as child}
+          {@render indicator(child, topic)}
+        {/each}
+      </NavSection>
+      {#if topic.count > maxIndicators}
+        <Button
+          variant="secondary"
+          icon="carret"
+          iconRotation={expandedTopics[topic.slug] ? 180 : 0}
+          small
+          on:click={() =>
+            (expandedTopics[topic.slug] = !expandedTopics[topic.slug])}
+          >Show {expandedTopics[topic.slug]
+            ? "fewer"
+            : `${topic.count - maxIndicators} more`}
+          {topic?.label.toLowerCase()} indicators</Button
+        >
+      {/if}
+      <div style:margin-bottom="2rem"></div>
+    {/each}
+  </div>
+  <NavSection title="Select an indicator">
+    <div
+      style="display: block; height: 400px; background: var(--ons-color-banner-bg);"
+      class="ons-u-mb-l ons-u-p-m"
+    >
+      Indicator section to be added.
+    </div>
+  </NavSection>
   {#if data.related.similar[0]}
     <NavSection title="Similar areas">
       <p>
-        See which areas are similar to {formatName(
-          data.area.properties.areanm,
-          "the",
-        )} based on specific groups of indicators. These clusters of areas are based
-        on an analysis carried out by the ONS.
+        See which areas are statistically similar to {getName(areaProps, "the")}
+        based on specific groups of indicators. These clusters of areas are based
+        on
+        <a
+          href="https://www.ons.gov.uk/peoplepopulationandcommunity/wellbeing/methodologies/clusteringsimilarlocalauthoritiesandstatisticalnearestneighboursintheukmethodology"
+          target="_blank">an analysis carried out by the ONS</a
+        >.
       </p>
       <Dropdown
         label="Select a group of indicators"
         options={data.related.similar}
         bind:value={pageState.selectedCluster}
       />
-      <Details
-        title="Show the 20 most similar areas to {formatName(
-          data.area.properties.areanm,
-          'the',
-        )}"
-      >
-        <ol>
-          {#each pageState.selectedCluster.similar as area}
-            <li>{area.areanm}</li>
-          {/each}
-        </ol>
-      </Details>
+      <SimilarAreas {areaProps} selectedCluster={pageState.selectedCluster} />
     </NavSection>
   {/if}
   <NavSection title="Get the data">
     <p>
-      Download all datasets that include {formatName(
-        data.area.properties.areanm,
-        "the",
-      )} in an
+      Download all datasets that include {getName(areaProps, "the")} in an
       <a
         href={resolve(
-          `/api/v1/data.ods?hasGeo=${data.area.properties.areacd}&excludeMultivariate=true&time=all`,
+          `/api/v1/data.ods?hasGeo=${areaProps.areacd}&excludeMultivariate=true&time=all`,
         )}
         download="data.ods">ODS</a
       >
       <a
         href={resolve(
-          `/api/v1/data.csv?hasGeo=${data.area.properties.areacd}&excludeMultivariate=true&time=all`,
+          `/api/v1/data.csv?hasGeo=${areaProps.areacd}&excludeMultivariate=true&time=all`,
         )}
         download="data.csv">CSV</a
       >,
       <a
         href={resolve(
-          `/api/v1/data.csv?hasGeo=${data.area.properties.areacd}&excludeMultivariate=true&time=all`,
+          `/api/v1/data.csv?hasGeo=${areaProps.areacd}&excludeMultivariate=true&time=all`,
         )}
         download="data.csv-metadata.json">CSVW</a
       >, or
       <a
         href={resolve(
-          `/api/v1/data.json?hasGeo=${data.area.properties.areacd}&excludeMultivariate=true&time=all`,
+          `/api/v1/data.json?hasGeo=${areaProps.areacd}&excludeMultivariate=true&time=all`,
         )}
         download="data.json">JSON-Stat</a
       > format.
@@ -165,12 +240,20 @@
 </NavSections>
 
 <style>
-  .modals-sticky {
+  .legend-sticky {
     z-index: 1;
-    display: block;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
     position: sticky;
     top: 0;
     background: var(--ons-color-page-light);
     padding: 0.5em 0;
+  }
+  .indicators-nav-sections > :global(section) {
+    scroll-margin-top: 116px;
+  }
+  .titleblock-container {
+    position: relative;
   }
 </style>

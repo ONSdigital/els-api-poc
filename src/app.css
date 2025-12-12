@@ -2,3 +2,15 @@
 .titleblock-transparent .ons-hero__details {
 	padding: 1.5rem 0 0.5rem;
 }
+
+@media (min-width: 740px) {
+	.wider-nav-sections .ons-col-4\@m {
+		width: 28%;
+		max-width: 28%;
+	}
+
+	.wider-nav-sections .ons-col-8\@m {
+		width: 72%;
+		max-width: 72%;
+	}
+}

@@ -29,10 +29,8 @@ export function medMad(xs, constant = 1.4826) {
 }
 
 export function parseChartData(data, valueKey = "value", periodKey = "period", idKey = "areacd") {
-  console.log("data", data)
   if (data.message) return null;
   if (!data[valueKey] || !data[periodKey] || !data[idKey]) throw new Error("Columns missing from data.");
-  console.log("processing data");
 
   const array = [];
   const keyed = {};
@@ -56,8 +54,6 @@ export function parseChartData(data, valueKey = "value", periodKey = "period", i
     keyed[row[idKey]].push(row);
     array.push(row);
   }
-
-  console.log({ array, keyed, valueDomain, dateDomain })
 
   return { array, keyed, valueDomain, dateDomain };
 }
@@ -118,14 +114,4 @@ export const contrastColor = (color) => {
     return brightness > 125 ? "black" : "white";
   }
   return "black";
-};
-
-export const markerPaths = {
-  circle: "M3,0A3,3,0,1,1,-3,0A3,3,0,1,1,3,0Z",
-  diamond: "M0,-3.33L3.33,0L0,3.33L-3.33,0Z",
-  square: "M2.356,2.356L2.356,-2.356L-2.356,-2.356L-2.356,2.356Z",
-  triangle: "M0,-3.629L3.142,1.814L-3.142,1.814Z",
-  plus: "M 3.5 0.8 L 3.5 -0.8 L 0.8 -0.8 L 0.8 -3.5 L -0.8 -3.5 L -0.8 -0.8 L -3.5 -0.8 L -3.5 0.8 L -0.8 0.8 L -0.8 3.5 L 0.8 3.5 L 0.8 0.8 Z",
-  cross:
-    "M 1.9092 3.0406 L 3.0406 1.9092 L 1.1314 -0 L 3.0406 -1.9092 L 1.9092 -3.0406 L -0 -1.1314 L -1.9092 -3.0406 L -3.0406 -1.9092 L -1.1314 0 L -3.0406 1.9092 L -1.9092 3.0406 L 0 1.1314 Z",
 };

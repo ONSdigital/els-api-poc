@@ -2,18 +2,30 @@ import getIndicators from "./getIndicators";
 import summaryData from "$lib/data/json-stat-summary.json";
 import { capitalise } from "$lib/utils";
 
-function makeItem(slug, label = null, description = null) {
+function makeItem(slug, label = null, description = null, index = 0) {
   const item = { label: label || capitalise(slug), slug };
-  if (description) return { ...item, description };
+  if (description) return { ...item, description, index };
   return { ...item, children: {} };
 }
 
 function nestTaxonomy(taxonomy) {
   const topicsIndex = {};
 
+  let index = 0, topic = null;
   for (const ind of taxonomy) {
-    const indicator = makeItem(ind.slug, ind.label, ind.description);
-    if (!topicsIndex[ind.topic]) topicsIndex[ind.topic] = makeItem(ind.topic);
+    const tpc = ind.topic;
+    if (tpc !== topic) {
+      topic = tpc;
+      index = 0;
+    } else {
+      index += 1;
+    }
+
+    const indicator = makeItem(ind.slug, ind.label, ind.description, index);
+
+    if (!topicsIndex[ind.topic]) topicsIndex[ind.topic] = { ...makeItem(ind.topic), count: 0 };
+    topicsIndex[ind.topic].count += 1;
+
     if (ind.topic === ind.subTopic) {
       topicsIndex[ind.topic].children[ind.slug] = indicator;
     } else {
