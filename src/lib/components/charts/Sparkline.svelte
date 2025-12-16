@@ -38,8 +38,11 @@
     yDomain ? scaleLinear().domain(yDomain).range([100, 0]) : null,
   );
 
-  let yTickWidth = $state(Array(2).fill(40));
-  let labelWidth = $state(Array(2).fill(40));
+  let margins = $state({ left: 0, right: 0 });
+  function updateMargins(el, params) {
+    const width = el.getBoundingClientRect().width;
+    if (width > margins[params.side]) margins[params.side] = width;
+  }
 </script>
 
 {#snippet line(arr, width = 2, color = "grey")}
@@ -70,11 +73,11 @@
 {#snippet label(d, diff, i)}
   {@const color = ONSpalette[i]}
   <div
+    use:updateMargins={{ side: "right" }}
     class="sparkline-label"
     style:background={color}
     style:color={contrastColor(color)}
     style:top="{yScale(d[yKey])}%"
-    bind:clientWidth={labelWidth[i]}
   >
     {diff > 0 ? "+" : ""}{valuePrefix}{formatValue(diff)}{valueSuffix}
   </div>
@@ -82,8 +85,8 @@
 
 <div
   class="sparkline-wrapper"
-  style:padding-left="{(yTickWidth[1] ?? 40) + 10}px"
-  style:padding-right="{(Math.max(...labelWidth) ?? 40) + 10}px"
+  style:padding-left="{margins.left + 10}px"
+  style:padding-right="{margins.right + 10}px"
   style:padding-top="10px"
   style:padding-bottom="25px"
 >
@@ -114,9 +117,9 @@
         {#each yDomain as yTick, i}
           <div class="sparkline-y-tick" style:top="{yScale(yTick)}%"></div>
           <div
+            use:updateMargins={{ side: "left" }}
             class="sparkline-y-tick-label"
             style:top="{yScale(yTick)}%"
-            bind:clientWidth={yTickWidth[i]}
           >
             {formatYTick(yTick)}
           </div>
