@@ -20,13 +20,18 @@
     geoLevel,
   } = $props();
 
-  $inspect(data);
-
   const height = 300;
   let width = $state();
   const widthThreshold = 550;
   let rightMargin = $derived(width < widthThreshold ? 20 : 150);
   let widthInner = $derived(width - rightMargin - leftMargin);
+
+  let _data = $derived(parseChartData(data, yKey, xKey, idKey));
+  let _selected = $derived(
+    _data ? selected.map((cd) => _data.keyed[cd]).filter((d) => d) : []
+  );
+
+  $inspect(_data);
 </script>
 
 <p>Insert excellent bar chart here</p>
