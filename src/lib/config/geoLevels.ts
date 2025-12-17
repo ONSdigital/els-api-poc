@@ -1,43 +1,50 @@
 // Define all area levels/groups used in ELS
-const uk = {label: "United Kingdom", codes: ["K02"]};
-const ctry = {label: "Country", codes: ["E92", "N92", "S92", "W92"]};
-const rgn = {label: "Region", codes: ["E12"]};
-const cauth = {label: "Combined authority", codes: ["E47"]};
-const cty = {label: "County", codes: ["E10"]};
-const ua = {label: "Unitary authority", codes: ["E06", "E07", "E08", "E09", "N09", "S12", "W06"]};
-const lad = {label: "Non-metropolitan district", codes: ["E07"]};
-const utla = {label: "Upper tier/unitary authority", codes: [...cty.codes, ...ua.codes]};
-const ltla = {label: "Lower tier/unitary authority", codes: [...ua.codes, ...lad.codes]};
-const wpc = {label: "Parliamentary constituency", codes: ["E14", "N05", "N06", "S14", "W07"]};
-const wd = {label: "Electoral ward", codes: ["E05", "W05"]};
-const par = {label: "Parish", codes: ["E04", "W04"]};
-const sener = {label: "Senedd electoral region", codes: ["W10"]};
-const senc = {label: "Senedd constituency", codes: ["W09"]};
-const msoa = {label: "Middle-layer super output area", codes: ["E02", "W02"]};
-const lsoa = {label: "Lower-layer super output area", codes: ["E01", "W01"]};
-const oa = {label: "Output area", codes: ["E00", "W00"]};
+const uk = { label: "United Kingdom", codes: ["K02"] };
+const ctry = { label: "Country", codes: ["E92", "N92", "S92", "W92"] };
+const rgn = { label: "Region", codes: ["E12"] };
+const cauth = { label: "Combined authority", codes: ["E47"] };
+const cty = { label: "County", codes: ["E10"] };
+const ua = { label: "Unitary authority", codes: ["E06", "E07", "E08", "E09", "N09", "S12", "W06"] };
+const lad = { label: "Non-metropolitan district", codes: ["E07"] };
+const utla = { label: "Upper tier/unitary authority", codes: [...cty.codes, ...ua.codes] };
+const ltla = { label: "Lower tier/unitary authority", codes: [...ua.codes, ...lad.codes] };
+const wpc = { label: "Parliamentary constituency", codes: ["E14", "N05", "N06", "S14", "W07"] };
+const wd = { label: "Electoral ward", codes: ["E05", "W05"] };
+const par = { label: "Parish", codes: ["E04", "W04"] };
+const sener = { label: "Senedd electoral region", codes: ["W10"] };
+const senc = { label: "Senedd constituency", codes: ["W09"] };
+const msoa = { label: "Middle-layer super output area", codes: ["E02", "W02"] };
+const lsoa = { label: "Lower-layer super output area", codes: ["E01", "W01"] };
+const oa = { label: "Output area", codes: ["E00", "W00"] };
 
 // Alternative labels where geography type names vary from level/group names
 const altLabels = {
-	E08: "Metropolitan district",
-	E09: "Borough",
-	N09: "Local government district",
-	S12: "Council area",
+  E08: "Metropolitan district",
+  E09: "Borough",
+  N09: "Local government district",
+  S12: "Council area",
   W04: "Community"
 };
 
 // Overlapping groupings of geographies for visualising data
 export const geoLevels = {
-  ctry: {label: ctry.label, codes: [...uk.codes, ...ctry.codes]},
-  rgn: {label: "Region/country", codes: ["N92", "S92", "W92", ...rgn.codes]},
+  ctry: { label: ctry.label, codes: [...uk.codes, ...ctry.codes] },
+  rgn: { label: "Region/country", codes: ["N92", "S92", "W92", ...rgn.codes] },
   cauth,
   utla,
   ltla
 };
 
-// Mutually exclusive groupings for navigation and selections
-export const geoLevelsNamed = {uk, ctry, rgn, cauth, cty, ltla, wpc, wd, par, sener, senc};
-export const geoLevelsAll = {...geoLevelsNamed, msoa, lsoa, oa};
+// Alternative groupings for navigation
+export const geoLevelsNav = {
+  ctry, rgn,
+  cauth: { label: "Upper tier/combined authority", codes: [...cauth.codes, ...utla.codes] },
+  utla, ltla, wpc, wd, par, sener, senc, msoa, lsoa, oa
+};
+
+// Mutually exclusive groupings for area search and selection
+export const geoLevelsNamed = { uk, ctry, rgn, cauth, cty, ltla, wpc, wd, par, sener, senc };
+export const geoLevelsAll = { ...geoLevelsNamed, msoa, lsoa, oa };
 
 function makeArray(obj) {
   return Object.keys(obj).map((key) => ({
@@ -68,8 +75,10 @@ function makeOrderedCodes(arr) {
 export const geoLevelsArray = makeArray(geoLevels);
 export const geoLevelsLookup = makeLookup(geoLevelsArray);
 
+export const geoLevelsNavArray = makeArray(geoLevelsNav);
+
 export const geoLevelsAllArray = makeArray(geoLevelsAll);
 export const geoLevelsAllLookup = makeLookup(geoLevelsAllArray);
 export const geoCodesAllArray = makeOrderedCodes(geoLevelsAllArray);
 
-export const countriesMap = {E: "E92000001", N: "N92000002", S: "S92000003", W: "W92000004"};
+export const countriesMap = { E: "E92000001", N: "N92000002", S: "S92000003", W: "W92000004" };
