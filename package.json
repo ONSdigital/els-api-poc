@@ -21,7 +21,7 @@
   "license": "MIT",
   "devDependencies": {
     "@mapbox/tilebelt": "^2.0.2",
-    "@onsvisual/accessible-spreadsheet-creator": "^0.1.1",
+    "@onsvisual/accessible-spreadsheet-creator": "^0.1.2",
     "@onsvisual/robo-utils": "^0.3.9",
     "@onsvisual/svelte-charts": "^0.4.11",
     "@onsvisual/svelte-components": "^1.0.44",
