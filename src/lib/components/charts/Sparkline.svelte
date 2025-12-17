@@ -27,15 +27,15 @@
           .map((cd, i) => ({ i, data: _data.keyed[cd] }))
           .filter((d) => d.data && d.data.length > 1)
           .reverse()
-      : [],
+      : []
   );
 
   let xScale = $derived(
-    _data ? scaleTime().domain(_data.dateDomain).range([0, 100]) : null,
+    _data ? scaleTime().domain(_data.dateDomain).range([0, 100]) : null
   );
   let yDomain = $derived(_data ? nice(..._data.valueDomain, 2) : null);
   let yScale = $derived(
-    yDomain ? scaleLinear().domain(yDomain).range([100, 0]) : null,
+    yDomain ? scaleLinear().domain(yDomain).range([100, 0]) : null
   );
 
   let margins = $state({ left: 0, right: 0 });
