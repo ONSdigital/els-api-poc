@@ -79,6 +79,14 @@
   });
 </script>
 
+{#snippet downloadUrl(url, format, formatLabel = null)}
+  {@const label = formatLabel || format.toUpperCase()}
+  <a
+    href={url?.replace(".cols.json", `.${format}`)}
+    download="{indicator}.{format}">{label}</a
+  >
+{/snippet}
+
 <Observe bind:visible rootMargin={200}>
   <details class="indicator-header">
     <summary class="indicator-title"
@@ -102,6 +110,21 @@
             : ", "}
         {/each}
       </p>
+      <p><strong>Download data:</strong></p>
+      <ul>
+        <li>
+          Beeswarm data as {@render downloadUrl(loadedBeeswarmUrl, "csv")},
+          {@render downloadUrl(loadedBeeswarmUrl, "csvw")},
+          {@render downloadUrl(loadedBeeswarmUrl, "ods")}, or
+          {@render downloadUrl(loadedBeeswarmUrl, "json", "JSON-Stat")}.
+        </li>
+        <li>
+          Line chart data as {@render downloadUrl(loadedSparklineUrl, "csv")},
+          {@render downloadUrl(loadedSparklineUrl, "csvw")},
+          {@render downloadUrl(loadedSparklineUrl, "ods")}, or
+          {@render downloadUrl(loadedSparklineUrl, "json", "JSON-Stat")}.
+        </li>
+      </ul>
       <p>
         For more data and charts, visit our page on <a
           href={resolve(`/app/indicators/${metadata.slug}`)}>{metadata.label}</a
@@ -185,11 +208,16 @@
     border-left-width: 4px;
     line-height: 20px;
   }
-  .indicator-description > p {
+  .indicator-description > p,
+  .indicator-description > ul {
     font-size: 16px;
     margin: 0;
   }
-  .indicator-description > p + p {
+  .indicator-description > p + p,
+  .indicator-description > ul + p {
     margin-top: 1rem;
+  }
+  .indicator-description > p + ul {
+    margin-top: 0.5em;
   }
 </style>
