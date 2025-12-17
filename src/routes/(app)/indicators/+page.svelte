@@ -30,7 +30,7 @@
 
 {#snippet indicator(ind)}
   <p>
-    <a href={resolve(`/app/indicators/${ind.slug}`)}>{ind.label}</a><br />
+    <a href={resolve(`/indicators/${ind.slug}`)}>{ind.label}</a><br />
     {ind.description}
   </p>
 {/snippet}

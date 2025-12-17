@@ -35,8 +35,8 @@
   function handleSelect(area) {
     const isPostcode = area.type === "postcode";
     const url = isPostcode
-      ? `/app/areas/search?q=${area.areacd}`
-      : `/app/areas/${makeCanonicalSlug(area)}`;
+      ? `/areas/search?q=${area.areacd}`
+      : `/areas/${makeCanonicalSlug(area)}`;
     goto(resolve(url), { noScroll: !isPostcode });
   }
 </script>
@@ -76,9 +76,7 @@
           icon="arrow"
           iconPosition="after"
           variant="ghost"
-          href={resolve(
-            `/app/areas/${makeCanonicalSlug(areaProps)}/indicators`,
-          )}
+          href={resolve(`/areas/${makeCanonicalSlug(areaProps)}/indicators`)}
           small>Explore local indicators</Button
         >
       </div>
@@ -105,7 +103,7 @@
                 {#each childGroup.areas as child}
                   <li>
                     <a
-                      href={resolve(`/app/areas/${makeCanonicalSlug(child)}`)}
+                      href={resolve(`/areas/${makeCanonicalSlug(child)}`)}
                       data-sveltekit-noscroll>{getName(child)}</a
                     >
                   </li>

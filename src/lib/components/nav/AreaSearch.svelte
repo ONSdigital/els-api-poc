@@ -7,7 +7,7 @@
     id = "search",
     name = "q",
     placeholder = `Eg. "Fareham" or "PO15 5RR"`,
-    action = "/app/areas/search",
+    action = "/areas/search",
     allAreas = true,
     onSelect,
   } = $props();

@@ -17,12 +17,12 @@ export const load: PageLoad = async ({ parent }) => {
     pageType: `area page`,
     breadcrumbLinks: [
       { label: "Home", href: resolve("/") },
-      { label: "Explore local statistics", href: resolve("/app") },
+      { label: "Explore local statistics", href: resolve("/") },
       ...[...area.properties.parents]
         .reverse()
         .map((p) => ({
           label: getName(p),
-          href: resolve(`/app/areas/${p.areacd}`),
+          href: resolve(`/areas/${p.areacd}`),
         })),
     ]
   };

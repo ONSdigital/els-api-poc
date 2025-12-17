@@ -31,15 +31,15 @@ export const load: PageLoad = async ({ params, fetch }) => {
     areas,
     geoLevels: gLevels,
     periods,
-    
+
     // Page metadata
     title: `${indicator.label} - ONS`,
-		description: indicator.subtitle,
-		pageType: `indicator data page`,
+    description: indicator.subtitle,
+    pageType: `indicator data page`,
     breadcrumbLinks: [
       { label: "Home", href: resolve("/") },
-      { label: "Explore local statistics", href: resolve("/app") },
-      { label: "Indicators", href: resolve("/app/indicators") },
+      { label: "Explore local statistics", href: resolve("/") },
+      { label: "Indicators", href: resolve("/indicators") },
     ],
     breadcrumbBackground: "#eaeaea",
   };

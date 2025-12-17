@@ -127,7 +127,7 @@
       </ul>
       <p>
         For more data and charts, visit our page on <a
-          href={resolve(`/app/indicators/${metadata.slug}`)}>{metadata.label}</a
+          href={resolve(`/indicators/${metadata.slug}`)}>{metadata.label}</a
         >.
       </p>
     </div>

@@ -50,7 +50,7 @@
                 <li>
                     <a
                         href={resolve(
-                            `/app/areas/${makeCanonicalSlug(area)}/indicators`,
+                            `/areas/${makeCanonicalSlug(area)}/indicators`,
                         )}>{getName(area)}</a
                     >
                 </li>

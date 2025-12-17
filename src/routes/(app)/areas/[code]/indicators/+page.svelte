@@ -51,7 +51,7 @@
   let hovered = $state();
 
   function handleSelect(area) {
-    const url = `/app/areas/${makeCanonicalSlug(area)}/indicators`;
+    const url = `/areas/${makeCanonicalSlug(area)}/indicators`;
     goto(resolve(url));
   }
 </script>

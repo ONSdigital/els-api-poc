@@ -18,7 +18,7 @@
 </script>
 
 <Hero title={`Search results for "${data.meta.query || ""}"`} cls="search-hero">
-  <form class="search-form" action={resolve("/app/areas/search")}>
+  <form class="search-form" action={resolve("/areas/search")}>
     <Input
       id="search"
       name="q"
@@ -46,7 +46,7 @@
     <DocumentList>
       {#each data.data as area}
         <Document
-          href={resolve(`/app/areas/${area?.areacd}`)}
+          href={resolve(`/areas/${area?.areacd}`)}
           title={area?.areanm || area.areacd}
           meta="GSS code: {area.areacd}"
           description="{area?.type}{area.parent ? ` in ${area.parent}` : ''}"
