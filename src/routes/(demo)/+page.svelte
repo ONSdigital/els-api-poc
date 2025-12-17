@@ -21,7 +21,7 @@
 </Section>
 
 <Grid colWidth="medium">
-  <Card title="ELS app rebuild" mode="featured" href="{base}/app">
+  <Card title="ELS app rebuild" mode="featured" href="{base}/home">
     Rebuilding the ELS app using the API (in progress).
   </Card>
   <Card title="Query builder" mode="featured" href="{base}/query">
