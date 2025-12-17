@@ -1,6 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import { Observe } from "@onsvisual/svelte-components";
+  import { Observe, Em } from "@onsvisual/svelte-components";
   import {
     makeDataUrl,
     makeValueFormatter,
@@ -88,13 +88,18 @@
 {/snippet}
 
 <Observe bind:visible rootMargin={200}>
-  <details class="indicator-header">
+  <details id={indicator} class="indicator-header">
     <summary class="indicator-title"
       ><strong>{metadata.label}</strong>{metadata.subText
         ? `, ${metadata.subText}`
         : ""}</summary
     >
     <div class="indicator-description">
+      {#if metadata.experimentalStatistic}
+        <p>
+          <Em color="#003c57">Official statistics in development</Em>
+        </p>
+      {/if}
       <p><strong>Definition:</strong> {metadata.description}</p>
       <p>
         <strong
@@ -132,7 +137,7 @@
       </p>
     </div>
   </details>
-  <div id={indicator} class="indicator-row">
+  <div class="indicator-row">
     <div class="indicator-beeswarm">
       <Beeswarm
         data={beeswarmData || { message: "No data" }}
@@ -219,5 +224,8 @@
   }
   .indicator-description > p + ul {
     margin-top: 0.5em;
+  }
+  .indicator-header {
+    scroll-margin-top: 116px;
   }
 </style>
