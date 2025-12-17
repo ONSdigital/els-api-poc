@@ -1,12 +1,7 @@
 <script lang="ts">
   //@ts-nocheck
   let { data, title, indicator, source } = $props();
-
   let el;
-  function arrayJoin(arr, separators = [", ", " and "]) {
-    if (arr.length < 2) return arr.join(separators[0]);
-    return arr.slice(0, -1).join(separators[0]) + separators[1] + arr.slice(-1);
-  }
 </script>
 
 <div class="content-block-wrapper">
@@ -25,11 +20,11 @@
       <div class="source-notes-container">
         <p class="source-container">
           <span style="font-weight: bold">Source:</span>
-          {arrayJoin(
-            source.map(
-              (s) => `<a href="${s.href}" target="_blank">${s.name}</a>`
-            )
-          )}
+          {#each source as s, i}
+            <a href={s.href} target="_blank">{s.name}</a>{i < source.length - 1
+              ? " and "
+              : ""}
+          {/each}
         </p>
       </div>
     {/if}

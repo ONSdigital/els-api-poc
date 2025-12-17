@@ -4,7 +4,9 @@
     makeValueFormatter,
     makePeriodFormatter,
   } from "$lib/utils";
-  import Line from "$lib/components/charts/LineNew.svelte";
+  import Line from "$lib/components/charts/Line.svelte";
+  import Map from "$lib/components/charts/Map.svelte";
+  import Bar from "$lib/components/charts/Bar.svelte";
 
   let {
     indicator,
@@ -14,6 +16,7 @@
     geoLevel,
     hovered = $bindable(),
     formatPeriod,
+    chartType,
   } = $props();
 
   let formatValue = $derived(makeValueFormatter(metadata.decimalPlaces));
@@ -36,18 +39,26 @@
       return { message: "Failed" };
     }
   }
+
+  const chartComponents = {
+    map: Map,
+    line: Line,
+    bar: Bar,
+  };
 </script>
 
-<div class="line-chart">
+<div class="indicator-chart">
   {#await fetchData(indicator, timeRange, selected, geoLevel)}
     Fetching chart data
   {:then chartData}
-    <Line
+    <svelte:component
+      this={chartComponents[chartType]}
       data={chartData || { message: "No data" }}
       {formatValue}
       {selected}
       bind:hovered
       {formatPeriod}
+      {geoLevel}
     />
   {:catch}
     Failed to load chart data
