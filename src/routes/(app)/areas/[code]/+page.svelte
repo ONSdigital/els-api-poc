@@ -90,8 +90,8 @@
       <AreaSearch id="search" onSelect={handleSelect} />
     </div>
   </div>
-  {#if areaProps.children[0]}
-    <GridCell colspan={3}>
+  <GridCell colspan={3}>
+    {#if areaProps.children[0]}
       {#key areaProps}
         <Tabs bind:selected={selectedChildGroupKey} compact>
           {#each areaProps.children as childGroup, i}
@@ -114,8 +114,10 @@
           {/each}
         </Tabs>
       {/key}
-    </GridCell>
-  {/if}
+    {:else}
+      <p>No smaller areas available within {getName(areaProps, "the")}.</p>
+    {/if}
+  </GridCell>
 </Grid>
 
 {#if data.productLinks.length > 0}
