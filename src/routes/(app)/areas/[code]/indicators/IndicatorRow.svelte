@@ -16,9 +16,10 @@
     selected = [],
     geoGroup,
     hovered = $bindable(),
+    hidden = null,
   } = $props();
 
-  let visible = $state();
+  let visible = $state(false);
   let formatValue = $derived(makeValueFormatter(metadata.decimalPlaces));
   let formatPeriod = $derived(makePeriodFormatter(metadata.periodFormat));
 
@@ -38,6 +39,7 @@
     visible,
   ) {
     if (!visible) return;
+    console.log(`Refreshing ${indicator} data`);
     const beeswarmUrl = makeDataUrl(
       indicator,
       timeRange[1],
@@ -66,7 +68,6 @@
     }
   }
   $effect(async () => {
-    console.log(`Refreshing ${indicator} data`);
     fetchData(
       indicator,
       timeRange,
@@ -74,7 +75,7 @@
       geoGroup.geoLevel,
       geoGroup.geoExtent,
       geoGroup.geoCluster,
-      visible,
+      visible && !hidden,
     );
   });
 </script>
@@ -88,82 +89,84 @@
 {/snippet}
 
 <Observe bind:visible rootMargin={200}>
-  <details id={indicator} class="indicator-header">
-    <summary class="indicator-title"
-      ><strong>{metadata.label}</strong>{metadata.subText
-        ? `, ${metadata.subText}`
-        : ""}</summary
-    >
-    <div class="indicator-description">
-      {#if metadata.experimentalStatistic}
+  <div id={indicator} class="indicator-row" {hidden}>
+    <details class="indicator-header">
+      <summary class="indicator-title"
+        ><strong>{metadata.label}</strong>{metadata.subText
+          ? `, ${metadata.subText}`
+          : ""}</summary
+      >
+      <div class="indicator-description">
+        {#if metadata.experimentalStatistic}
+          <p>
+            <Em color="#003c57">Official statistics in development</Em>
+          </p>
+        {/if}
+        <p><strong>Definition:</strong> {metadata.description}</p>
         <p>
-          <Em color="#003c57">Official statistics in development</Em>
+          <strong
+            >{metadata.source.length > 1
+              ? "Data sources"
+              : "Data source"}:</strong
+          >
+          {#each metadata.source as s, i}
+            <a href={s.href} target="_blank">{s.name}</a>
+            ({s.date.split("-").reverse().join("/")}){i ===
+            metadata.source.length - 1
+              ? ""
+              : ", "}
+          {/each}
         </p>
-      {/if}
-      <p><strong>Definition:</strong> {metadata.description}</p>
-      <p>
-        <strong
-          >{metadata.source.length > 1
-            ? "Data sources"
-            : "Data source"}:</strong
-        >
-        {#each metadata.source as s, i}
-          <a href={s.href} target="_blank">{s.name}</a>
-          ({s.date.split("-").reverse().join("/")}){i ===
-          metadata.source.length - 1
-            ? ""
-            : ", "}
-        {/each}
-      </p>
-      <p><strong>Download data:</strong></p>
-      <ul>
-        <li>
-          Beeswarm data as {@render downloadUrl(loadedBeeswarmUrl, "csv")},
-          {@render downloadUrl(loadedBeeswarmUrl, "csvw")},
-          {@render downloadUrl(loadedBeeswarmUrl, "ods")}, or
-          {@render downloadUrl(loadedBeeswarmUrl, "json", "JSON-Stat")}.
-        </li>
-        <li>
-          Line chart data as {@render downloadUrl(loadedSparklineUrl, "csv")},
-          {@render downloadUrl(loadedSparklineUrl, "csvw")},
-          {@render downloadUrl(loadedSparklineUrl, "ods")}, or
-          {@render downloadUrl(loadedSparklineUrl, "json", "JSON-Stat")}.
-        </li>
-      </ul>
-      <p>
-        For more data and charts, visit our page on <a
-          href={resolve(`/indicators/${metadata.slug}`)}>{metadata.label}</a
-        >.
-      </p>
-    </div>
-  </details>
-  <div class="indicator-row">
-    <div class="indicator-beeswarm">
-      <Beeswarm
-        data={beeswarmData || { message: "No data" }}
-        {formatPeriod}
-        {formatValue}
-        valuePrefix={metadata.prefix}
-        valueSuffix={metadata.suffix}
-        {selected}
-        bind:hovered
-      />
-    </div>
-    <div class="indicator-sparkline">
-      <Sparkline
-        data={sparklineData || { message: "No data" }}
-        {formatPeriod}
-        {formatValue}
-        valuePrefix={metadata.prefix}
-        valueSuffix={metadata.suffix}
-        {selected}
-      />
+        <p><strong>Download data:</strong></p>
+        <ul>
+          <li>
+            Beeswarm data as {@render downloadUrl(loadedBeeswarmUrl, "csv")},
+            {@render downloadUrl(loadedBeeswarmUrl, "csvw")},
+            {@render downloadUrl(loadedBeeswarmUrl, "ods")}, or
+            {@render downloadUrl(loadedBeeswarmUrl, "json", "JSON-Stat")}.
+          </li>
+          <li>
+            Line chart data as {@render downloadUrl(loadedSparklineUrl, "csv")},
+            {@render downloadUrl(loadedSparklineUrl, "csvw")},
+            {@render downloadUrl(loadedSparklineUrl, "ods")}, or
+            {@render downloadUrl(loadedSparklineUrl, "json", "JSON-Stat")}.
+          </li>
+        </ul>
+        <p>
+          For more data and charts, visit our page on <a
+            href={resolve(`/indicators/${metadata.slug}`)}>{metadata.label}</a
+          >.
+        </p>
+      </div>
+    </details>
+    <div class="indicator-charts">
+      <div class="indicator-beeswarm">
+        <Beeswarm
+          data={beeswarmData || { message: "No data" }}
+          {formatPeriod}
+          {formatValue}
+          valuePrefix={metadata.prefix}
+          valueSuffix={metadata.suffix}
+          {selected}
+          bind:hovered
+        />
+      </div>
+      <div class="indicator-sparkline">
+        <Sparkline
+          data={sparklineData || { message: "No data" }}
+          {formatPeriod}
+          {formatValue}
+          valuePrefix={metadata.prefix}
+          valueSuffix={metadata.suffix}
+          {selected}
+        />
+      </div>
     </div>
   </div>
 </Observe>
 
 <style>
-  .indicator-row {
+  .indicator-charts {
     display: flex;
     flex-direction: row;
     gap: 2rem;

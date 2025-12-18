@@ -110,13 +110,19 @@
 
 {#snippet indicator(item, topic)}
   {#if item.children}
-    {#if expandedTopics[topic.slug] || item.children[0].index < maxIndicators}
-      <h4>{item.label}</h4>
-      {#each item.children as child}
-        {@render indicator(child, topic)}
-      {/each}
-    {/if}
-  {:else if expandedTopics[topic.slug] || item.index < maxIndicators}
+    {@const hidden = !(
+      expandedTopics[topic.slug] || item.children[0].index < maxIndicators
+    )}
+    <h4 {hidden}>
+      {item.label}
+    </h4>
+    {#each item.children as child}
+      {@render indicator(child, topic)}
+    {/each}
+  {:else}
+    {@const hidden = !(
+      expandedTopics[topic.slug] || item.index < maxIndicators
+    )}
     <IndicatorRow
       indicator={item.slug}
       metadata={data.metadata[item.slug]}
@@ -126,6 +132,7 @@
         ...pageState.selectedAreas.map((a) => a.areacd),
       ]}
       geoGroup={pageState.selectedGeoGroup}
+      {hidden}
       bind:hovered
     />
   {/if}
@@ -255,5 +262,8 @@
   }
   .titleblock-container {
     position: relative;
+  }
+  .hidden {
+    display: none;
   }
 </style>

@@ -14,3 +14,7 @@
 		max-width: 72%;
 	}
 }
+
+[hidden] {
+	display: none !important;
+}
