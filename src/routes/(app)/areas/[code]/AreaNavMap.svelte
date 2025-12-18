@@ -39,8 +39,6 @@
     map.fitBounds(bounds, { padding: 20 });
   }
   $effect(() => fitBounds(bounds));
-
-  $inspect({ area });
 </script>
 
 <div style:height="450px">

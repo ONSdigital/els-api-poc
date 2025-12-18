@@ -24,6 +24,7 @@
   import ESSMap from "$lib/components/visuals/ESSMap.svelte";
 
   let { data } = $props();
+  $inspect({ data });
   let areaProps = $derived(data.area.properties);
 
   let clientWidth = $state();
