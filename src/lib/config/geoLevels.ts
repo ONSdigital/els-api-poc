@@ -76,6 +76,7 @@ export const geoLevelsArray = makeArray(geoLevels);
 export const geoLevelsLookup = makeLookup(geoLevelsArray);
 
 export const geoLevelsNavArray = makeArray(geoLevelsNav);
+export const geoLevelsNavLookup = makeLookup(geoLevelsNavArray);
 
 export const geoLevelsAllArray = makeArray(geoLevelsAll);
 export const geoLevelsAllLookup = makeLookup(geoLevelsAllArray);

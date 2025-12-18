@@ -1,27 +1,24 @@
-import { geoLevelsAllArray, geoLevelsNavArray } from "$lib/config/geoLevels";
+import { geoLevelsAllLookup, geoLevelsNavLookup } from "$lib/config/geoLevels";
+import sortAreasByName from "./sortAreasByName";
 
 export default function groupAreasByLevel(areas, mode = "default") {
   if (areas.length === 0) return [];
 
-  const cds = new Set(areas.map((a) => a.areacd.slice(0, 3)));
-  const levels = (mode === "nav" ? geoLevelsNavArray : geoLevelsAllArray).filter((l) =>
-    l.codes.some((cd) => cds.has(cd))
-  );
-  const areaGroups = levels.map((l) => ({
-    key: l.key,
-    label: l.label,
-    areas: [],
-  }));
+  const lookup = mode === "nav" ? geoLevelsNavLookup : geoLevelsAllLookup;
+  const levels = {};
 
-  while (areas.length > 0) {
-    const area = areas.shift();
-    for (let i = 0; i < levels.length; i++) {
-      if (levels[i].codes.includes(area.areacd.slice(0, 3))) {
-        areaGroups[i].areas.push(area);
-        break;
-      }
-    }
+  for (const area of areas) {
+    const cd = area.areacd.slice(0, 3);
+    const level = lookup[cd];
+
+    if (level && !levels[level.key]) levels[level.key] = {
+      key: level.key,
+      label: level.label,
+      areas: [],
+    };
+    if (levels[level.key]) levels[level.key].areas.push(area);
   }
 
-  return areaGroups.filter(l => l.areas.length > 0);
+  return Object.values(levels)
+    .map(l => ({ ...l, areas: sortAreasByName(l.areas) }));
 }
