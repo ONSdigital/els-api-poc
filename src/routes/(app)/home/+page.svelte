@@ -128,6 +128,29 @@
     </Li>
   </List>
 </Section>
+<Section title="Get the data">
+  <p>
+    You can download all of the data available on the Explore Local Statistics
+    service in an
+    <a href={resolve("/api/v1/data.ods?time=all")} download="data.ods">ODS</a>,
+    <a href={resolve("/api/v1/data.csv?time=all")} download="data.csv">CSV</a>,
+    <a href={resolve("/api/v1/data.csvw?time=all")} download="data.csvw.json"
+      >CSVW</a
+    >
+    or
+    <a href={resolve("/api/v1/data.json?time=all")} download="data.json"
+      >JSON-Stat</a
+    > format.
+  </p>
+  <p>
+    Information on the strengths and limitations of the Explore Local Statistics
+    service and methods used is available in the
+    <a
+      href="https://www.ons.gov.uk/peoplepopulationandcommunity/healthandsocialcare/healthandwellbeing/methodologies/explorelocalstatisticsserviceqmi"
+      >quality and methodology information (QMI) report</a
+    >.
+  </p>
+</Section>
 <Section title="About these pages">
   <p>
     These pages are part of the Explore Subnational Statistics (ESS) service.
@@ -145,14 +168,6 @@
     The ESS service aims to provide one place for users to find, visualise,
     compare and download subnational statistics by standardised geographies and
     customer-defined areas.
-  </p>
-  <p>
-    Information on the strengths and limitations of the Explore Local Statistics
-    service and methods used is available in the
-    <a
-      href="https://www.ons.gov.uk/peoplepopulationandcommunity/healthandsocialcare/healthandwellbeing/methodologies/explorelocalstatisticsserviceqmi"
-      >quality and methodology information (QMI) report</a
-    >.
   </p>
   <p>
     We value your feedback on these statistics. If you would like to get in
