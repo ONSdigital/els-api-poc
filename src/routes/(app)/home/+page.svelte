@@ -148,10 +148,10 @@
   </p>
   <p>
     Information on the strengths and limitations of the Explore Local Statistics
-    (ELS) service and methods used is available in
+    service and methods used is available in the
     <a
       href="https://www.ons.gov.uk/peoplepopulationandcommunity/healthandsocialcare/healthandwellbeing/methodologies/explorelocalstatisticsserviceqmi"
-      >ELS quality and methodology information (QMI) report</a
+      >quality and methodology information (QMI) report</a
     >.
   </p>
   <p>

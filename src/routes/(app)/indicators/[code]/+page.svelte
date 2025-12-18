@@ -79,13 +79,13 @@
           ? ["K03000001"]
           : data.indicator.geography.countries.length == 1
             ? data.indicator.geography.countries.map((d) => countryLookup[d])
-            : []
+            : [],
   );
 
   let pageState = $state({
     selectedAreas: [],
     selectedGeoLevel: data.geoLevels.find(
-      (g) => g.id === data.indicator.geography.initialLevel
+      (g) => g.id === data.indicator.geography.initialLevel,
     ),
     selectedPeriodRange: [
       data.periods[0],
@@ -105,8 +105,8 @@
       key: data.indicator.source.length === 1 ? "Data source" : "Data sources",
       value: arrayJoin(
         data.indicator.source.map(
-          (s) => `<a href="${s.href}" target="_blank">${s.name}</a>`
-        )
+          (s) => `<a href="${s.href}" target="_blank">${s.name}</a>`,
+        ),
       ),
     },
     {
@@ -141,13 +141,13 @@
         <p class="subtitle">
           {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(
             0,
-            4
+            4,
           )}
           to {pageState.selectedPeriodRange[1].slice(0, 4)}
         </p>
         <LazyLoad>
           <div class="chart-container map-container">
-            {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange[1].slice(0, 10) } )}
+            {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange[1].slice(0, 10) }, )}
               Fetching chart data
             {:then chartData}
               <Map data={chartData} />
@@ -180,7 +180,7 @@
           <p class="subtitle">
             {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(
               0,
-              4
+              4,
             )}
             to {pageState.selectedPeriodRange[1].slice(0, 4)}
           </p>
@@ -190,7 +190,7 @@
               metadata={data.indicator}
               timeRange={pageState.selectedPeriodRange}
               selected={initialSelected.concat(
-                pageState.selectedAreas.map((a) => a.areacd)
+                pageState.selectedAreas.map((a) => a.areacd),
               )}
               geoLevel={pageState.selectedGeoLevel}
               {formatPeriod}
@@ -207,7 +207,7 @@
       <p class="subtitle">
         {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(
           0,
-          4
+          4,
         )}
         to {pageState.selectedPeriodRange[1].slice(0, 4)}
       </p>
@@ -217,7 +217,7 @@
           metadata={data.indicator}
           timeRange={pageState.selectedPeriodRange[1]}
           selected={initialSelected.concat(
-            pageState.selectedAreas.map((a) => a.areacd)
+            pageState.selectedAreas.map((a) => a.areacd),
           )}
           geoLevel={pageState.selectedGeoLevel}
           {formatPeriod}
@@ -231,13 +231,13 @@
       <p class="subtitle">
         {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(
           0,
-          4
+          4,
         )}
         to {pageState.selectedPeriodRange[1].slice(0, 4)}
       </p>
       <LazyLoad>
         <div class="chart-container">
-          {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: "all" } )}
+          {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: "all" }, )}
             Fetching chart data
           {:then chartData}
             <Table
@@ -263,26 +263,26 @@
     <p>
       You can download this dataset in an <a
         href={resolve(
-          `/api/v1/data.ods?indicator=${data.indicator.slug}&time=all`
+          `/api/v1/data.ods?indicator=${data.indicator.slug}&time=all`,
         )}
         download={`${data.indicator.slug}.ods`}>ODS</a
       >,
       <a
         href={resolve(
-          `/api/v1/data.csv?indicator=${data.indicator.slug}&time=all`
+          `/api/v1/data.csv?indicator=${data.indicator.slug}&time=all`,
         )}
         download={`${data.indicator.slug}.csv`}>CSV</a
       >,
       <a
         href={resolve(
-          `/api/v1/data.csvw?indicator=${data.indicator.slug}&time=all`
+          `/api/v1/data.csvw?indicator=${data.indicator.slug}&time=all`,
         )}
         download={`${data.indicator.slug}.csv-metadata.json`}>CSVW</a
       >
       or
       <a
         href={resolve(
-          `/api/v1/data.json?indicator=${data.indicator.slug}&time=all`
+          `/api/v1/data.json?indicator=${data.indicator.slug}&time=all`,
         )}
         download={`${data.indicator.slug}.json`}>JSON-Stat</a
       >
@@ -293,9 +293,12 @@
       >.
     </p>
     <p>
-      Quality and Methodology Information for the Explore Local Statistics
-      service details the strengths and limitations of the service, methods
-      used, data uses and users.
+      Information on the strengths and limitations of the Explore Local
+      Statistics service and methods used is available in the
+      <a
+        href="https://www.ons.gov.uk/peoplepopulationandcommunity/healthandsocialcare/healthandwellbeing/methodologies/explorelocalstatisticsserviceqmi"
+        >quality and methodology information (QMI) report</a
+      >.
     </p>
   </NavSection>
   <NavSection title="Other indicators">
