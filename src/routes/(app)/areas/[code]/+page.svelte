@@ -4,6 +4,7 @@
   import { goto, afterNavigate } from "$app/navigation";
   import { getName, capitalise } from "@onsvisual/robo-utils";
   import { makeCanonicalSlug } from "$lib/api/geo/helpers/areaSlugUtils";
+  import { getNearestRelatedParent } from "$lib/util/linkHelpers";
   import {
     analyticsEvent,
     Hero,
@@ -32,6 +33,7 @@
   let selectedChildGroup = $derived(
     areaProps.children.find((c) => c.key === selectedChildGroupKey),
   );
+  let indicatorsArea = $derived(getNearestRelatedParent(areaProps));
 
   function handleSelect(area) {
     const isPostcode = area.type === "postcode";
@@ -68,7 +70,7 @@
     {#if areaProps.areacd !== "K02000001"}
       <div class="local-indicators-card">
         <h2 class="ons-card__title ons-u-fs-m" style:margin-bottom="12px">
-          Local indicators for {areaProps.areanm}
+          Local indicators for {getName(indicatorsArea, "the")}
         </h2>
         <p style:margin-bottom="20px">
           Health, education, economy, life satisfaction and more.
@@ -77,7 +79,9 @@
           icon="arrow"
           iconPosition="after"
           variant="ghost"
-          href={resolve(`/areas/${makeCanonicalSlug(areaProps)}/indicators`)}
+          href={resolve(
+            `/areas/${makeCanonicalSlug(indicatorsArea)}/indicators`,
+          )}
           small>Explore local indicators</Button
         >
       </div>

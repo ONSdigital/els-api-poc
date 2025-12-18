@@ -74,6 +74,7 @@ function makeOrderedCodes(arr) {
 
 export const geoLevelsArray = makeArray(geoLevels);
 export const geoLevelsLookup = makeLookup(geoLevelsArray);
+export const geoCodesArray = makeOrderedCodes(geoLevelsArray);
 
 export const geoLevelsNavArray = makeArray(geoLevelsNav);
 export const geoLevelsNavLookup = makeLookup(geoLevelsNavArray);
