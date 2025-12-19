@@ -1,14 +1,13 @@
-import { geoLevelsAllLookup } from "$lib/config/geoLevels";
+import { geoLevelsAllLookup, geoCodesArray } from "$lib/config/geoLevels";
 import { getName } from '@onsvisual/robo-utils';
 import { makeCanonicalSlug } from '$lib/api/geo/helpers/areaSlugUtils';
 import productLinks from "$lib/data/product-links.json";
-import { render } from "svelte/server";
 
 const validYear = (area, year) =>
     !year || ((!area.start || year > area.start) && (!area.end || year <= area.end));
 
-function getParent(area, geocodes, year = null) {
-    const parents = [...area.parents];
+export function getNearestRelatedParent(area, geocodes = geoCodesArray, year = null) {
+    const parents = [area, ...area.parents];
     if (['E', 'W'].includes(area.areacd[0]))
         parents.push({
             areacd: 'K04000001',
@@ -64,11 +63,11 @@ function filterProductLinks(links: object[], area: object) {
     const areaLinks = [];
     const parentLinks = [];
     for (const l of links) {
-        const parent = getParent(area, l.geocodes, l.year);
-        if (l.geocodes.includes(area.typecd) && validYear(area, l.year)) {
-            areaLinks.push(formatLink(l, area));
-        } else if (parent) {
-            parentLinks.push(formatLink(l, parent));
+        const linkArea = getNearestRelatedParent(area, l.geocodes, l.year);
+        if (linkArea?.areacd === area.areacd) {
+            areaLinks.push(formatLink(l, linkArea));
+        } else if (linkArea) {
+            parentLinks.push(formatLink(l, linkArea));
         }
     }
     return [...areaLinks, ...parentLinks];

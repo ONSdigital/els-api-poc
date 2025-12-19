@@ -5,6 +5,7 @@
   import { analyticsEvent } from "@onsvisual/svelte-components";
   import { getName } from "@onsvisual/robo-utils";
   import navMapSources from "$lib/config/navMapSources";
+  import { geoLevelsNavLookup } from "$lib/config/geoLevels";
   import { makeGeoJSON } from "$lib/utils";
   import topojson from "$lib/data/topo.json";
 
@@ -13,13 +14,14 @@
     children,
     mapDescription,
     primaryColor = "rgb(17, 140, 123)",
-    onSelect
+    onSelect,
   } = $props();
 
   let map = $state();
   let hovered = $state();
 
-  let { areacd, bounds, groupcd } = $derived(area.properties);
+  let { areacd, bounds } = $derived(area.properties);
+  let levelcd = $derived(geoLevelsNavLookup?.[area.properties.typecd]?.key);
 
   function doSelect(e) {
     const props = e.detail.feature.properties;
@@ -34,7 +36,7 @@
   }
 
   function fitBounds(bounds) {
-      map.fitBounds(bounds, { padding: 20 });
+    map.fitBounds(bounds, { padding: 20 });
   }
   $effect(() => fitBounds(bounds));
 </script>
@@ -66,13 +68,13 @@
           ? { bounds: [-6.3603, 49.88234, 1.76357, 55.8112] }
           : {}}
       >
-        {#each s.layers ? s.layers : [{key: s.id}] as l}
+        {#each s.layers ? s.layers : [{ key: s.id }] as l}
           <MapLayer
             id="{l.key}-fill"
             type="fill"
             paint={{
               "fill-color":
-                l.key === groupcd
+                l.key === levelcd
                   ? [
                       "case",
                       ["==", ["feature-state", "selected"], true],
@@ -81,7 +83,7 @@
                     ]
                   : primaryColor,
               "fill-opacity":
-                l.key === groupcd
+                l.key === levelcd
                   ? [
                       "case",
                       ["==", ["feature-state", "hovered"], true],
@@ -97,18 +99,22 @@
                       0.2,
                     ],
             }}
-            visible={l.key === groupcd || l.key === children?.key}
+            visible={l.key === levelcd || l.key === children?.key}
             filter={!children
               ? null
-              : l.key === groupcd && l.filter
+              : l.key === levelcd && l.filter
                 ? [
                     "all",
                     ...l.filter.slice(1),
                     ["!", ["==", ["get", "areacd"], areacd]],
                   ]
-                : l.key === groupcd
+                : l.key === levelcd
                   ? ["!", ["==", ["get", "areacd"], areacd]]
-                  : ["in", "areacd", ...(children?.areas?.map?.((d) => d.areacd) || [])]}
+                  : [
+                      "in",
+                      "areacd",
+                      ...(children?.areas?.map?.((d) => d.areacd) || []),
+                    ]}
             hover
             on:hover={(e) => (hovered = e.detail.feature)}
             select
@@ -121,25 +127,29 @@
             id="{l.key}-line"
             type="line"
             paint={{
-              "line-color": l.key === groupcd ? "grey" : primaryColor,
+              "line-color": l.key === levelcd ? "grey" : primaryColor,
               "line-width": 1,
             }}
-            visible={l.key === groupcd || l.key === children?.key}
-            filter={l.key === groupcd && l.filter
+            visible={l.key === levelcd || l.key === children?.key}
+            filter={l.key === levelcd && l.filter
               ? [
                   "all",
                   ...l.filter.slice(1),
                   ["!", ["==", ["get", "areacd"], areacd]],
                 ]
-              : l.key === groupcd
+              : l.key === levelcd
                 ? ["!", ["==", ["get", "areacd"], areacd]]
-                : ["in", "areacd", ...(children?.areas?.map?.((d) => d.areacd) || [])]}
+                : [
+                    "in",
+                    "areacd",
+                    ...(children?.areas?.map?.((d) => d.areacd) || []),
+                  ]}
           />
           <MapLayer
             id="{l.key}-active"
             type="line"
             paint={{ "line-color": primaryColor, "line-width": 2 }}
-            visible={l.key === groupcd}
+            visible={l.key === levelcd}
             filter={["==", "areacd", areacd]}
           />
         {/each}

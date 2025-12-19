@@ -110,13 +110,19 @@
 
 {#snippet indicator(item, topic)}
   {#if item.children}
-    {#if expandedTopics[topic.slug] || item.children[0].index < maxIndicators}
-      <h4>{item.label}</h4>
-      {#each item.children as child}
-        {@render indicator(child, topic)}
-      {/each}
-    {/if}
-  {:else if expandedTopics[topic.slug] || item.index < maxIndicators}
+    {@const hidden = !(
+      expandedTopics[topic.slug] || item.children[0].index < maxIndicators
+    )}
+    <h4 {hidden}>
+      {item.label}
+    </h4>
+    {#each item.children as child}
+      {@render indicator(child, topic)}
+    {/each}
+  {:else}
+    {@const hidden = !(
+      expandedTopics[topic.slug] || item.index < maxIndicators
+    )}
     <IndicatorRow
       indicator={item.slug}
       metadata={data.metadata[item.slug]}
@@ -126,6 +132,7 @@
         ...pageState.selectedAreas.map((a) => a.areacd),
       ]}
       geoGroup={pageState.selectedGeoGroup}
+      {hidden}
       bind:hovered
     />
   {/if}
@@ -224,10 +231,10 @@
     </p>
     <p>
       Information on the strengths and limitations of the Explore Local
-      Statistics (ELS) service and methods used is available in
+      Statistics service and methods used is available in the
       <a
         href="https://www.ons.gov.uk/peoplepopulationandcommunity/healthandsocialcare/healthandwellbeing/methodologies/explorelocalstatisticsserviceqmi"
-        >ELS quality and methodology information (QMI) report</a
+        >quality and methodology information (QMI) report</a
       >.
     </p>
     <p>
@@ -255,5 +262,8 @@
   }
   .titleblock-container {
     position: relative;
+  }
+  .hidden {
+    display: none;
   }
 </style>
