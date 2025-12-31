@@ -19,7 +19,7 @@
   import { fetchChartDataV1, makePeriodFormatter } from "$lib/utils";
   import AreasModal from "$lib/components/modals/AreasModal.svelte";
   import OptionsModal from "$lib/components/modals/OptionsModal.svelte";
-  import Map from "$lib/components/charts/Map.svelte";
+  import Map from "$lib/components/charts/demo/Map.svelte";
   import ContentBlock from "$lib/components/charts/ContentBlock.svelte";
   import IndicatorChart from "./IndicatorChart.svelte";
 

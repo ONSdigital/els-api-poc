@@ -6,7 +6,7 @@
     makeValueFormatter,
     makePeriodFormatter,
   } from "$lib/utils";
-  import Beeswarm from "$lib/components/charts/BeeswarmNew.svelte";
+  import Beeswarm from "$lib/components/charts/Beeswarm.svelte";
   import Sparkline from "$lib/components/charts/Sparkline.svelte";
 
   let {

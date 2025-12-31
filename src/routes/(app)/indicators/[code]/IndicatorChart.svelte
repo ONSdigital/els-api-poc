@@ -5,7 +5,7 @@
     makePeriodFormatter,
   } from "$lib/utils";
   import Line from "$lib/components/charts/Line.svelte";
-  import Map from "$lib/components/charts/Map.svelte";
+  import Map from "$lib/components/charts/demo/Map.svelte";
   import Bar from "$lib/components/charts/Bar.svelte";
 
   let {
@@ -27,7 +27,7 @@
       timeRange,
       null,
       selected,
-      geoLevel.id
+      geoLevel.id,
     );
     console.log({ chartUrl });
     try {
