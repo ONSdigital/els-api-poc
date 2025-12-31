@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { getName } from "@onsvisual/robo-utils";
+    import { getName, pluralise } from "@onsvisual/robo-utils";
     import { ONSpalette, ONStextPalette, markerPathsArray } from "$lib/config";
 
     let { selectedAreas = [], selectedGeoGroup = null } = $props();
@@ -28,7 +28,7 @@
         {#if selectedGeoGroup}
             <li style:color="#707070">
                 {@render marker()}
-                {selectedGeoGroup.label}
+                {pluralise(selectedGeoGroup.label)}
             </li>
         {/if}
     </ul>

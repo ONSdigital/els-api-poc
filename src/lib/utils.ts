@@ -3,6 +3,8 @@ import { format } from "d3-format";
 import { utcFormat } from "d3-time-format";
 import { geoLevels } from "./config/geoLevels";
 import { feature } from 'topojson-client';
+import { ckmeans } from "simple-statistics";
+import { oldGeoCodesLookup } from "./config/geoLookups";
 
 type jsonDataColumns = { [key: string]: any[] };
 type jsonDataRows = { [key: string]: any }[];
@@ -181,4 +183,28 @@ export function makeDataUrl(
 
 export function makeGeoJSON(topojson, layer) {
   return feature(topojson, layer);
+}
+
+export function makeMapFeatures(topo) {
+  const features = {};
+
+  for (const layer of Object.keys(topo.objects)) {
+    const geo = makeGeoJSON(topo, layer);
+    for (const f of geo.features) {
+      features[f.properties.areacd] = f;
+    }
+  }
+  for (const code of Object.keys(oldGeoCodesLookup))
+    features[code] = features[oldGeoCodesLookup[code]];
+
+  return features;
+}
+
+export function valuesToBreaks(values, count = 5) {
+  const clusters = ckmeans(values, values.length < count ? values.length : count);
+  const breaks = [
+    ...clusters.map(c => c[0]),
+    clusters[clusters.length - 1][clusters[clusters.length - 1].length - 1]
+  ];
+  return Array.from(new Set(breaks)); // de-duplicate breaks
 }
