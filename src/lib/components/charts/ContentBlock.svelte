@@ -36,6 +36,7 @@
     border: 1px solid #909090;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
+    margin-bottom: 1rem;
   }
   .border-rounded {
     border-radius: 4px;

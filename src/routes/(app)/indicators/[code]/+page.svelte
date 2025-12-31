@@ -16,7 +16,11 @@
     Li,
   } from "@onsvisual/svelte-components";
   import { capitalise } from "@onsvisual/robo-utils";
-  import { fetchChartDataV1, makePeriodFormatter } from "$lib/utils";
+  import {
+    fetchChartDataV1,
+    makePeriodFormatter,
+    makeValueFormatter,
+  } from "$lib/utils";
   import AreasModal from "$lib/components/modals/AreasModal.svelte";
   import OptionsModal from "$lib/components/modals/OptionsModal.svelte";
   import Map from "$lib/components/charts/demo/Map.svelte";
@@ -27,6 +31,9 @@
 
   let { data } = $props();
   $inspect(data);
+
+  let formatPeriod = $derived(makePeriodFormatter(data.indicator.periodFormat));
+  let formatValue = $derived(makeValueFormatter(data.indicator.decimalPlaces));
 
   function arrayJoin(arr, separators = [", ", " and "]) {
     if (arr.length < 2) return arr.join(separators[0]);
@@ -45,23 +52,33 @@
     });
   };
 
-  export function pivotData(data, formatPeriod = (d) => d, filter = null) {
+  function pivotData(data, filter = null) {
     const piv = {};
 
     for (const d of data) {
       if (!filter || filter.includes(d.areacd.slice(0, 3))) {
         if (!piv[d.areacd])
-          piv[d.areacd] = { "Area code": d.areacd, "Area name": d.areanm };
-        piv[d.areacd][formatPeriod(d["period"])] = d.value;
+          piv[d.areacd] = { areacd: d.areacd, areanm: d.areanm };
+        piv[d.areacd][d.period] = d.value;
       }
     }
 
-    return Object.keys(piv)
-      .map((key) => piv[key])
-      .sort((a, b) => a["Area name"].localeCompare(b["Area name"]));
+    return Object.values(piv);
   }
 
-  let formatPeriod = $derived(makePeriodFormatter(data.indicator.periodFormat));
+  function makeColumns(data) {
+    return Object.keys(data[0]).map((key) => ({
+      key,
+      label:
+        key === "areacd"
+          ? "Area code"
+          : key === "areanm"
+            ? "Area name"
+            : formatPeriod(key),
+      numeric: !["areacd", "areanm"].includes(key),
+      formatter: formatValue,
+    }));
+  }
 
   const countryLookup = {
     N: "N92000002",
@@ -240,8 +257,10 @@
           {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: "all" }, )}
             Fetching chart data
           {:then chartData}
+            {@const pivotedData = pivotData(chartData)}
             <Table
-              data={pivotData(chartData, formatPeriod)}
+              data={pivotedData}
+              columns={makeColumns(pivotedData)}
               sortable
               compact
               height={400}
