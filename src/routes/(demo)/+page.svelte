@@ -11,19 +11,22 @@
 </script>
 
 <PhaseBanner phase="prototype" />
-<Header compact title="ELS API experiments" />
+<Header compact title="Explore local statistics app rebuild" />
 
 <Section marginTop={true}>
   <p>
-    This prototype is being developed as a sandbox for exploring and testing new
-    ways to serve data to the Explore Local Statistics (ELS) service.
+    This preview includes ongoing work on the rebuild of the Explore Local
+    Statistics (ELS) app along with various proof-of-concept pages for
+    demonstrating and testing the performance new internal API.
   </p>
 </Section>
 
-<Grid colWidth="medium">
+<Grid colWidth="medium" title="App rebuild">
   <Card title="ELS app rebuild" mode="featured" href="{base}/home">
     Rebuilding the ELS app using the API (in progress).
   </Card>
+</Grid>
+<Grid colWidth="medium" title="Demos and tests">
   <Card title="Query builder" mode="featured" href="{base}/query">
     Build a query to download data from the API.
   </Card>
