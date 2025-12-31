@@ -15,9 +15,11 @@
 
 <Section marginTop={true}>
   <p>
-    This preview includes ongoing work on the rebuild of the Explore Local
-    Statistics (ELS) app along with various proof-of-concept pages for
-    demonstrating and testing the performance new internal API.
+    This preview includes ongoing work on the rebuild of the <a
+      href="https://www.ons.gov.uk/explore-local-statistics"
+      target="_blank">Explore Local Statistics</a
+    > (ELS) app along with various proof-of-concept pages for demonstrating and testing
+    the performance new internal API.
   </p>
 </Section>
 
