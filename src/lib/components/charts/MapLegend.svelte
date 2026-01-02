@@ -231,11 +231,8 @@
                     style:padding="0 {markerPadding}px"
                     bind:this={labels[i]}
                 >
-                    {#if d.align === "left"}
-                        {d.areanm} {prefix}{format(d.value)}{suffix}
-                    {:else}
-                        {prefix}{format(d.value)}{suffix} {d.areanm}
-                    {/if}
+                    {d.areanm},
+                    {prefix}{format(d.value)}{suffix}
                 </div>
             </div>
         {/each}
