@@ -194,7 +194,6 @@
                 minimumFractionDigits: metadata.decimalPlaces,
                 maximumFractionDigits: metadata.decimalPlaces,
             })}
-        on:select={doSelect}
         on:hover={doHover}
     />
 </div>
