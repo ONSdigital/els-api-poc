@@ -65,20 +65,20 @@
         for (const d of data) {
             const ft = features[d.areacd] ? { ...features[d.areacd] } : null;
             if (!ft) continue;
-            const highlightColor = selected.includes(d.areacd)
-                ? ONSpalette[selected.indexOf(d.areacd)]
-                : null;
             ft.properties = {
                 ...ft.properties,
                 ...d,
                 color: valueToColor(d.value, breaks, colors),
-                highlightColor,
-                textColor: highlightColor
-                    ? contrastColor(highlightColor)
-                    : null,
             };
+            const highlightColor = selected.includes(d.areacd)
+                ? ONSpalette[selected.indexOf(d.areacd)]
+                : null;
+            if (highlightColor) {
+                ft.properties.highlightColor = highlightColor;
+                ft.properties.textColor = contrastColor(highlightColor);
+                selectedAreas.push(ft.properties);
+            }
             renderedFeatures.features.push(ft);
-            if (highlightColor) selectedAreas.push(ft.properties);
         }
         const bounds = bbox(renderedFeatures);
         return { renderedFeatures, selectedAreas, bounds };
@@ -118,8 +118,6 @@
                         {hovered}
                         let:hovered
                         on:hover={doHover}
-                        highlight
-                        highlighted={selected}
                     >
                         <MapTooltip
                             content={features?.[hovered]?.properties?.areanm ||
@@ -129,11 +127,33 @@
                     <MapLayer
                         id="lines"
                         type="line"
-                        paint={{ "line-color": "white", "line-width": 0.5 }}
+                        paint={{
+                            "line-color": "white",
+                            "line-width": [
+                                "case",
+                                ["has", "highlightColor"],
+                                5,
+                                0.5,
+                            ],
+                        }}
                         order="place_other"
                     />
                     <MapLayer
-                        id="highlight"
+                        id="highlighted"
+                        type="line"
+                        paint={{
+                            "line-color": [
+                                "case",
+                                ["has", "highlightColor"],
+                                ["get", "highlightColor"],
+                                "rgba(0,0,0,0)",
+                            ],
+                            "line-width": 3,
+                        }}
+                        order="place_other"
+                    />
+                    <MapLayer
+                        id="hovered"
                         type="line"
                         paint={{
                             "line-color": [
