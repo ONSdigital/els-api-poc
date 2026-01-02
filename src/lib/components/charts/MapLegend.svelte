@@ -310,7 +310,7 @@
     }
     .value {
         position: absolute;
-        z-index: 50;
+        z-index: 3;
         font-weight: bold;
         text-align: center;
         white-space: nowrap;

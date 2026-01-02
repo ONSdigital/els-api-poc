@@ -247,16 +247,6 @@
 </NavSections>
 
 <style>
-  .legend-sticky {
-    z-index: 1;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    background: var(--ons-color-page-light);
-    padding: 0.5em 0;
-  }
   .indicators-nav-sections > :global(section) {
     scroll-margin-top: 116px;
   }
