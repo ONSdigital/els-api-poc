@@ -259,6 +259,7 @@
                 class="value value-hovered"
                 style:left="{pos(d.value, breaks)}%"
                 style:bottom="{-labelHeight}px"
+                style:padding="0 {markerPadding}px"
                 style:transform={hoverLeft
                     ? "translateX(-100%) translateX(1.5px)"
                     : "translateX(-1.5px)"}
