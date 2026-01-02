@@ -117,12 +117,8 @@
 {/snippet}
 
 <div class="beeswarm-wrapper">
-  <div class="beeswarm-container">
-    <svg
-      viewBox="0 0 100 100"
-      class="beeswarm-chart"
-      preserveAspectRatio="none"
-    >
+  <div class="beeswarm-chart">
+    <svg viewBox="0 0 100 100" class="beeswarm-svg" preserveAspectRatio="none">
       {#if _data}
         <g class="beeswarm-points" onmouseleave={() => (hovered = null)}>
           {#each _data.array as d (d[idKey])}
@@ -175,14 +171,15 @@
     display: block;
     position: relative;
     margin: 30px 0 20px;
+    padding: 0 7px;
   }
-  .beeswarm-container {
+  .beeswarm-chart {
     display: block;
     position: relative;
     height: 100%;
     margin: 0;
   }
-  .beeswarm-chart {
+  .beeswarm-svg {
     display: block;
     width: 100%;
     height: 70px;
