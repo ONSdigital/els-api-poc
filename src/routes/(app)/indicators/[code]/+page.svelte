@@ -21,7 +21,7 @@
     makePeriodFormatter,
     makeValueFormatter,
   } from "$lib/utils";
-  import { countryLookup } from "$lib/config/geoLookups";
+  import { countryLetterLookup } from "$lib/config/geoLookups";
   import AreasLegend from "$lib/components/modals/AreasLegend.svelte";
   import AreasModal from "$lib/components/modals/AreasModal.svelte";
   import OptionsModal from "$lib/components/modals/OptionsModal.svelte";
@@ -82,17 +82,16 @@
   }
 
   function getInitialSelection(data) {
-    return [];
-    // Need to add missing area codes to lookup to stop this from breaking
-    return data.indicator.standardised === false
-      ? []
-      : data.areas.map((d) => d.areacd).includes("K02000001")
-        ? ["K02000001"]
-        : data.areas.map((d) => d.areacd).includes("K03000001")
-          ? ["K03000001"]
-          : data.indicator.geography.countries.length === 1
-            ? data.indicator.geography.countries.map((d) => countryLookup[d])
-            : [];
+    let area =
+      data.indicator.geography.countries.length === 1
+        ? data.areas.find(
+            (d) =>
+              d.areacd ===
+              countryLetterLookup[data.indicator.geography.countries[0]],
+          )
+        : data.areas.find((d) => d.areacd === "K02000001") ||
+          data.areas.find((d) => d.areacd === "K03000001");
+    return area ? [area] : [];
   }
 
   let pageState = $state({

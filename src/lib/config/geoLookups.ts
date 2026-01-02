@@ -14,6 +14,10 @@ export const countryLookup = {
     W92000004: 'Wales'
 };
 
+export const countryLetterLookup = Object.fromEntries(
+    Object.keys(countryLookup).map(key => [key[0], key])
+);
+
 export const regionLookup = {
     E12000001: 'North East',
     E12000002: 'North West',
