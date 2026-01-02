@@ -13,7 +13,7 @@
         MapLayer,
         MapTooltip,
     } from "@onsvisual/svelte-maps";
-    import BreaksChart from "./BreaksChart.svelte";
+    import MapLegend from "./MapLegend.svelte";
 
     let {
         mapDescription,
@@ -38,7 +38,6 @@
     let { renderedFeatures, selectedAreas, bounds } = $derived(
         makeRenderedFeatures(features, data),
     );
-    $inspect({ selected, selectedAreas });
 
     function doHover(e) {
         const area = e.detail?.feature?.properties || e.detail?.d;
@@ -151,14 +150,14 @@
             </Map>
         {/if}
     </div>
-    <BreaksChart
+    <MapLegend
         data={data.map((d) => ({
             ...d,
             areanm: features[d.areacd]?.properties?.areanm,
         }))}
         {breaks}
         {hovered}
-        selected={selectedAreas}
+        {selectedAreas}
         prefix={metadata.prefix}
         suffix={metadata.suffix}
         format={(d) =>

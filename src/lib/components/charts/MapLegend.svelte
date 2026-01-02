@@ -5,7 +5,7 @@
     let {
         data,
         hovered = $bindable(),
-        selected = [],
+        selectedAreas = [],
         lineWidth = 3,
         barHeight = 15,
         labelHeight = 30,
@@ -29,7 +29,6 @@
     let hoveredLabel = $state();
     let hoverLeft = $state();
     let labels = $state([]);
-    $inspect({ labels });
 
     const dispatch = createEventDispatcher();
 
@@ -96,8 +95,7 @@
             const sortedData = sortIndex.map((i) => selectedData[i]);
             const sortedLabels = sortIndex.map((i) => filteredLabels[i]);
             let labs = [];
-            // const containerLeft = container.offsetLeft;
-            const containerLeft = 0;
+            const containerLeft = container.offsetLeft || 0;
             const containerRight = containerLeft + container.offsetWidth;
             for (let i = 0; i < sortedLabels.length; i++) {
                 const lab = {
@@ -155,16 +153,9 @@
     }
 
     let cells = $derived(makeCells(data.map((d) => d.value)));
-    let selectedData = $derived(
-        selected.map((s) => ({
-            ...s,
-            ...data.find((d) => d.areacd === s.areacd),
-        })),
-    );
     let positionedData = $derived(
-        positionLabels(selectedData, labels, container, width),
+        positionLabels(selectedAreas, labels, container, width),
     );
-    $inspect({ selected, selectedData, positionedData });
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -257,7 +248,7 @@
             style:left="{pos(cells[i][0], breaks)}%"
             on:mouseenter={(e) => doHover(e, d)}
         ></div>
-        {#if hovered === d.areacd && !(selected[0] && selected
+        {#if hovered === d.areacd && !(selectedAreas[0] && selectedAreas
                     .map((s) => s.areacd)
                     .includes(d.areacd))}
             <div
