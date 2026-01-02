@@ -1,6 +1,6 @@
 import getIndicators from "./getIndicators";
 import summaryData from "$lib/data/json-stat-summary.json";
-import { capitalise } from "$lib/utils";
+import { capitalise } from "@onsvisual/robo-utils";
 
 function makeItem(slug, label = null, description = null, index = 0) {
   const item = { label: label || capitalise(slug), slug };

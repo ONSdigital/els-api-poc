@@ -97,10 +97,6 @@ export async function fetchTopicsData(
   return topics;
 }
 
-export function capitalise(str) {
-  return `${str[0].toUpperCase()}${str.slice(1)}`;
-}
-
 export function makeValueFormatter(dp) {
   return format(`,.${dp ?? 0}f`);
 }
