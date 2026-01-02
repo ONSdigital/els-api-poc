@@ -171,7 +171,11 @@
               {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange[1].slice(0, 10) }, )}
                 Fetching chart data
               {:then chartData}
-                <Map metadata={data.indicator} data={chartData} />
+                <Map
+                  metadata={data.indicator}
+                  data={chartData}
+                  selected={pageState.selectedAreas.map((a) => a.areacd)}
+                />
               {:catch}
                 Failed to load chart data
               {/await}

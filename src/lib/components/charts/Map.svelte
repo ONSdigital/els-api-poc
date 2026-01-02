@@ -4,6 +4,8 @@
     import { resolve } from "$app/paths";
     import bbox from "@turf/bbox";
     import { makeMapFeatures, valuesToBreaks } from "$lib/utils";
+    import { ONSpalette } from "$lib/config";
+    import { contrastColor } from "./chartHelpers";
     import topo from "$lib/data/topo.json";
     import {
         Map,
@@ -33,13 +35,10 @@
     const dispatch = createEventDispatcher();
 
     let breaks = $derived(valuesToBreaks(data.map((d) => d.value)));
-    let featureCollection = $derived(
-        data ? makeFeatureCollection(features, data) : null,
+    let { renderedFeatures, selectedAreas, bounds } = $derived(
+        makeRenderedFeatures(features, data),
     );
-    let bounds = $derived(featureCollection ? bbox(featureCollection) : null);
-    let selectedAreas = $derived(
-        selected.map((cd) => features[cd]?.properties).filter((f) => f),
-    );
+    $inspect({ selected, selectedAreas });
 
     function doHover(e) {
         const area = e.detail?.feature?.properties || e.detail?.d;
@@ -54,27 +53,36 @@
         return colors[breaks.length - 2];
     }
 
-    const makeFeatureCollection = (features, data) => {
-        return {
-            type: "FeatureCollection",
-            features: data
-                .map((d) => {
-                    const ft = features[d.areacd]
-                        ? { ...features[d.areacd] }
-                        : null;
-                    if (!ft) return null;
-                    ft.properties = {
-                        ...ft.properties,
-                        ...d,
-                        color: valueToColor(d.value, breaks, colors),
-                        boundary: selected[d.areacd]
-                            ? colors[selected.indexOf(d.areacd)]
-                            : null,
-                    };
-                    return ft;
-                })
-                .filter((f) => f != null),
-        };
+    const makeRenderedFeatures = (features, data) => {
+        if (!data)
+            return {
+                renderedFeatures: null,
+                selectedAreas: [],
+                bounds: null,
+            };
+        const renderedFeatures = { type: "FeatureCollection", features: [] };
+        const selectedAreas = [];
+
+        for (const d of data) {
+            const ft = features[d.areacd] ? { ...features[d.areacd] } : null;
+            if (!ft) continue;
+            const highlightColor = selected.includes(d.areacd)
+                ? ONSpalette[selected.indexOf(d.areacd)]
+                : null;
+            ft.properties = {
+                ...ft.properties,
+                ...d,
+                color: valueToColor(d.value, breaks, colors),
+                highlightColor,
+                textColor: highlightColor
+                    ? contrastColor(highlightColor)
+                    : null,
+            };
+            renderedFeatures.features.push(ft);
+            if (highlightColor) selectedAreas.push(ft.properties);
+        }
+        const bounds = bbox(renderedFeatures);
+        return { renderedFeatures, selectedAreas, bounds };
     };
 </script>
 
@@ -96,7 +104,7 @@
                 <MapSource
                     id="features"
                     type="geojson"
-                    data={featureCollection}
+                    data={renderedFeatures}
                     promoteId="areacd"
                 >
                     <MapLayer

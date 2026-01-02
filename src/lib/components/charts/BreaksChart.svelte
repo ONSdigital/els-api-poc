@@ -7,7 +7,8 @@
         hovered = $bindable(),
         selected = [],
         lineWidth = 3,
-        height = 15,
+        barHeight = 15,
+        labelHeight = 30,
         breaks,
         colors = [
             "rgba(234,236,177,.8)",
@@ -21,7 +22,6 @@
         suffix = "",
         snapTicks = true,
         markerPadding = 4,
-        getColor = () => ({ color: null, contrast: null }),
     } = $props();
 
     let container = $state();
@@ -164,14 +164,15 @@
     let positionedData = $derived(
         positionLabels(selectedData, labels, container, width),
     );
-    $inspect(positionedData);
+    $inspect({ selected, selectedData, positionedData });
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
     class="container"
-    style:height="{height}px"
-    style:margin-bottom="{24 + (positionedData?.maxOffset || 0) * 26}px"
+    style:height="{barHeight}px"
+    style:margin-bottom="{24 +
+        (positionedData?.maxOffset || 0) * labelHeight}px"
     on:mouseleave={doHover}
     bind:this={container}
     bind:clientWidth={width}
@@ -218,24 +219,24 @@
                     style:width="{lineWidth}px"
                     style:left="calc({pos(d.value, breaks)}% - {lineWidth /
                         2}px)"
-                    style:bottom="{-20 - (d.offset || 0) * 26}px"
-                    style:height="calc(100% + {20 + (d.offset || 0) * 26}px)"
+                    style:bottom="{-20 - (d.offset || 0) * labelHeight}px"
+                    style:height="calc(100% + {20 +
+                        (d.offset || 0) * labelHeight}px)"
                     style:background-color={d.areacd === hovered
                         ? "orange"
-                        : getColor(d)?.color || "grey"}
+                        : d.highlightColor}
                 ></div>
                 <div
                     class="value"
                     style:left="{pos(d.value, breaks)}%"
+                    style:bottom="{-labelHeight}px"
                     style:transform={d.align === "left"
-                        ? `translateX(-100%) translateX(1.5px) translateY(${(d.offset || 0) * 26}px)`
-                        : `translateX(-1.5px) translateY(${(d.offset || 0) * 26}px)`}
-                    style:color={d.areacd === hovered
-                        ? "black"
-                        : getColor(d)?.contrast || "white"}
+                        ? `translateX(-100%) translateX(1.5px) translateY(${(d.offset || 0) * labelHeight}px)`
+                        : `translateX(-1.5px) translateY(${(d.offset || 0) * labelHeight}px)`}
+                    style:color={d.areacd === hovered ? "black" : d.textColor}
                     style:background={d.areacd === hovered
                         ? "orange"
-                        : getColor(d)?.color || "grey"}
+                        : d.highlightColor}
                     style:padding="0 {markerPadding}px"
                     bind:this={labels[i]}
                 >
@@ -269,6 +270,7 @@
             <div
                 class="value value-hovered"
                 style:left="{pos(d.value, breaks)}%"
+                style:bottom="{-labelHeight}px"
                 style:transform={hoverLeft
                     ? "translateX(-100%) translateX(1.5px)"
                     : "translateX(-1.5px)"}
@@ -320,7 +322,7 @@
     .value {
         position: absolute;
         z-index: 50;
-        bottom: -26px;
+        font-weight: bold;
         text-align: center;
         white-space: nowrap;
         border-radius: 3px;
