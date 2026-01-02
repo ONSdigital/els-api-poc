@@ -31,9 +31,12 @@
         topoPath = resolve("/data/topo.json"),
     } = $props();
 
+    const ukBounds = [-8.65, 49.867, 1.761, 60.856];
+    const fitBoundsOptions = { padding: 10 };
     const features = makeMapFeatures(topo);
     const dispatch = createEventDispatcher();
 
+    let map = $state();
     let breaks = $derived(valuesToBreaks(data.map((d) => d.value)));
     let { renderedFeatures, selectedAreas, bounds } = $derived(
         makeRenderedFeatures(features, data),
@@ -83,23 +86,29 @@
         const bounds = bbox(renderedFeatures);
         return { renderedFeatures, selectedAreas, bounds };
     };
+
+    function fitBounds(bounds) {
+        map?.fitBounds?.(bounds, fitBoundsOptions);
+    }
+    $effect(() => fitBounds(bounds));
 </script>
 
 <div aria-hidden="true" class="map-outer">
     <div class="map-container">
-        {#if features && bounds}
-            <Map
-                style={resolve("/data/mapstyle.json")}
-                location={{ bounds }}
-                options={{
-                    fitBoundsOptions: { padding: 10 },
-                    maxBounds: [-19, 48, 12, 62],
-                    cooperativeGestures: true,
-                    preserveDrawingBuffer: true,
-                }}
-                controls
-                {mapDescription}
-            >
+        <Map
+            bind:map
+            style={resolve("/data/mapstyle.json")}
+            location={{ bounds: bounds || ukBounds }}
+            options={{
+                fitBoundsOptions,
+                maxBounds: [-19, 48, 12, 62],
+                cooperativeGestures: true,
+                preserveDrawingBuffer: true,
+            }}
+            controls
+            {mapDescription}
+        >
+            {#if renderedFeatures}
                 <MapSource
                     id="features"
                     type="geojson"
@@ -167,8 +176,8 @@
                         order="place_suburb"
                     />
                 </MapSource>
-            </Map>
-        {/if}
+            {/if}
+        </Map>
     </div>
     <MapLegend
         data={data.map((d) => ({
