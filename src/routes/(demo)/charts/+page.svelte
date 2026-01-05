@@ -13,7 +13,7 @@
     NavSection,
     LazyLoad,
   } from "@onsvisual/svelte-components";
-  import Beeswarm from "$lib/components/charts/Beeswarm.svelte";
+  import Beeswarm from "$lib/components/charts/demo/Beeswarm.svelte";
   import { fetchChartDataV1 } from "$lib/utils";
 
   export let data;

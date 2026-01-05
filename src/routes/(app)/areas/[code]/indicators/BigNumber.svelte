@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Card, Icon, Observe } from "@onsvisual/svelte-components";
+  import { capitalise } from "@onsvisual/robo-utils";
   import {
     makePeriodFormatter,
     makeValueFormatter,
@@ -28,7 +29,7 @@
       loadedDataUrl = dataUrl;
     }
   }
-  $effect(async () => {
+  $effect(() => {
     console.log(`Refreshing ${indicator} big number data`);
     fetchData(period, visible);
   });
@@ -55,7 +56,7 @@
         <p class="ons-card__body ons-u-mb-xs">
           {indicator === "five-year-population-change"
             ? "Five year change"
-            : metadata.unit}
+            : capitalise(metadata.subText)}
         </p>
       {/if}
     </div>

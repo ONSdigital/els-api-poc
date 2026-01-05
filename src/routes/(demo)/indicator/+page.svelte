@@ -13,7 +13,7 @@
     NavSection,
     LazyLoad,
   } from "@onsvisual/svelte-components";
-  import Map from "$lib/components/charts/Map.svelte";
+  import Map from "$lib/components/charts/demo/Map.svelte";
   import Bar from "$lib/components/charts/Bar.svelte";
   import Line from "$lib/components/charts/Line.svelte";
   import { fetchChartData } from "$lib/utils";

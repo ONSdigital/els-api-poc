@@ -16,17 +16,25 @@
     Li,
   } from "@onsvisual/svelte-components";
   import { capitalise } from "@onsvisual/robo-utils";
-  import { fetchChartDataV1, makePeriodFormatter } from "$lib/utils";
+  import {
+    fetchChartDataV1,
+    makePeriodFormatter,
+    makeValueFormatter,
+  } from "$lib/utils";
+  import { countryLetterLookup } from "$lib/config/geoLookups";
+  import AreasLegend from "$lib/components/modals/AreasLegend.svelte";
   import AreasModal from "$lib/components/modals/AreasModal.svelte";
   import OptionsModal from "$lib/components/modals/OptionsModal.svelte";
   import Map from "$lib/components/charts/Map.svelte";
   import ContentBlock from "$lib/components/charts/ContentBlock.svelte";
   import IndicatorChart from "./IndicatorChart.svelte";
-
   import Bar from "$lib/components/charts/Bar.svelte";
 
   let { data } = $props();
   $inspect(data);
+
+  let formatPeriod = $derived(makePeriodFormatter(data.indicator.periodFormat));
+  let formatValue = $derived(makeValueFormatter(data.indicator.decimalPlaces));
 
   function arrayJoin(arr, separators = [", ", " and "]) {
     if (arr.length < 2) return arr.join(separators[0]);
@@ -45,47 +53,51 @@
     });
   };
 
-  export function pivotData(data, formatPeriod = (d) => d, filter = null) {
+  function pivotData(data, filter = null) {
     const piv = {};
 
     for (const d of data) {
       if (!filter || filter.includes(d.areacd.slice(0, 3))) {
         if (!piv[d.areacd])
-          piv[d.areacd] = { "Area code": d.areacd, "Area name": d.areanm };
-        piv[d.areacd][formatPeriod(d["period"])] = d.value;
+          piv[d.areacd] = { areacd: d.areacd, areanm: d.areanm };
+        piv[d.areacd][d.period] = d.value;
       }
     }
 
-    return Object.keys(piv)
-      .map((key) => piv[key])
-      .sort((a, b) => a["Area name"].localeCompare(b["Area name"]));
+    return Object.values(piv);
   }
 
-  let formatPeriod = $derived(makePeriodFormatter(data.indicator.periodFormat));
+  function makeColumns(data) {
+    return Object.keys(data[0]).map((key) => ({
+      key,
+      label:
+        key === "areacd"
+          ? "Area code"
+          : key === "areanm"
+            ? "Area name"
+            : formatPeriod(key),
+      numeric: !["areacd", "areanm"].includes(key),
+      formatter: formatValue,
+    }));
+  }
 
-  const countryLookup = {
-    N: "N92000002",
-    E: "E92000001",
-    W: "W92000004",
-    S: "S92000003",
-  };
-
-  let initialSelected = $derived(
-    data.indicator.standardised === false
-      ? []
-      : data.areas.map((d) => d.areacd).includes("K02000001")
-        ? ["K02000001"]
-        : data.areas.map((d) => d.areacd).includes("K03000001")
-          ? ["K03000001"]
-          : data.indicator.geography.countries.length == 1
-            ? data.indicator.geography.countries.map((d) => countryLookup[d])
-            : []
-  );
+  function getInitialSelection(data) {
+    let area =
+      data.indicator.geography.countries.length === 1
+        ? data.areas.find(
+            (d) =>
+              d.areacd ===
+              countryLetterLookup[data.indicator.geography.countries[0]],
+          )
+        : data.areas.find((d) => d.areacd === "K02000001") ||
+          data.areas.find((d) => d.areacd === "K03000001");
+    return area ? [area] : [];
+  }
 
   let pageState = $state({
-    selectedAreas: [],
+    selectedAreas: getInitialSelection(data),
     selectedGeoLevel: data.geoLevels.find(
-      (g) => g.id === data.indicator.geography.initialLevel
+      (g) => g.id === data.indicator.geography.initialLevel,
     ),
     selectedPeriodRange: [
       data.periods[0],
@@ -105,8 +117,8 @@
       key: data.indicator.source.length === 1 ? "Data source" : "Data sources",
       value: arrayJoin(
         data.indicator.source.map(
-          (s) => `<a href="${s.href}" target="_blank">${s.name}</a>`
-        )
+          (s) => `<a href="${s.href}" target="_blank">${s.name}</a>`,
+        ),
       ),
     },
     {
@@ -129,50 +141,19 @@
 </Hero>
 
 <NavSections cls="wider-nav-sections" marginTop>
-  <div class="row-container">
-    <div class="content-dropdowns">
-      <AreasModal />
-      <OptionsModal />
+  <div class="indicators-nav-sections">
+    <div class="legend-sticky">
+      <AreasLegend
+        selectedAreas={pageState.selectedAreas}
+        selectedGeoGroup={pageState.selectedGeoLevel}
+      />
+      <div>
+        <AreasModal />
+        <OptionsModal />
+      </div>
     </div>
-  </div>
-  {#if data.indicator.standardised}
-    <NavSection title="Map">
-      <ContentBlock title={data.indicator.label} source={data.indicator.source}>
-        <p class="subtitle">
-          {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(
-            0,
-            4
-          )}
-          to {pageState.selectedPeriodRange[1].slice(0, 4)}
-        </p>
-        <LazyLoad>
-          <div class="chart-container map-container">
-            {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange[1].slice(0, 10) } )}
-              Fetching chart data
-            {:then chartData}
-              <Map data={chartData} />
-            {:catch}
-              Failed to load chart data
-            {/await}
-          </div>
-        </LazyLoad>
-      </ContentBlock>
-    </NavSection>
-  {/if}
-
-  {#if data.periods.length > 1}
-    <NavSection title="Line chart">
-      {#if pageState.selectedPeriodRange[0] === pageState.selectedPeriodRange[1]}
-        <ContentBlock>
-          <div class="no-chart-container">
-            <p>
-              Time series not displayed as selected date range includes only one
-              time period with
-              <span style="font-weight: bold;">{data.indicator.label}</span> data.
-            </p>
-          </div>
-        </ContentBlock>
-      {:else}
+    {#if data.indicator.standardised}
+      <NavSection title="Map">
         <ContentBlock
           title={data.indicator.label}
           source={data.indicator.source}
@@ -180,79 +161,121 @@
           <p class="subtitle">
             {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(
               0,
-              4
+              4,
             )}
             to {pageState.selectedPeriodRange[1].slice(0, 4)}
           </p>
           <LazyLoad>
-            <IndicatorChart
-              indicator={data.indicator.slug}
-              metadata={data.indicator}
-              timeRange={pageState.selectedPeriodRange}
-              selected={initialSelected.concat(
-                pageState.selectedAreas.map((a) => a.areacd)
-              )}
-              geoLevel={pageState.selectedGeoLevel}
-              {formatPeriod}
-              chartType="line"
-            />
+            <div class="chart-container">
+              {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange[1].slice(0, 10) }, )}
+                Fetching chart data
+              {:then chartData}
+                <Map
+                  metadata={data.indicator}
+                  data={chartData}
+                  selected={pageState.selectedAreas.map((a) => a.areacd)}
+                />
+              {:catch}
+                Failed to load chart data
+              {/await}
+            </div>
           </LazyLoad>
         </ContentBlock>
-      {/if}
-    </NavSection>
-  {/if}
+      </NavSection>
+    {/if}
 
-  <NavSection title="Bar chart">
-    <ContentBlock title={data.indicator.label} source={data.indicator.source}>
-      <p class="subtitle">
-        {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(
-          0,
-          4
-        )}
-        to {pageState.selectedPeriodRange[1].slice(0, 4)}
-      </p>
-      <LazyLoad>
-        <IndicatorChart
-          indicator={data.indicator.slug}
-          metadata={data.indicator}
-          timeRange={pageState.selectedPeriodRange[1]}
-          selected={initialSelected.concat(
-            pageState.selectedAreas.map((a) => a.areacd)
+    {#if data.periods.length > 1}
+      <NavSection title="Line chart">
+        {#if pageState.selectedPeriodRange[0] === pageState.selectedPeriodRange[1]}
+          <ContentBlock>
+            <div class="no-chart-container">
+              <p>
+                Time series not displayed as selected date range includes only
+                one time period with
+                <span style="font-weight: bold;">{data.indicator.label}</span> data.
+              </p>
+            </div>
+          </ContentBlock>
+        {:else}
+          <ContentBlock
+            title={data.indicator.label}
+            source={data.indicator.source}
+          >
+            <p class="subtitle">
+              {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(
+                0,
+                4,
+              )}
+              to {pageState.selectedPeriodRange[1].slice(0, 4)}
+            </p>
+            <LazyLoad>
+              <IndicatorChart
+                indicator={data.indicator.slug}
+                metadata={data.indicator}
+                timeRange={pageState.selectedPeriodRange}
+                selected={pageState.selectedAreas.map((a) => a.areacd)}
+                geoLevel={pageState.selectedGeoLevel}
+                {formatPeriod}
+                chartType="line"
+              />
+            </LazyLoad>
+          </ContentBlock>
+        {/if}
+      </NavSection>
+    {/if}
+
+    <NavSection title="Bar chart">
+      <ContentBlock title={data.indicator.label} source={data.indicator.source}>
+        <p class="subtitle">
+          {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(
+            0,
+            4,
           )}
-          geoLevel={pageState.selectedGeoLevel}
-          {formatPeriod}
-          chartType="bar"
-        />
-      </LazyLoad>
-    </ContentBlock>
-  </NavSection>
-  <NavSection title="Table">
-    <ContentBlock title={data.indicator.label} source={data.indicator.source}>
-      <p class="subtitle">
-        {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(
-          0,
-          4
-        )}
-        to {pageState.selectedPeriodRange[1].slice(0, 4)}
-      </p>
-      <LazyLoad>
-        <div class="chart-container">
-          {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: "all" } )}
-            Fetching chart data
-          {:then chartData}
-            <Table
-              data={pivotData(chartData, formatPeriod)}
-              sortable
-              compact
-              height={400}
-            />
-          {:catch}
-            Failed to load chart data
-          {/await}
-        </div>
-      </LazyLoad>
-    </ContentBlock>
-  </NavSection>
+          to {pageState.selectedPeriodRange[1].slice(0, 4)}
+        </p>
+        <LazyLoad>
+          <IndicatorChart
+            indicator={data.indicator.slug}
+            metadata={data.indicator}
+            timeRange={pageState.selectedPeriodRange[1]}
+            selected={pageState.selectedAreas.map((a) => a.areacd)}
+            geoLevel={pageState.selectedGeoLevel}
+            {formatPeriod}
+            chartType="bar"
+          />
+        </LazyLoad>
+      </ContentBlock>
+    </NavSection>
+    <NavSection title="Table">
+      <ContentBlock title={data.indicator.label} source={data.indicator.source}>
+        <p class="subtitle">
+          {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(
+            0,
+            4,
+          )}
+          to {pageState.selectedPeriodRange[1].slice(0, 4)}
+        </p>
+        <LazyLoad>
+          <div class="chart-container">
+            {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: "all" }, )}
+              Fetching chart data
+            {:then chartData}
+              {@const pivotedData = pivotData(chartData)}
+              <Table
+                data={pivotedData}
+                columns={makeColumns(pivotedData)}
+                sortable
+                compact
+                height={400}
+              />
+            {:catch}
+              Failed to load chart data
+            {/await}
+          </div>
+        </LazyLoad>
+      </ContentBlock>
+    </NavSection>
+  </div>
   <NavSection title="Get the data">
     <p>The original data source for this indicator can be found here:</p>
     <List mode="dash">
@@ -263,26 +286,26 @@
     <p>
       You can download this dataset in an <a
         href={resolve(
-          `/api/v1/data.ods?indicator=${data.indicator.slug}&time=all`
+          `/api/v1/data.ods?indicator=${data.indicator.slug}&time=all`,
         )}
         download={`${data.indicator.slug}.ods`}>ODS</a
       >,
       <a
         href={resolve(
-          `/api/v1/data.csv?indicator=${data.indicator.slug}&time=all`
+          `/api/v1/data.csv?indicator=${data.indicator.slug}&time=all`,
         )}
         download={`${data.indicator.slug}.csv`}>CSV</a
       >,
       <a
         href={resolve(
-          `/api/v1/data.csvw?indicator=${data.indicator.slug}&time=all`
+          `/api/v1/data.csvw?indicator=${data.indicator.slug}&time=all`,
         )}
         download={`${data.indicator.slug}.csv-metadata.json`}>CSVW</a
       >
       or
       <a
         href={resolve(
-          `/api/v1/data.json?indicator=${data.indicator.slug}&time=all`
+          `/api/v1/data.json?indicator=${data.indicator.slug}&time=all`,
         )}
         download={`${data.indicator.slug}.json`}>JSON-Stat</a
       >
@@ -293,9 +316,12 @@
       >.
     </p>
     <p>
-      Quality and Methodology Information for the Explore Local Statistics
-      service details the strengths and limitations of the service, methods
-      used, data uses and users.
+      Information on the strengths and limitations of the Explore Local
+      Statistics service and methods used is available in the
+      <a
+        href="https://www.ons.gov.uk/peoplepopulationandcommunity/healthandsocialcare/healthandwellbeing/methodologies/explorelocalstatisticsserviceqmi"
+        >quality and methodology information (QMI) report</a
+      >.
     </p>
   </NavSection>
   <NavSection title="Other indicators">
@@ -313,9 +339,6 @@
     width: 100%;
     min-height: 300px;
     margin-bottom: 32px;
-  }
-  .map-container {
-    max-width: 400px;
   }
   .chart-container :global(svg) {
     overflow: visible;

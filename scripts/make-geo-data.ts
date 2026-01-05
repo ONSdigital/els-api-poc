@@ -14,6 +14,14 @@ const geoCodes = new Set(
     .flat()
 );
 
+const gb = {
+  areacd: "K03000001",
+  areanm: "Great Britain",
+  level: ["ctry"],
+  parents: ["K02000001"],
+  children: ["E92000001", "S92000003", "W92000004"]
+};
+
 function getLevels(cd) {
   return Object.keys(geoLevels).filter((key) =>
     geoLevels[key].codes.includes(cd.slice(0, 3))
@@ -51,6 +59,11 @@ for (const row of rows) {
   obj.parents = row.parentcd ? getParents([row.parentcd], rows) : [];
   obj.children = getChildren(row.areacd, rows);
   lookup[row.areacd] = obj;
+
+  // Add GB after UK
+  if (row.areacd === "K02000001") {
+    lookup[gb.areacd] = gb;
+  }
 }
 
 const geoPath = `${outputDir}/data/geo-metadata.json`;

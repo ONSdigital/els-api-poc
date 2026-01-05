@@ -2,7 +2,7 @@
   import { resolve } from "$app/paths";
   import { getName } from "@onsvisual/robo-utils";
   import { makeCanonicalSlug } from "$lib/api/geo/helpers/areaSlugUtils";
-  import { capitalise } from "$lib/utils";
+  import { capitalise } from "@onsvisual/robo-utils";
 
   let { areaProps } = $props();
 </script>
