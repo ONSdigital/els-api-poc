@@ -1,7 +1,21 @@
 <script lang="ts">
   //@ts-nocheck
+  import { Icon } from "@onsvisual/svelte-components";
+
   let { data, title, indicator, source } = $props();
-  let el;
+
+  let el = $state();
+  let fullScreenMode = $state(false);
+
+  function toggleFullScreen() {
+    if (!fullScreenMode) {
+      el?.requestFullscreen?.();
+      fullScreenMode = true;
+    } else {
+      document?.exitFullscreen?.();
+      fullScreenMode = false;
+    }
+  }
 </script>
 
 <div class="content-block-wrapper">
@@ -15,6 +29,16 @@
         <!-- <span>{unit ? `, ${unit}` : ''}</span> -->
       </span>
     {/if}
+    <button
+      class="fullscreen-toggle"
+      title="{fullScreenMode ? 'Exit' : 'Enter'} full screen mode"
+      onclick={toggleFullScreen}
+    >
+      <Icon type={fullScreenMode ? "shrink" : "expand"} size="l" />
+      <span class="ons-u-vh"
+        >{fullScreenMode ? "Exit" : "Enter"} full screen mode</span
+      >
+    </button>
     <slot />
     {#if source.length > 0}
       <div class="source-notes-container">
@@ -34,27 +58,27 @@
 <style>
   .content-block-wrapper {
     border: 1px solid #909090;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
     margin-bottom: 1rem;
   }
-  .border-rounded {
-    border-radius: 4px;
-  }
   .content-block {
+    position: relative;
     padding: 12px;
+    background: white;
   }
-  .hide-actions {
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
+  .fullscreen-toggle {
+    position: absolute;
+    cursor: pointer;
+    top: 12px;
+    right: 8px;
+    color: var(--ons-color-text-link);
+    background: none;
+    border: none;
   }
-  h3.content-subhead {
-    font-size: 1.222em;
-    margin: 0;
+  .fullscreen-toggle:hover {
+    color: var(--ons-color-text-link-hover);
   }
-  h3.content-subhead > span {
-    font-size: 16px;
-    font-weight: normal;
+  .fullscreen-toggle:hover :global(.ons-icon) {
+    transform: scale(1.2);
   }
   .source-notes-container {
     padding: 8px 0 4px;
@@ -68,7 +92,6 @@
     margin: 0px;
     line-height: 1.2;
   }
-
   .content-subhead {
     margin: 0;
     display: flex;
@@ -76,7 +99,6 @@
     flex-wrap: wrap;
     align-items: baseline;
   }
-
   h3 {
     margin: 0px;
   }
