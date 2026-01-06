@@ -4,9 +4,11 @@
     makeValueFormatter,
     makePeriodFormatter,
   } from "$lib/utils";
+  import { Observe } from "@onsvisual/svelte-components";
   import Line from "$lib/components/charts/Line.svelte";
-  import Map from "$lib/components/charts/demo/Map.svelte";
+  import Map from "$lib/components/charts/Map.svelte";
   import Bar from "$lib/components/charts/Bar.svelte";
+  import Table from "$lib/components/charts/Table.svelte";
 
   let {
     indicator,
@@ -15,52 +17,76 @@
     selected = [],
     geoLevel,
     hovered = $bindable(),
+    formatValue,
     formatPeriod,
     chartType,
   } = $props();
 
-  let formatValue = $derived(makeValueFormatter(metadata.decimalPlaces));
+  let visible = $state();
 
-  async function fetchData(indicator, timeRange, selected, geoLevel) {
-    const chartUrl = makeDataUrl(
+  let loadedChartDataUrl;
+  let chartData;
+
+  async function fetchData(
+    indicator,
+    timeRange,
+    selected,
+    geoLevel,
+    chartType,
+    visible,
+  ) {
+    if (!visible && chartData) return chartData;
+    else if (!visible) return null;
+    const chartDataUrl = makeDataUrl(
       indicator,
-      timeRange,
-      null,
+      ["line", "table"].includes(chartType) ? timeRange : timeRange[1],
+      "latest",
       selected,
-      geoLevel.id,
+      geoLevel,
     );
-    console.log({ chartUrl });
-    try {
-      const response = await fetch(chartUrl);
-      const chartData = await response.json();
-      return chartData;
-    } catch {
-      console.log("Failed to load chart data");
-      return { message: "Failed" };
-    }
+    if (chartDataUrl !== loadedChartDataUrl) {
+      console.log(`Loading ${indicator} ${chartType} data`);
+      loadedChartDataUrl = chartDataUrl;
+      try {
+        chartData = await (await fetch(chartDataUrl)).json();
+        console.log(`Loaded ${indicator} ${chartType} data`);
+        return chartData;
+      } catch {
+        console.log(`Failed to load ${indicator} ${chartType} data`);
+        return null;
+      }
+    } else return chartData;
   }
 
   const chartComponents = {
     map: Map,
     line: Line,
     bar: Bar,
+    table: Table,
   };
 </script>
 
-<div class="indicator-chart">
-  {#await fetchData(indicator, timeRange, selected, geoLevel)}
-    Fetching chart data
-  {:then chartData}
-    <svelte:component
-      this={chartComponents[chartType]}
-      data={chartData || { message: "No data" }}
-      {formatValue}
-      {selected}
-      bind:hovered
-      {formatPeriod}
-      {geoLevel}
-    />
-  {:catch}
-    Failed to load chart data
-  {/await}
-</div>
+<Observe bind:visible>
+  <div class="indicator-chart">
+    {#await fetchData(indicator, timeRange, selected, geoLevel.id, chartType, visible) then chartData}
+      {@const Component = chartComponents[chartType]}
+      {#if chartData}
+        <Component
+          data={chartData}
+          {metadata}
+          {formatValue}
+          {selected}
+          bind:hovered
+          {formatPeriod}
+          {geoLevel}
+        />
+      {/if}
+    {/await}
+  </div>
+</Observe>
+
+<style>
+  .indicator-chart {
+    min-height: 400px;
+  }
+</style>

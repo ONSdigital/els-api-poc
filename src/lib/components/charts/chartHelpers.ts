@@ -29,7 +29,7 @@ export function medMad(xs, constant = 1.4826) {
 }
 
 export function parseChartData(data, valueKey = "value", periodKey = "period", idKey = "areacd") {
-  if (data.message) return null;
+  if (!data || data.message) return null;
   if (!data[valueKey] || !data[periodKey] || !data[idKey]) throw new Error("Columns missing from data.");
 
   const array = [];
