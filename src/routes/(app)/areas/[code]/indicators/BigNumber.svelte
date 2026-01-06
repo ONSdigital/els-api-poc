@@ -10,29 +10,30 @@
   let { indicator, metadata, geography, period } = $props();
 
   let visible = $state(false);
-  let data = $state();
-  let loadedDataUrl = $state();
+
+  let loadedData;
+  let loadedDataUrl;
 
   let formatPeriod = $derived(makePeriodFormatter(metadata.periodFormat));
   let formatValue = $derived(makeValueFormatter(metadata.decimalPlaces));
 
   async function fetchData(period, visible) {
-    if (!visible) return;
+    if (!visible && loadedData) return loadedData;
+    if (!visible) return null;
 
     const dataUrl = makeDataUrl(metadata.slug, period, "latest", [geography]);
     if (dataUrl !== loadedDataUrl) {
-      try {
-        data = await (await fetch(dataUrl)).json();
-      } catch {
-        console.log("Failed to load big number data");
-      }
       loadedDataUrl = dataUrl;
-    }
+      try {
+        loadedData = await (await fetch(dataUrl)).json();
+        console.log(`Loaded ${indicator} big number data`);
+        return loadedData;
+      } catch {
+        console.log(`Failed to load ${indicator} big number data`);
+        return null;
+      }
+    } else return loadedData;
   }
-  $effect(() => {
-    console.log(`Refreshing ${indicator} big number data`);
-    fetchData(period, visible);
-  });
 </script>
 
 <Card
@@ -44,7 +45,7 @@
 >
   <Observe bind:visible rootMargin={200}>
     <div class="big-number-contents ons-u-mb-xs">
-      {#if data}
+      {#await fetchData(period, visible) then data}
         <p class="ons-card__subtitle ons-u-mb-xs" style:margin-top="-12px">
           {formatPeriod(data.period[0])}
         </p>
@@ -58,7 +59,7 @@
             ? "Five year change"
             : capitalise(metadata.subText)}
         </p>
-      {/if}
+      {/await}
     </div>
     <p class="ons-u-mb-no">
       <a href="#{indicator}"

@@ -23,67 +23,52 @@
   let formatValue = $derived(makeValueFormatter(metadata.decimalPlaces));
   let formatPeriod = $derived(makePeriodFormatter(metadata.periodFormat));
 
-  let loadedBeeswarmUrl = $state();
-  let beeswarmData = $state();
-
-  let loadedSparklineUrl = $state();
-  let sparklineData = $state();
+  let loadedDataUrl = $state({});
+  let chartData = $state({});
 
   async function fetchData(
+    chartType,
+    visible,
     indicator,
     timeRange,
     selected,
-    geoLevel,
-    geoExtent,
-    geoCluster,
-    visible,
+    geoLevel = null,
+    geoExtent = null,
+    geoCluster = null,
   ) {
-    if (!visible) return;
-    console.log(`Refreshing ${indicator} data`);
-    const beeswarmUrl = makeDataUrl(
-      indicator,
-      timeRange[1],
-      "latest",
-      selected,
-      geoLevel,
-      geoExtent,
-      geoCluster,
-    );
-    if (beeswarmUrl !== loadedBeeswarmUrl) {
+    if (!visible && chartData[chartType]) return chartData[chartType];
+    else if (!visible) return null;
+    const args =
+      chartType === "beeswarm"
+        ? [
+            indicator,
+            timeRange[1],
+            "latest",
+            selected,
+            geoLevel,
+            geoExtent,
+            geoCluster,
+          ]
+        : [indicator, timeRange, null, selected];
+    const chartDataUrl = makeDataUrl(...args);
+    if (chartDataUrl !== loadedDataUrl[chartType]) {
+      loadedDataUrl[chartType] = chartDataUrl;
       try {
-        beeswarmData = await (await fetch(beeswarmUrl)).json();
+        chartData[chartType] = await (await fetch(chartDataUrl)).json();
+        console.log(`Loaded ${indicator} ${chartType} data`);
+        return chartData[chartType];
       } catch {
-        console.log("Failed to load beeswarm data");
+        console.log(`Failed to load ${indicator} ${chartType} data`);
+        return null;
       }
-      loadedBeeswarmUrl = beeswarmUrl;
-    }
-    const sparklineUrl = makeDataUrl(indicator, timeRange, null, selected);
-    if (sparklineUrl !== loadedSparklineUrl) {
-      try {
-        sparklineData = await (await fetch(sparklineUrl)).json();
-      } catch {
-        console.log("Failed to load sparkline data");
-      }
-      loadedSparklineUrl = sparklineUrl;
-    }
+    } else return chartData[chartType];
   }
-  $effect(async () => {
-    fetchData(
-      indicator,
-      timeRange,
-      selected,
-      geoGroup.geoLevel,
-      geoGroup.geoExtent,
-      geoGroup.geoCluster,
-      visible && !hidden,
-    );
-  });
 </script>
 
 {#snippet downloadUrl(url, format, formatLabel = null)}
   {@const label = formatLabel || format.toUpperCase()}
   <a
-    href={url?.replace(".cols.json", `.${format}`)}
+    href={url?.replace?.(".cols.json", `.${format}`)}
     download="{indicator}.{format}">{label}</a
   >
 {/snippet}
@@ -120,16 +105,30 @@
         <p><strong>Download data:</strong></p>
         <ul>
           <li>
-            Beeswarm data as {@render downloadUrl(loadedBeeswarmUrl, "csv")},
-            {@render downloadUrl(loadedBeeswarmUrl, "csvw")},
-            {@render downloadUrl(loadedBeeswarmUrl, "ods")}, or
-            {@render downloadUrl(loadedBeeswarmUrl, "json", "JSON-Stat")}.
+            Beeswarm data as {@render downloadUrl(
+              loadedDataUrl["beeswarm"],
+              "csv",
+            )},
+            {@render downloadUrl(loadedDataUrl["beeswarm"], "csvw")},
+            {@render downloadUrl(loadedDataUrl["beeswarm"], "ods")}, or
+            {@render downloadUrl(
+              loadedDataUrl["beeswarm"],
+              "json",
+              "JSON-Stat",
+            )}.
           </li>
           <li>
-            Line chart data as {@render downloadUrl(loadedSparklineUrl, "csv")},
-            {@render downloadUrl(loadedSparklineUrl, "csvw")},
-            {@render downloadUrl(loadedSparklineUrl, "ods")}, or
-            {@render downloadUrl(loadedSparklineUrl, "json", "JSON-Stat")}.
+            Line chart data as {@render downloadUrl(
+              loadedDataUrl["sparkline"],
+              "csv",
+            )},
+            {@render downloadUrl(loadedDataUrl["sparkline"], "csvw")},
+            {@render downloadUrl(loadedDataUrl["sparkline"], "ods")}, or
+            {@render downloadUrl(
+              loadedDataUrl["sparkline"],
+              "json",
+              "JSON-Stat",
+            )}.
           </li>
         </ul>
         <p>
@@ -141,25 +140,29 @@
     </details>
     <div class="indicator-charts">
       <div class="indicator-beeswarm">
-        <Beeswarm
-          data={beeswarmData || { message: "No data" }}
-          {formatPeriod}
-          {formatValue}
-          valuePrefix={metadata.prefix}
-          valueSuffix={metadata.suffix}
-          {selected}
-          bind:hovered
-        />
+        {#await fetchData("beeswarm", visible && !hidden, indicator, timeRange, selected, geoGroup.geoLevel, geoGroup.geoExtent, geoGroup.geoCluster) then chartData}
+          <Beeswarm
+            data={chartData}
+            {formatPeriod}
+            {formatValue}
+            valuePrefix={metadata.prefix}
+            valueSuffix={metadata.suffix}
+            {selected}
+            bind:hovered
+          />
+        {/await}
       </div>
       <div class="indicator-sparkline">
-        <Sparkline
-          data={sparklineData || { message: "No data" }}
-          {formatPeriod}
-          {formatValue}
-          valuePrefix={metadata.prefix}
-          valueSuffix={metadata.suffix}
-          {selected}
-        />
+        {#await fetchData("sparkline", visible && !hidden, indicator, timeRange, selected) then chartData}
+          <Sparkline
+            data={chartData}
+            {formatPeriod}
+            {formatValue}
+            valuePrefix={metadata.prefix}
+            valueSuffix={metadata.suffix}
+            {selected}
+          />
+        {/await}
       </div>
     </div>
   </div>
