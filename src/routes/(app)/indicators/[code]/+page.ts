@@ -39,7 +39,7 @@ export const load: PageLoad = async ({ params, fetch }) => {
     breadcrumbLinks: [
       { label: "Home", href: resolve("/") },
       { label: "Explore local statistics", href: resolve("/") },
-      { label: "Indicators", href: resolve("/indicators") },
+      { label: "Local indicators", href: resolve("/indicators") },
     ],
     breadcrumbBackground: "#eaeaea",
   };
