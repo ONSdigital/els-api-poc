@@ -19,7 +19,7 @@
     geoLevel,
   } = $props();
 
-  const height = 300;
+  const height = 500;
   const widthThreshold = 550;
 
   let width = $state(680);

@@ -18,8 +18,6 @@
     geoLevel,
   } = $props();
 
-  // const barHeight = 10;
-  // const height = 500;
   let width = $state();
   const widthThreshold = 550;
   let leftMargin = $derived(width < widthThreshold ? 20 : 150);
@@ -30,10 +28,6 @@
   let sorted = $derived(
     _data ? [..._data.array].sort((a, b) => b[yKey] - a[yKey]) : []
   );
-
-  // const barGap = 1; // actual size of barGap in pixels
-  // const barGapScale = (1 / barHeight) * barGap;
-  // const selectedBarScale = 5;
 
   const maxHeight = 500;
   const maxBarHeight = 30;
