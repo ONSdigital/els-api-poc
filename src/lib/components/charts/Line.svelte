@@ -4,6 +4,7 @@
   import { format } from "d3-format";
   import { parseChartData, contrastColor } from "./chartHelpers";
   import { markerPaths, ONSpalette } from "$lib/config";
+  import { pluralise } from "@onsvisual/robo-utils";
 
   let {
     data,
@@ -18,7 +19,7 @@
     geoLevel,
   } = $props();
 
-  const height = 300;
+  const height = 500;
   let width = $state();
   const widthThreshold = 550;
   let rightMargin = $derived(width < widthThreshold ? 20 : 150);
@@ -88,6 +89,7 @@
     )
   );
   $inspect(_data.dateDomain[1], Object.values(_data.keyed).flat());
+  $inspect(Object.values(_data.keyed));
 </script>
 
 {#snippet line(arr, width = 1, color = "#b0b0b0", opacity = 1, id = "")}
@@ -114,7 +116,7 @@
         class="label"
         style="background:{'grey'}; color:white; font-size:18px; font-weight:bold"
       >
-        {geoLevel.label}
+        {pluralise(geoLevel.label)}
       </li>
     {/if}
 
@@ -216,7 +218,7 @@
                 font-weight="bold"
                 alignment-baseline="middle"
               >
-                {geoLevel.label}
+                {pluralise(geoLevel.label)}
               </text>
             {/if}
           {/each}
@@ -276,7 +278,7 @@
   .line-chart {
     width: 100%;
     margin-top: 30px;
-    height: 300px;
+    height: 500px;
     overflow: visible;
     display: block;
   }
