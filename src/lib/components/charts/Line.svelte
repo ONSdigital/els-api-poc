@@ -105,38 +105,28 @@
     onpointerleave={() => {
       hoveredArea = null;
     }}
+    style:pointer-events={color === "#b0b0b0" ? null : "none"}
   />
 {/snippet}
 
 {#if width < widthThreshold}
-  <ul class="selected-labels">
+  <ul class="top-labels">
     {#if !hoveredArea}
-      <li
-        class="label"
-        style="background:{'grey'}; color:white; font-size:18px; font-weight:bold"
-      >
+      <li class="top-label-geo" style="background:{'grey'}">
         {pluralise(geoLevel.label)}
       </li>
     {/if}
 
     {#if _selected.length && !hoveredArea}
       {#each _selected as a, i}
-        <li
-          class="label"
-          style="background:{ONSpalette[
-            i
-          ]}; color:white; font-size:18px; font-weight:bold"
-        >
+        <li class="top-label-selected" style="background:{ONSpalette[i]}">
           {a[0]?.areanm}
         </li>
       {/each}
     {/if}
 
     {#if hoveredArea}
-      <li
-        class="label"
-        style="background:#f39431; color:white; font-size:18px; font-weight:bold"
-      >
+      <li class="top-label-hovered" style="background:#f39431">
         {hovered?.[0]?.areanm}
       </li>
     {/if}
@@ -176,6 +166,38 @@
           </div>
         {/each}
       </div>
+      <div class="margin-labels">
+        {#if width >= widthThreshold && hoveredArea}
+          <div
+            class="margin-label-hovered"
+            style="left: {xScale(_data.dateDomain[1]) + 10}px;top: {yScale(
+              finalHoveredValue
+            )}px;"
+          >
+            {hovered?.[0]?.areanm}
+          </div>
+        {/if}
+        {#if width >= widthThreshold}
+          {#each _selected as arr, i}
+            <div
+              class="margin-label-selected"
+              style="left: {xScale(_data.dateDomain[1]) + 10}px;top: {yScale(
+                arr[arr.length - 1][yKey]
+              )}px;color:{ONSpalette[i]}"
+            >
+              {arr?.[0]?.areanm}
+            </div>
+          {/each}
+          <div
+            class="margin-label-geo"
+            style="left: {xScale(_data.dateDomain[1]) + 10}px;top: {yScale(
+              maxValueLatestDate
+            )}px;"
+          >
+            {pluralise(geoLevel.label)}
+          </div>
+        {/if}
+      </div>
       <svg
         viewBox="0 0 {widthInner} {height}"
         class="line-chart"
@@ -194,31 +216,6 @@
 
           {#each _selected as arr, i}
             {@render line(arr, 3, ONSpalette[i], 1, arr[0][idKey])}
-            {#if width >= widthThreshold}
-              <text
-                class="margin-labels"
-                x={xScale(_data.dateDomain[1]) + 10}
-                y={yScale(arr[arr.length - 1][yKey])}
-                fill={ONSpalette[i]}
-                font-size="16"
-                font-weight="bold"
-                alignment-baseline="middle"
-              >
-                {arr[0]?.areanm}
-              </text>
-
-              <text
-                class="margin-labels"
-                x={xScale(_data.dateDomain[1]) + 10}
-                y={yScale(maxValueLatestDate)}
-                fill="grey"
-                font-size="16"
-                font-weight="bold"
-                alignment-baseline="middle"
-              >
-                {pluralise(geoLevel.label)}
-              </text>
-            {/if}
           {/each}
           {#each _selected as s, sIndex}
             {#each s as c}
@@ -235,19 +232,6 @@
         <g>
           {#if hoveredArea}
             {@render line(hovered, "4px", "orange", 1, hoveredArea)}
-            {#if width >= widthThreshold}
-              <text
-                class="margin-labels"
-                x={xScale(_data.dateDomain[1]) + 10}
-                y={yScale(finalHoveredValue)}
-                fill={"orange"}
-                font-size="16"
-                font-weight="bold"
-                alignment-baseline="middle"
-              >
-                {hovered?.[0]?.areanm}
-              </text>
-            {/if}
             {#each hovered as c}
               <circle
                 cx={xScale(c.date)}
@@ -291,13 +275,18 @@
     vector-effect: non-scaling-size;
   }
 
-  .selected-labels {
+  .top-labels {
     list-style: none;
     padding: 0;
     margin: 0 0 20px 0;
     min-height: 40px;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
   }
-  .label {
+  .top-label-selected,
+  .top-label-geo,
+  .top-label-hovered {
     display: inline-block;
     padding: 0.2rem 0.5rem;
     border-radius: 4px;
@@ -355,6 +344,41 @@
     right: calc(100% + 10px);
     transform: translateY(-50%);
     font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .margin-labels {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+  }
+
+  .margin-label-hovered {
+    position: absolute;
+    transform: translateY(-50%);
+    font-size: 16px;
+    font-weight: bold;
+    color: orange;
+    white-space: nowrap;
+  }
+
+  .margin-label-selected {
+    position: absolute;
+    transform: translateY(-50%);
+    font-size: 16px;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+
+  .margin-label-geo {
+    position: absolute;
+    transform: translateY(-50%);
+    font-size: 16px;
+    font-weight: bold;
+    color: grey;
     white-space: nowrap;
   }
 </style>

@@ -21,8 +21,8 @@
   let width = $state();
   const widthThreshold = 550;
   let leftMargin = $derived(width < widthThreshold ? 20 : 150);
-  // let widthInner = $derived(width - rightMargin - leftMargin);
-  let widthInner = $derived(width - 20 - 40);
+  const rightMargin = 30;
+  let widthInner = $derived(width - rightMargin - leftMargin);
 
   let _data = $derived(parseChartData(data, yKey, xKey, idKey));
   let sorted = $derived(
@@ -80,13 +80,6 @@
     return (id) => lookup[id];
   }
 
-  // function setBarHeight(id) {
-  //   const defaultHeight = yScale.bandwidth();
-  //   return selected.includes(id)
-  //     ? defaultHeight * selectedBarScale
-  //     : defaultHeight;
-  // }
-
   function setBarColour(id) {
     const index = selected.indexOf(id);
     if (index === -1) {
@@ -104,32 +97,9 @@
       : null
   );
 
-  // let yScale = $derived(
-  //   _data
-  //     ? scaleBand()
-  //         .domain(sorted.map((d) => d[idKey]))
-  //         .range([height, 0])
-  //         .paddingInner(barGapScale)
-  //     : null
-  // );
-
   let yScale = $derived(sorted ? makeYScale(sorted, selected) : null);
 
   let hovered = $derived(_data.keyed[hoveredArea]?.[0]);
-
-  // let barPositions = $derived(
-  //   sorted
-  //     ? (() => {
-  //         let positions: number[] = [];
-  //         let y = 0;
-  //         for (const b of sorted) {
-  //           positions.push(y);
-  //           y += setBarHeight(b[idKey]) + barGap;
-  //         }
-  //         return positions;
-  //       })()
-  //     : []
-  // );
 
   let hoveredIndex = $derived(
     hoveredArea ? sorted.findIndex((d) => d[idKey] === hoveredArea) : -1
@@ -160,8 +130,8 @@
 <div
   bind:clientWidth={width}
   class="bar-wrapper"
-  style:padding-right="{30}px"
-  style:padding-top="0px"
+  style:padding-right="{rightMargin}px"
+  style:padding-top="36px"
   style:padding-bottom="25px"
   style:padding-left="{leftMargin}px"
 >
@@ -211,7 +181,6 @@
   }
   .bar-chart {
     width: 100%;
-    margin-top: 30px;
     overflow: visible;
     display: block;
   }
@@ -236,17 +205,18 @@
   .line-x-tick {
     position: absolute;
     width: 1px;
-    top: calc(0%);
+    bottom: 100%;
     height: 10px;
     border-left: 1px solid grey;
   }
 
   .line-x-tick-label {
     position: absolute;
-    top: calc(0% - 25px);
+    bottom: calc(100% + 14px);
     transform: translateX(-50%);
     font-size: 14px;
     white-space: nowrap;
+    line-height: 1;
   }
 
   .x-baseline {
