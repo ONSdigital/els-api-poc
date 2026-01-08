@@ -44,6 +44,7 @@
 <div style:height="450px">
   <Map
     bind:map
+    css={resolve("/css/maplibre-gl.css")}
     style={resolve("/data/mapstyle-nav.json")}
     location={{ bounds }}
     options={{

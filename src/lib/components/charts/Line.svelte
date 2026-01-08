@@ -1,6 +1,6 @@
 <script lang="ts">
   import { scaleLinear, scaleTime } from "d3-scale";
-  import { ticks, nice } from "d3-array";
+  import { nice } from "d3-array";
   import { format } from "d3-format";
   import { parseChartData, contrastColor } from "./chartHelpers";
   import { markerPaths, ONSpalette } from "$lib/config";
@@ -19,9 +19,11 @@
     geoLevel,
   } = $props();
 
-  const height = 500;
-  let width = $state();
+  const height = 300;
   const widthThreshold = 550;
+
+  let width = $state(680);
+  let leftMargin = $state(0);
   let rightMargin = $derived(width < widthThreshold ? 20 : 150);
   let widthInner = $derived(width - rightMargin - leftMargin);
 
@@ -36,26 +38,23 @@
 
   let yDomain = $derived(_data ? nice(..._data.valueDomain, 2) : null);
   let yScale = $derived(
-    _data ? scaleLinear().domain(yDomain).range([height, 0]) : null
+    yDomain ? scaleLinear().domain(yDomain).range([height, 0]) : null
   );
 
-  let linesCount = $derived(Object.values(_data.keyed).length);
+  let linesCount = $derived(_data ? Object.keys(_data.keyed).length : null);
   let lineOpacity = $derived(
-    linesCount < 30 ? 0.5 : linesCount < 100 ? 0.35 : 0.2
+    linesCount && linesCount < 30 ? 0.5 : linesCount < 100 ? 0.35 : 0.2
   );
   let lineStroke = $derived(
     linesCount < 30 ? "2px" : linesCount < 100 ? "1.75px" : "1.5px"
   );
 
-  let yTickWidth = $state({});
-
-  let hovered = $derived(_data.keyed[hoveredArea]);
+  let hovered = $derived(_data?.keyed?.[hoveredArea]);
   let finalHoveredValue = $derived(
     hovered ? hovered[hovered.length - 1][yKey] : null
   );
 
   const formatYTick = format(",.0f");
-  let leftMargin = $state(0);
   function updateLeftMargin(el) {
     const width = el.getBoundingClientRect().width;
     if (width > leftMargin) leftMargin = width;
@@ -64,8 +63,8 @@
   const maxTickGap = 100; // in pixels
   let nXTicks = $derived(Math.floor(width / maxTickGap));
 
-  let xTicks = $derived.by(() => {
-    if (!xScale) return [];
+  function makeXTicks(xScale, _data) {
+    if (!xScale || !_data) return [];
     const initialTicks = xScale.ticks(nXTicks);
     const tickDiff =
       _data.dateDomain[1] - initialTicks[initialTicks.length - 1];
@@ -76,20 +75,20 @@
     const firstGap = newTicks[0] - _data.dateDomain[0];
     if (firstGap > tickGap) newTicks.unshift(new Date(newTicks[0] - tickGap));
     return newTicks;
-  });
+  }
+  let xTicks = $derived(makeXTicks(xScale, _data));
 
-  $inspect(_data);
+  // $inspect(_data);
 
   let maxValueLatestDate = $derived(
-    Math.max(
-      Object.values(_data.keyed)
-        .flat()
-        .filter((d) => d.date === _data.dateDomain[1])
-        .map((m) => m.value)
-    )
+    _data
+      ? Math.max(
+          ...Object.values(_data.keyed).map((d) => d[d.length - 1].value)
+        )
+      : 0
   );
-  $inspect(_data.dateDomain[1], Object.values(_data.keyed).flat());
-  $inspect(Object.values(_data.keyed));
+  $inspect({ maxValueLatestDate });
+  // $inspect(_data.dateDomain[1], Object.values(_data.keyed).flat());
 </script>
 
 {#snippet line(arr, width = 1, color = "#b0b0b0", opacity = 1, id = "")}
@@ -100,10 +99,10 @@
     stroke={color}
     stroke-width={width}
     {opacity}
-    on:pointerenter={() => {
+    onpointerenter={() => {
       hoveredArea = id;
     }}
-    on:pointerleave={() => {
+    onpointerleave={() => {
       hoveredArea = null;
     }}
   />
@@ -148,41 +147,40 @@
   bind:clientWidth={width}
   class="line-wrapper"
   style:padding-left="{leftMargin + 10}px"
-  style:padding-top="0px"
   style:padding-bottom="25px"
   style:padding-right="{rightMargin}px"
 >
   <div class="line-inner">
-    <div class="line-x-axis">
-      {#if yDomain?.[0] <= 0 && yDomain?.[1] >= 0}
-        <div class="x-baseline" style:top="{yScale(0)}px"></div>
-      {/if}
-      {#each xTicks as xTick}
-        <div class="line-x-tick" style:left="{xScale(xTick)}px"></div>
-        <div class="line-x-tick-label" style:left="{xScale(xTick)}px">
-          {formatPeriod(xTick.toISOString())}
-        </div>
-      {/each}
-    </div>
-    <div class="line-y-axis">
-      <div class="y-baseline"></div>
-      {#each yScale.ticks(5) as yTick, i}
-        <div class="line-y-tick" style:top="{yScale(yTick)}px"></div>
-        <div
-          class="line-y-tick-label"
-          style:top="{yScale(yTick)}px"
-          use:updateLeftMargin
-        >
-          {formatYTick(yTick)}
-        </div>
-      {/each}
-    </div>
-    <svg
-      viewBox="0 0 {widthInner} {height}"
-      class="line-chart"
-      preserveAspectRatio="none"
-    >
-      {#if _data && xScale && yScale}
+    {#if _data && xScale && yScale}
+      <div class="line-x-axis">
+        {#if yDomain?.[0] <= 0 && yDomain?.[1] >= 0}
+          <div class="x-baseline" style:top="{yScale(0)}px"></div>
+        {/if}
+        {#each xTicks as xTick}
+          <div class="line-x-tick" style:left="{xScale(xTick)}px"></div>
+          <div class="line-x-tick-label" style:left="{xScale(xTick)}px">
+            {formatPeriod(xTick.toISOString())}
+          </div>
+        {/each}
+      </div>
+      <div class="line-y-axis">
+        <div class="y-baseline"></div>
+        {#each yScale.ticks(5) as yTick, i}
+          <div class="line-y-tick" style:top="{yScale(yTick)}px"></div>
+          <div
+            class="line-y-tick-label"
+            style:top="{yScale(yTick)}px"
+            use:updateLeftMargin
+          >
+            {formatYTick(yTick)}
+          </div>
+        {/each}
+      </div>
+      <svg
+        viewBox="0 0 {widthInner} {height}"
+        class="line-chart"
+        preserveAspectRatio="none"
+      >
         <g opacity={hoveredArea ? 0.2 : 1}>
           {#each Object.values(_data.keyed) as arr, i}
             {@render line(
@@ -261,8 +259,8 @@
             {/each}
           {/if}
         </g>
-      {/if}
-    </svg>
+      </svg>
+    {/if}
   </div>
 </div>
 
@@ -270,17 +268,17 @@
   .line-wrapper {
     display: block;
     position: relative;
+    padding-top: 0;
   }
   .line-inner {
     display: block;
     position: relative;
   }
   .line-chart {
-    width: 100%;
+    display: block;
     margin-top: 30px;
     height: 500px;
     overflow: visible;
-    display: block;
   }
   .line-chart polyline,
   .line-chart line {

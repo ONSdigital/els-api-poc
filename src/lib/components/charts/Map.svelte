@@ -3,7 +3,7 @@
     import { onMount, createEventDispatcher } from "svelte";
     import { resolve } from "$app/paths";
     import bbox from "@turf/bbox";
-    import { makeMapFeatures, valuesToBreaks } from "$lib/utils";
+    import { parseData, makeMapFeatures, valuesToBreaks } from "$lib/utils";
     import { ONSpalette } from "$lib/config";
     import { contrastColor } from "./chartHelpers";
     import topo from "$lib/data/topo.json";
@@ -16,11 +16,13 @@
     import MapLegend from "./MapLegend.svelte";
 
     let {
-        mapDescription,
         data,
         metadata,
         selected = [],
-        hovered = null,
+        hovered = $bindable(),
+        formatValue = (d) => d,
+        formatPeriod = (d) => d,
+        geoLevel = null,
         colors = [
             "rgb(234, 236, 177)",
             "rgb(169, 216, 145)",
@@ -28,18 +30,19 @@
             "rgb(0, 78, 166)",
             "rgb(0, 13, 84)",
         ],
-        topoPath = resolve("/data/topo.json"),
     } = $props();
 
+    const topoPath = resolve("/data/topo.json");
     const ukBounds = [-8.65, 49.867, 1.761, 60.856];
     const fitBoundsOptions = { padding: 10 };
     const features = makeMapFeatures(topo);
     const dispatch = createEventDispatcher();
 
     let map = $state();
-    let breaks = $derived(valuesToBreaks(data.map((d) => d.value)));
+    let _data = $derived(parseData(data));
+    let breaks = $derived(valuesToBreaks(_data.map((d) => d.value)));
     let { renderedFeatures, selectedAreas, bounds } = $derived(
-        makeRenderedFeatures(features, data),
+        makeRenderedFeatures(features, _data),
     );
 
     function doHover(e) {
@@ -97,6 +100,7 @@
     <div class="map-container">
         <Map
             bind:map
+            css={resolve("/css/maplibre-gl.css")}
             style={resolve("/data/mapstyle.json")}
             location={{ bounds: bounds || ukBounds }}
             options={{
@@ -106,7 +110,7 @@
                 preserveDrawingBuffer: true,
             }}
             controls
-            {mapDescription}
+            mapDescription="Map of {metadata.label}"
         >
             {#if renderedFeatures}
                 <MapSource
@@ -180,20 +184,13 @@
         </Map>
     </div>
     <MapLegend
-        data={data.map((d) => ({
-            ...d,
-            areanm: features[d.areacd]?.properties?.areanm,
-        }))}
+        data={_data}
         {breaks}
         {hovered}
         {selectedAreas}
         prefix={metadata.prefix}
         suffix={metadata.suffix}
-        format={(d) =>
-            d.toLocaleString("en-GB", {
-                minimumFractionDigits: metadata.decimalPlaces,
-                maximumFractionDigits: metadata.decimalPlaces,
-            })}
+        format={formatValue}
         on:hover={doHover}
     />
 </div>

@@ -1,34 +1,21 @@
 <script lang="ts">
-  //@ts-nocheck
-  import { base, assets, resolve } from "$app/paths";
-  import { afterNavigate } from "$app/navigation";
+  import { resolve } from "$app/paths";
   import { setContext } from "svelte";
   import {
     Hero,
     NavSections,
     NavSection,
-    Dropdown,
-    Table,
-    analyticsEvent,
-    Header,
-    LazyLoad,
     List,
     Li,
   } from "@onsvisual/svelte-components";
   import { capitalise } from "@onsvisual/robo-utils";
-  import {
-    fetchChartDataV1,
-    makePeriodFormatter,
-    makeValueFormatter,
-  } from "$lib/utils";
+  import { makePeriodFormatter, makeValueFormatter } from "$lib/utils";
   import { countryLetterLookup } from "$lib/config/geoLookups";
   import AreasLegend from "$lib/components/modals/AreasLegend.svelte";
   import AreasModal from "$lib/components/modals/AreasModal.svelte";
   import OptionsModal from "$lib/components/modals/OptionsModal.svelte";
-  import Map from "$lib/components/charts/Map.svelte";
   import ContentBlock from "$lib/components/charts/ContentBlock.svelte";
   import IndicatorChart from "./IndicatorChart.svelte";
-  import Bar from "$lib/components/charts/Bar.svelte";
 
   let { data } = $props();
   $inspect(data);
@@ -52,34 +39,6 @@
       day: "2-digit",
     });
   };
-
-  function pivotData(data, filter = null) {
-    const piv = {};
-
-    for (const d of data) {
-      if (!filter || filter.includes(d.areacd.slice(0, 3))) {
-        if (!piv[d.areacd])
-          piv[d.areacd] = { areacd: d.areacd, areanm: d.areanm };
-        piv[d.areacd][d.period] = d.value;
-      }
-    }
-
-    return Object.values(piv);
-  }
-
-  function makeColumns(data) {
-    return Object.keys(data[0]).map((key) => ({
-      key,
-      label:
-        key === "areacd"
-          ? "Area code"
-          : key === "areanm"
-            ? "Area name"
-            : formatPeriod(key),
-      numeric: !["areacd", "areanm"].includes(key),
-      formatter: formatValue,
-    }));
-  }
 
   function getInitialSelection(data) {
     let area =
@@ -165,29 +124,27 @@
             )}
             to {pageState.selectedPeriodRange[1].slice(0, 4)}
           </p>
-          <LazyLoad>
-            <div class="chart-container">
-              {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: pageState.selectedPeriodRange[1].slice(0, 10) }, )}
-                Fetching chart data
-              {:then chartData}
-                <Map
-                  metadata={data.indicator}
-                  data={chartData}
-                  selected={pageState.selectedAreas.map((a) => a.areacd)}
-                />
-              {:catch}
-                Failed to load chart data
-              {/await}
-            </div>
-          </LazyLoad>
+          <IndicatorChart
+            indicator={data.indicator.slug}
+            metadata={data.indicator}
+            timeRange={pageState.selectedPeriodRange}
+            selected={pageState.selectedAreas.map((a) => a.areacd)}
+            geoLevel={pageState.selectedGeoLevel}
+            {formatValue}
+            {formatPeriod}
+            chartType="map"
+          />
         </ContentBlock>
       </NavSection>
     {/if}
 
     {#if data.periods.length > 1}
       <NavSection title="Line chart">
-        {#if pageState.selectedPeriodRange[0] === pageState.selectedPeriodRange[1]}
-          <ContentBlock>
+        <ContentBlock
+          title={data.indicator.label}
+          source={data.indicator.source}
+        >
+          {#if pageState.selectedPeriodRange[0] === pageState.selectedPeriodRange[1]}
             <div class="no-chart-container">
               <p>
                 Time series not displayed as selected date range includes only
@@ -195,12 +152,7 @@
                 <span style="font-weight: bold;">{data.indicator.label}</span> data.
               </p>
             </div>
-          </ContentBlock>
-        {:else}
-          <ContentBlock
-            title={data.indicator.label}
-            source={data.indicator.source}
-          >
+          {:else}
             <p class="subtitle">
               {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(
                 0,
@@ -208,19 +160,18 @@
               )}
               to {pageState.selectedPeriodRange[1].slice(0, 4)}
             </p>
-            <LazyLoad>
-              <IndicatorChart
-                indicator={data.indicator.slug}
-                metadata={data.indicator}
-                timeRange={pageState.selectedPeriodRange}
-                selected={pageState.selectedAreas.map((a) => a.areacd)}
-                geoLevel={pageState.selectedGeoLevel}
-                {formatPeriod}
-                chartType="line"
-              />
-            </LazyLoad>
-          </ContentBlock>
-        {/if}
+            <IndicatorChart
+              indicator={data.indicator.slug}
+              metadata={data.indicator}
+              timeRange={pageState.selectedPeriodRange}
+              selected={pageState.selectedAreas.map((a) => a.areacd)}
+              geoLevel={pageState.selectedGeoLevel}
+              {formatValue}
+              {formatPeriod}
+              chartType="line"
+            />
+          {/if}
+        </ContentBlock>
       </NavSection>
     {/if}
 
@@ -233,17 +184,16 @@
           )}
           to {pageState.selectedPeriodRange[1].slice(0, 4)}
         </p>
-        <LazyLoad>
-          <IndicatorChart
-            indicator={data.indicator.slug}
-            metadata={data.indicator}
-            timeRange={pageState.selectedPeriodRange[1]}
-            selected={pageState.selectedAreas.map((a) => a.areacd)}
-            geoLevel={pageState.selectedGeoLevel}
-            {formatPeriod}
-            chartType="bar"
-          />
-        </LazyLoad>
+        <IndicatorChart
+          indicator={data.indicator.slug}
+          metadata={data.indicator}
+          timeRange={pageState.selectedPeriodRange}
+          selected={pageState.selectedAreas.map((a) => a.areacd)}
+          geoLevel={pageState.selectedGeoLevel}
+          {formatValue}
+          {formatPeriod}
+          chartType="bar"
+        />
       </ContentBlock>
     </NavSection>
     <NavSection title="Table">
@@ -255,24 +205,16 @@
           )}
           to {pageState.selectedPeriodRange[1].slice(0, 4)}
         </p>
-        <LazyLoad>
-          <div class="chart-container">
-            {#await fetchChartDataV1( data.indicator.slug, { geo: pageState.selectedGeoLevel.id, time: "all" }, )}
-              Fetching chart data
-            {:then chartData}
-              {@const pivotedData = pivotData(chartData)}
-              <Table
-                data={pivotedData}
-                columns={makeColumns(pivotedData)}
-                sortable
-                compact
-                height={400}
-              />
-            {:catch}
-              Failed to load chart data
-            {/await}
-          </div>
-        </LazyLoad>
+        <IndicatorChart
+          indicator={data.indicator.slug}
+          metadata={data.indicator}
+          timeRange={pageState.selectedPeriodRange}
+          selected={pageState.selectedAreas.map((a) => a.areacd)}
+          geoLevel={pageState.selectedGeoLevel}
+          {formatValue}
+          {formatPeriod}
+          chartType="table"
+        />
       </ContentBlock>
     </NavSection>
   </div>
@@ -339,8 +281,5 @@
     width: 100%;
     min-height: 300px;
     margin-bottom: 32px;
-  }
-  .chart-container :global(svg) {
-    overflow: visible;
   }
 </style>
