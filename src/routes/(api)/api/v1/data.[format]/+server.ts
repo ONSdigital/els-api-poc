@@ -40,14 +40,14 @@ export const GET: RequestHandler = async ({ url, params }) => {
 
   const headers = { "Access-Control-Allow-Origin": "*" };
 
-  return datasets.format === "ods"
+  return datasets.format === "xlsx"
     ? new Response(datasets.data, {
-        headers: {
-          ...headers,
-          "Content-Type": "application/vnd.oasis.opendocument.spreadsheet",
-          "Content-Length": datasets.data.size.toString(),
-        },
-      })
+      headers: {
+        ...headers,
+        "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        // "Content-Length": datasets.data.size.toString(),
+      },
+    })
     : datasets.format === "text"
       ? text(datasets.data, { headers })
       : json(datasets.data, { headers });

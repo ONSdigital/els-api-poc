@@ -110,7 +110,7 @@
               "csv",
             )},
             {@render downloadUrl(loadedDataUrl["beeswarm"], "csvw")},
-            {@render downloadUrl(loadedDataUrl["beeswarm"], "ods")}, or
+            {@render downloadUrl(loadedDataUrl["beeswarm"], "xlsx")}, or
             {@render downloadUrl(
               loadedDataUrl["beeswarm"],
               "json",
@@ -123,7 +123,7 @@
               "csv",
             )},
             {@render downloadUrl(loadedDataUrl["sparkline"], "csvw")},
-            {@render downloadUrl(loadedDataUrl["sparkline"], "ods")}, or
+            {@render downloadUrl(loadedDataUrl["sparkline"], "xlsx")}, or
             {@render downloadUrl(
               loadedDataUrl["sparkline"],
               "json",

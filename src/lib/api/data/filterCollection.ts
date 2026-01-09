@@ -22,9 +22,9 @@ export default async function filterCollection(params = {}) {
     params.topic === "all"
       ? () => true
       : (d) =>
-          [params.topic]
-            .flat()
-            .some((t) => [d.extension.topic, d.extension.subTopic].includes(t));
+        [params.topic]
+          .flat()
+          .some((t) => [d.extension.topic, d.extension.subTopic].includes(t));
   const indicatorFilter =
     params.indicator === "all"
       ? () => true
@@ -97,7 +97,7 @@ export default async function filterCollection(params = {}) {
 
   return params.format === "csv"
     ? { format: "text", data: csvSerialise(datasets) }
-    : params.format === "ods"
-      ? { format: "ods", data: await generateSpreadsheet(datasets) }
+    : params.format === "xlsx"
+      ? { format: "xlsx", data: await generateSpreadsheet(datasets) }
       : { format: "json", data: datasets };
 }

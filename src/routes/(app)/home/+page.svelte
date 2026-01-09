@@ -132,7 +132,8 @@
   <p>
     You can download all of the data available on the Explore Local Statistics
     service in an
-    <a href={resolve("/api/v1/data.ods?time=all")} download="data.ods">ODS</a>,
+    <a href={resolve("/api/v1/data.xlsx?time=all")} download="data.xlsx">XLSX</a
+    >,
     <a href={resolve("/api/v1/data.csv?time=all")} download="data.csv">CSV</a>,
     <a href={resolve("/api/v1/data.csvw?time=all")} download="data.csvw.json"
       >CSVW</a

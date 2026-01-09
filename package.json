@@ -21,7 +21,6 @@
   "license": "MIT",
   "devDependencies": {
     "@mapbox/tilebelt": "^2.0.2",
-    "@onsvisual/accessible-spreadsheet-creator": "^0.1.2",
     "@onsvisual/robo-utils": "^0.3.9",
     "@onsvisual/svelte-components": "^1.0.46",
     "@onsvisual/svelte-maps": "^1.2.28",
@@ -43,6 +42,7 @@
     "d3-scale": "^4.0.2",
     "d3-time": "^3.1.0",
     "d3-time-format": "^4.1.0",
+    "exceljs": "^4.4.0",
     "jszip": "^3.10.1",
     "parse-color": "^1.0.0",
     "prettier": "^3.1.0",

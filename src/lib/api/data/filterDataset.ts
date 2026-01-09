@@ -38,7 +38,7 @@ export default function filterDataset(
     .reduce((a, b) => a * b, 1);
   if (length === 0) return null;
 
-  if (format === "ods") {
+  if (format === "xlsx") {
     const data = toCols(cube, dims, params.includeNames, params.includeStatus);
     return data ? { data, meta: getSpreadsheetMetadata(cube) } : null;
   }

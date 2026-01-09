@@ -206,10 +206,10 @@
       Download all datasets that include {getName(areaProps, "the")} in an
       <a
         href={resolve(
-          `/api/v1/data.ods?hasGeo=${areaProps.areacd}&excludeMultivariate=true&time=all`,
+          `/api/v1/data.xlsx?hasGeo=${areaProps.areacd}&excludeMultivariate=true&time=all`,
         )}
-        download="data.ods">ODS</a
-      >
+        download="data.xlsx">XLSX</a
+      >,
       <a
         href={resolve(
           `/api/v1/data.csv?hasGeo=${areaProps.areacd}&excludeMultivariate=true&time=all`,

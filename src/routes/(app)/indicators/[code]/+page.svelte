@@ -228,9 +228,9 @@
     <p>
       You can download this dataset in an <a
         href={resolve(
-          `/api/v1/data.ods?indicator=${data.indicator.slug}&time=all`,
+          `/api/v1/data.xlsx?indicator=${data.indicator.slug}&time=all`,
         )}
-        download={`${data.indicator.slug}.ods`}>ODS</a
+        download={`${data.indicator.slug}.xlsx`}>XLSX</a
       >,
       <a
         href={resolve(
@@ -253,8 +253,8 @@
       >
       format, or download
       <a
-        href={resolve(`/api/v1/data.ods?excludeMultivariate=true&time=all`)}
-        download="datasets.ods">all available datasets (ODS, ~10MB)</a
+        href={resolve(`/api/v1/data.xlsx?excludeMultivariate=true&time=all`)}
+        download="datasets.xlsx">all available datasets (XLSX, ~10MB)</a
       >.
     </p>
     <p>

@@ -20,9 +20,9 @@
 
   const formats = [
     {
-      id: "ods",
-      label: "ODS",
-      description: "Excel-compatible dataset and supporting information",
+      id: "xlsx",
+      label: "XLSX",
+      description: "Human readable data and supporting information",
       checked: true,
     },
     { id: "csv", label: "CSV", description: "Machine readable data" },
@@ -41,30 +41,30 @@
   let { data } = $props();
 
   let selectedTopics = $state(
-    data.topic[0] === "all" ? data.topics.map((t) => t.slug) : data.topic
+    data.topic[0] === "all" ? data.topics.map((t) => t.slug) : data.topic,
   );
   let selectAllTopics = $derived(selectedTopics.length === data.topics.length);
   let selectedIndicators = $state(
-    data.taxonomy.filter((item) => data.indicator.includes(item.slug))
+    data.taxonomy.filter((item) => data.indicator.includes(item.slug)),
   );
   let selectedGeoLevels = $state(
     data.geoLevel[0] === "all"
       ? data.geoLevels.map((level) => level.key)
-      : data.geoLevel
+      : data.geoLevel,
   );
   let selectAllGeoLevels = $derived(
-    selectedGeoLevels.length === data.geoLevels.length
+    selectedGeoLevels.length === data.geoLevels.length,
   );
   let selectedGeos = $state(
-    data.areaList.filter((area) => data.geo.includes(area.areacd))
+    data.areaList.filter((area) => data.geo.includes(area.areacd)),
   );
   let selectedTimePeriod = $state([data.time[0], data.time[1]]);
   let selectAllYears = $state(false);
   let selectedMeasures = $state(
-    data.measure[0] === "all" ? data.measures.map((m) => m.key) : data.measure
+    data.measure[0] === "all" ? data.measures.map((m) => m.key) : data.measure,
   );
   let selectAllMeasures = $derived(
-    selectedMeasures.length === data.measures.length
+    selectedMeasures.length === data.measures.length,
   );
   let selectedFormat = $state(formats[0]);
   let showLinkMessage = $state(false);
@@ -91,7 +91,7 @@
     times,
     allTimes,
     measures,
-    step
+    step,
   ) {
     let parts = [];
     const joinParts = () => `?${parts.join("&")}`;
@@ -132,8 +132,8 @@
       selectedTimePeriod,
       selectAllYears,
       selectedMeasures,
-      data.step
-    )
+      data.step,
+    ),
   );
 
   function makeDataUrl(
@@ -144,7 +144,7 @@
     times,
     allTimes,
     measures,
-    format
+    format,
   ) {
     let parts = [];
     const joinParts = () =>
@@ -167,7 +167,7 @@
         `geo=${[geo, geoLevel]
           .filter((g) => g)
           .flat()
-          .join(",")}`
+          .join(",")}`,
       );
     const time = allTimes ? "all" : times.filter((time) => time).join(",");
     if (time) parts.push(`time=${time}`);
@@ -186,8 +186,8 @@
       selectedTimePeriod,
       selectAllYears,
       selectedMeasures,
-      selectedFormat
-    )
+      selectedFormat,
+    ),
   );
 
   async function copyPermalink() {
@@ -329,8 +329,11 @@
           : selectedFormat.id}"
         small>Download data</Button
       >
-      <Button variant="secondary" on:click={copyPermalink} small>Copy permalink</Button>
-      {#if showLinkMessage}<span class="copy-link-message">Link copied!</span>{/if}
+      <Button variant="secondary" on:click={copyPermalink} small
+        >Copy permalink</Button
+      >
+      {#if showLinkMessage}<span class="copy-link-message">Link copied!</span
+        >{/if}
     </Details>
   {/if}
 </Section>
@@ -368,6 +371,6 @@
     display: inline-flex;
     align-items: center;
     height: 36px;
-    margin: .5em 0 0 .3em;
+    margin: 0.5em 0 0 0.3em;
   }
 </style>
