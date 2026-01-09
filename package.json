@@ -3,8 +3,8 @@
   "homepage": "http://onsvisual.github.io/sveltekit-starter",
   "version": "1.0.0",
   "scripts": {
-    "dev": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 NODE_OPTIONS=--max-old-space-size=8192 vite dev",
-    "build": "cross-env NODE_OPTIONS=--max-old-space-size=8192 vite build",
+    "dev": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 vite dev",
+    "build": "cross-env vite build",
     "build:preview": "cross-env PUBLIC_APP_ENV=preview vite build",
     "package": "vite package",
     "preview": "vite preview",
