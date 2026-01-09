@@ -45,7 +45,7 @@ export const GET: RequestHandler = async ({ url, params }) => {
       headers: {
         ...headers,
         "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        // "Content-Length": datasets.data.size.toString(),
+        // "Content-Length": String(datasets.data._readableState.length),
       },
     })
     : datasets.format === "text"

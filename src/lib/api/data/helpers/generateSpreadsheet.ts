@@ -6,6 +6,7 @@ StylesXform.prototype.init = function () {
 };
 
 import ExcelJS from "exceljs";
+import { PassThrough } from "node:stream";
 import { toWords } from "@onsvisual/robo-utils";
 
 // This function grabs the metadata from the JSON-Stat required to populate the XLSX spreadsheet
@@ -186,7 +187,10 @@ export async function dataToSpreadsheet(data) {
         }
     }
 
-    return await workbook.xlsx.writeBuffer();
+    const stream = new PassThrough();
+    await workbook.xlsx.write(stream);
+
+    return stream;
 }
 
 // This function generates an ODS spreadsheet given data and metadata for a series of datasets
