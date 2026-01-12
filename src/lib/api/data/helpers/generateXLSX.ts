@@ -194,7 +194,7 @@ export async function dataToSpreadsheet(data) {
 }
 
 // This function generates an ODS spreadsheet given data and metadata for a series of datasets
-export default async function generateSpreadsheet(datasets) {
+export default async function generateXLSX(datasets) {
     // Note: This cover sheet is currently hard-coded. Possibly better to move somewhere else?
     const data = {
         creator: "Office for National Statistics",

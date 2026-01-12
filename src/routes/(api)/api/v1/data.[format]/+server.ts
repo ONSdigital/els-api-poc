@@ -1,7 +1,7 @@
 import type { RequestHandler } from "./$types";
 import { json, text, error } from "@sveltejs/kit";
 import { getParam, getDimensionFilters } from "$lib/api/utils";
-import filterCollection from "$lib/api/data/filterCollection";
+import getFilteredData from "$lib/api/data/getFilteredData";
 
 export const GET: RequestHandler = async ({ url, params }) => {
   const format = params.format || "cols";
@@ -19,7 +19,7 @@ export const GET: RequestHandler = async ({ url, params }) => {
   const includeStatus = getParam(url, "includeStatus", false);
   const dimFilters = getDimensionFilters(url);
 
-  const datasets = await filterCollection({
+  const datasets = await getFilteredData({
     format,
     topic,
     indicator,

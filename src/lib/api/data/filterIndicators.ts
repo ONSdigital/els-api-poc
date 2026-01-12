@@ -1,5 +1,6 @@
 import { makeDatasetGeoFilter } from "$lib/api/metadata/helpers/datasetFilters";
 
+// Takes a JSON-Stat collection and returns an array of JSON-Stat datasets that meet the filter criteria
 export default function filterIndicators(datasets, params) {
     const indicators = new Set([params.indicator].flat());
     const topics = [params.topic].flat();
