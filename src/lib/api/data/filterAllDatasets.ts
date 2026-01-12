@@ -17,6 +17,7 @@ export default function filterAllDatasets(
     return { error: 400, message: "No data available for the selected filters." };
   if (format === "csv") return filtered.map((f) => f[1]);
   if (format === "xlsx") return filtered;
+
   if (["rows", "cols"].includes(format.slice(0, 4)))
     return singleIndicator && filtered.length === 1
       ? filtered[0][1]

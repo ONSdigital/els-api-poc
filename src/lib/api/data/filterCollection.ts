@@ -2,55 +2,21 @@ import filterAllDatasets from "./filterAllDatasets";
 import { makeFilter, makeGeoFilter } from "./helpers/dataFilters";
 import { toCSVW, csvSerialise } from "./helpers/dataFormatters";
 import { isValidDate } from "$lib/api/utils";
-import { makeDatasetGeoFilter } from "$lib/api/metadata/helpers/datasetFilters";
+import filterIndicators from "./filterIndicators";
 import generateSpreadsheet from "./helpers/generateSpreadsheet";
 import readData from "$lib/data";
 
 const cube = await readData("json-stat");
 
 export default async function filterCollection(params = {}) {
-  let datasets = cube.link.item;
+  // Filter datasets by indicator, topic and included geographies
+  let datasets = filterIndicators(cube.link.item, params);
 
+  // Check if request is for a single indicator
   const singleIndicator =
     params.topic === "all" &&
     params.indicator !== "all" &&
     [params.indicator].flat().length === 1;
-  const filters = {};
-
-  // Filter datasets by indicator, and by topic OR sub-topic (additive)
-  const topicFilter =
-    params.topic === "all"
-      ? () => true
-      : (d) =>
-        [params.topic]
-          .flat()
-          .some((t) => [d.extension.topic, d.extension.subTopic].includes(t));
-  const indicatorFilter =
-    params.indicator === "all"
-      ? () => true
-      : (d) => [params.indicator].flat().includes(d.extension.slug);
-  const combinedFilter = ![params.topic, params.indicator].includes("all")
-    ? (d) => topicFilter(d) || indicatorFilter(d)
-    : (d) => topicFilter(d) && indicatorFilter(d);
-  datasets = datasets.filter(combinedFilter);
-
-  // Remove multi-variate indicators if they have not been selected explicitly
-  if (params.excludeMultivariate === true) {
-    datasets = datasets.filter(
-      (d) =>
-        !(
-          d.extension.isMultivariate &&
-          ![params.indicator].flat().includes(d.extension.slug)
-        )
-    );
-  }
-
-  // Filter for datasets that include a specific geography
-  if (params.hasGeo !== "any") {
-    const geoFilter = makeDatasetGeoFilter(params.hasGeo);
-    if (geoFilter.error) return geoFilter;
-    datasets = datasets.filter(geoFilter);
-  }
 
   // Return only CSVW metadata, if requested
   if (params.format === "csvw") {
@@ -64,6 +30,9 @@ export default async function filterCollection(params = {}) {
     );
     return { format: "json", data: metadata };
   }
+
+  // Create filters
+  const filters = {};
 
   // Create filters for standard dimensions
   if (params.geo !== "all" || params.geoCluster !== "all")
