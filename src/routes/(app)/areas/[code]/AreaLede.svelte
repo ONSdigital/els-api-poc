@@ -54,10 +54,10 @@
           ? "the new"
           : getName(areaProps.successor, "the", "prefix")}
         <a
-          href={resolve(`/areas/${makeCanonicalSlug(areaProps)}`)}
+          href={resolve(`/areas/${makeCanonicalSlug(areaProps.successor)}`)}
           data-sveltekit-noscroll>{getName(areaProps.successor)}</a
         >
-        ({areaProps.areacd})
+        ({areaProps.successor.areacd})
       </p>
     {:else if areaProps.end}
       <p class="ons-u-fs-s additional-area-info">
