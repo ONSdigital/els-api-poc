@@ -2,7 +2,7 @@
 import { geoLevels, geoLevelsAll } from "$lib/config/geoLevels";
 import readData from "$lib/data";
 
-const cube = await readData("json-stat");
+const metadata = await readData("json-stat-metadata");
 
 export function geoYearFilter(item, year) {
   if (!item.start && !item.end) return true;
@@ -42,7 +42,7 @@ export function makeCountryFilter(countries) {
 }
 
 export function makeGeoDatasetFilter(slug) {
-  const ds = cube.link.item.find(ds => ds.extension.slug === slug);
+  const ds = metadata.link.item.find(ds => ds.extension.slug === slug);
   return ds ? (d) => ds.dimension.areacd.category.index[d.areacd] : () => false;
 }
 
