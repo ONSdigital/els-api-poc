@@ -25,7 +25,7 @@ export function getDimensionFilters(url: URL) {
   if (params.length === 0) return [];
   return params.map((p) => ({
     key: p[0].slice(10),
-    values: formatParam(p[1]),
+    values: parseParam(p[1]),
   }));
 }
 
