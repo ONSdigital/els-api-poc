@@ -1,8 +1,7 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import { getName } from "@onsvisual/robo-utils";
+  import { getName, capitalise } from "@onsvisual/robo-utils";
   import { makeCanonicalSlug } from "$lib/api/geo/helpers/areaSlugUtils";
-  import { capitalise } from "@onsvisual/robo-utils";
 
   let { areaProps } = $props();
 </script>
@@ -67,3 +66,18 @@
     {/if}
   {/if}
 </div>
+
+<style>
+  .additional-area-info {
+    margin-top: 12px;
+    margin-bottom: 0;
+  }
+  .inactive-badge {
+    font-weight: bold;
+    color: white;
+    padding: 0 8px 2px 8px;
+    border-radius: 4px;
+    background-color: #fa6401;
+    margin-right: 2px;
+  }
+</style>
