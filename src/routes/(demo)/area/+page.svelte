@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { base } from "$app/paths";
+  import { resolve } from "$app/paths";
+  import { parseData } from "$lib/utils";
   import {
     PhaseBanner,
     Header,
@@ -14,13 +15,44 @@
     LazyLoad,
   } from "@onsvisual/svelte-components";
   import Beeswarm from "$lib/components/charts/demo/Beeswarm.svelte";
-  import { fetchTopicsData } from "$lib/utils";
 
   export let data;
 
   let selected;
   let area;
   let topics;
+
+  async function fetchTopicsData(
+    selected,
+    geography = "ltla",
+    time = "latest",
+  ) {
+    const exclude = ["population-by-age-and-sex"];
+
+    const dataUrl = resolve(
+      `/api/v1/data.cols.json?geo=${geography}&time=${time}`,
+    );
+    const data = await (await fetch(dataUrl)).json();
+
+    const metaUrl = resolve(
+      `/api/v1/metadata/indicators?hasGeo=${selected.areacd}`,
+    );
+    const metadata = await (await fetch(metaUrl)).json();
+
+    // Filter out empty datasets
+    const indicators = metadata
+      .filter((meta) => !exclude.includes(meta.slug))
+      .map((meta) => ({ meta, data: parseData(data[meta.slug]) }));
+
+    const topics = Array.from(
+      new Set(indicators.map((ind) => ind.meta.topic)),
+    ).map((topic) => ({
+      key: topic,
+      label: topic[0].toUpperCase() + topic.slice(1),
+      indicators: indicators.filter((ind) => ind.meta.topic === topic),
+    }));
+    return topics;
+  }
 
   async function selectArea(selected) {
     if (!selected) {
@@ -35,7 +67,7 @@
 
 <PhaseBanner phase="prototype" />
 <Header compact title="Area chart demo" />
-<Breadcrumb links={[{ label: "ELS API experiments", href: `${base}/` }]} />
+<Breadcrumb links={[{ label: "ELS API experiments", href: resolve("/") }]} />
 
 <Section>
   <p style:margin="12px 0 32px">
