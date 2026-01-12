@@ -72,7 +72,7 @@ function processColumns(k, metaLookup, columnValues, id, size, role, dimension) 
         const entries = values.map((d, i) => [d, i]);
         dimension[k].category = { index: Object.fromEntries(entries) };
     }
-    
+
     // if it is 'measure' get the names for measure from the metadata
     if (k === 'measure') {
         const lookup = new Map(metaLookup.objects().map(d => [d.name, d.titles[d.titles.length - 1]]))
@@ -90,7 +90,7 @@ function processColumns(k, metaLookup, columnValues, id, size, role, dimension) 
 }
 function indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name) {
     console.log('Processing', indicator, '........')
-    console.log({dataset_name})
+    console.log({ dataset_name })
     // filter file-level metadata to be indicator level
     const meta_indicator = meta_data.metadata.indicators.find(d => d.code === indicator)
     const manifest_metadata_indicator = manifest_metadata.filter(aq.escape(d => d.dataset === dataset_name && d.code === indicator)).objects()
@@ -177,7 +177,7 @@ function indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name) {
 
     // sort by each dimension (including the newly made measure, which is a dimension)
     // age is numbers as strings, so needs sorting properly
-    
+
     indicatorTableLong_periods = indicatorTableLong_periods
         .orderby(...['areacd', 'period',
             ...otherDimensions,
@@ -212,7 +212,7 @@ function indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name) {
             Object.entries(dimension[key].category.label).map(l => l.reverse())
         );
     }
-        
+
 
     const valuesLength = size.reduce((a, b) => a * b, 1);
     const value = new Array(valuesLength).fill(null);
@@ -314,22 +314,31 @@ const cube = {
 
 const indicators = [];
 for (const file of file_paths) {
-    indicators.push(...processFile(file,excluded_indicators));
+    indicators.push(...processFile(file, excluded_indicators));
 }
 // Sort indicators to match order in manifest (ie. taxonomy order)
 cube.link.item = indicator_slugs.map(slug => indicators.find(ind => ind.extension.slug === slug));
 
 const output = "./src/lib/data/json-stat.json";
 writeFileSync(output, JSON.stringify(cube));
-console.log(`Wrote ${output}.`)
+console.log(`Wrote ${output}.`);
+
+const metadataOutput = "./src/lib/data/json-stat-metadata.json";
+cube.link.item = cube.link.item.map(item => {
+    item.value = [];
+    delete item.status;
+    return item;
+});
+writeFileSync(metadataOutput, JSON.stringify(cube));
+console.log(`Wrote ${metadataOutput}.`)
 
 // Generate JSON file with summary stats/data
 const summaryData = {
     count: cube.link.item.length,
     topics: Array.from(new Set(cube.link.item.map(ds => ds.extension.topic)))
-        .map(t => ({slug: t.replaceAll(" ", "-"), label: t[0].toUpperCase() + t.slice(1)})),
+        .map(t => ({ slug: t.replaceAll(" ", "-"), label: t[0].toUpperCase() + t.slice(1) })),
     years: Array.from(
-        new Set(cube.link.item.map(ds => 
+        new Set(cube.link.item.map(ds =>
             Object.keys(ds.dimension.period.category.index).map(val => +val.slice(0, 4))
         ).flat())).sort((a, b) => a - b),
     geoYears: Array.from(new Set(cube.link.item.map(ds => ds.extension.geography.year)))
