@@ -4,7 +4,7 @@
   import { Button, Dropdown, Select } from "@onsvisual/svelte-components";
   import Modal from "./Modal.svelte";
   import { ONSpalette } from "$lib/config";
-  import { isValidAreaCode } from "$lib/api/utils";
+  import { isValidAreaCode } from "$lib/util/validationHelpers";
 
   let pageState = getContext("pageState");
   let mode = $derived(

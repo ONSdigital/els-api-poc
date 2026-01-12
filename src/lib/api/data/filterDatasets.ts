@@ -6,7 +6,7 @@ import {
 } from "./helpers/dataFormatters";
 import { getSpreadsheetMetadata } from "./helpers/generateXLSX";
 import { toCSVW } from "./helpers/dataFormatters";
-import { isValidDate } from "$lib/api/utils";
+import { isValidDate } from "$lib/util/validationHelpers";
 
 // Filter and format a single JSON-Stat dataset based on selected filters/parameters
 export function filterJSONStat(

@@ -1,6 +1,6 @@
 // Functions to filter geography metadata
 import { geoLevels, geoLevelsAll } from "$lib/config/geoLevels";
-import { isValidAreaCode } from "$lib/api/utils";
+import { isValidAreaCode } from "$lib/util/validationHelpers";
 import readData from "$lib/data";
 
 const metadata = await readData("json-stat-metadata");

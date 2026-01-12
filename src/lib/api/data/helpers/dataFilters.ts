@@ -2,7 +2,7 @@ import { Temporal } from "temporal-polyfill";
 import { geoLevels } from "$lib/config/geoLevels";
 import getChildAreas from "$lib/api/geo/getChildAreas";
 import hasObservation from "./hasObservation";
-import { isValidMonth, isValidYear, isValidAreaCode } from "$lib/api/utils";
+import { isValidMonth, isValidYear, isValidAreaCode } from "$lib/util/validationHelpers";
 import readData from "$lib/data";
 
 const areasClusters = await readData("areas-clusters");

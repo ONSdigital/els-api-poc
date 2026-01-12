@@ -1,6 +1,6 @@
 // Functions to filter JSON-Stat at a dataset level
 import { geoLevels } from "$lib/config/geoLevels";
-import { isValidAreaCode, isValidYear } from "$lib/api/utils";
+import { isValidAreaCode, isValidYear } from "$lib/util/validationHelpers";
 
 export function makeIndicatorFilter(indicator, topic) {
   if ((!indicator || indicator === "all") && topic === "all") return () => true;
