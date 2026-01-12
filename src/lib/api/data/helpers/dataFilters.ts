@@ -2,7 +2,7 @@ import { Temporal } from "temporal-polyfill";
 import { geoLevels } from "$lib/config/geoLevels";
 import getChildAreas from "$lib/api/geo/getChildAreas";
 import hasObservation from "./hasObservation";
-import { isValidMonth, isValidYear } from "$lib/api/utils";
+import { isValidMonth, isValidYear, isValidAreaCode } from "$lib/api/utils";
 import readData from "$lib/data";
 
 const areasClusters = await readData("areas-clusters");
@@ -16,16 +16,15 @@ export function makeGeoFilter(geo, geoExtent, geoCluster) {
 	const codes = new Set();
 	const types = new Set();
 	for (const g of [geo].flat()) {
-		// if (g.match(/^[EKNSW]\d{2}$/)) types.add(g);
 		if (geoLevels[g] && geoCluster === "all") {
-			if (geoExtent.match(/^[EKNSW]\d{8}$/)) {
+			if (isValidAreaCode(geoExtent)) {
 				const children = getChildAreas({ code: geoExtent, geoLevel: g, includeNames: false });
 				for (const child of children) codes.add(child);
 			} else {
 				for (const code of geoLevels[g].codes) types.add(code);
 			}
 		}
-		else if (g.match(/^[EKNSW]\d{8}$/) && !types.has(g.slice(0, 3))) codes.add(g);
+		else if (isValidAreaCode(g) && !types.has(g.slice(0, 3))) codes.add(g);
 	}
 	if (geoCluster) {
 		const [grouping, cluster] = geoCluster.split("_");

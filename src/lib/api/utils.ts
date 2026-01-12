@@ -33,6 +33,10 @@ export function isValidAreaCode(code: string): boolean {
   return !!code.match(/^[EKNSW]\d{8}$/);
 }
 
+export function isValidAreaTypeCode(code: string): boolean {
+  return !!code.match(/^[EKNSW]\d{2}$/);
+}
+
 export function isValidPostcode(code: string): boolean {
   return !!code.match(/^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/);
 }
