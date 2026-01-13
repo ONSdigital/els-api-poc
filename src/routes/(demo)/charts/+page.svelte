@@ -102,7 +102,6 @@
 
 <style>
   :global(.ons-input) {
-    color: #707070;
     margin-bottom: 10px;
   }
   .select-container {
