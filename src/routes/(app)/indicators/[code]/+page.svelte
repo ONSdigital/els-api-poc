@@ -107,8 +107,8 @@
         selectedGeoGroup={pageState.selectedGeoLevel}
       />
       <div>
-        <AreasModal />
-        <OptionsModal />
+        <AreasModal mode="indicator" {data} bind:state={pageState} />
+        <OptionsModal {data} bind:state={pageState} />
       </div>
     </div>
     {#if data.indicator.standardised}

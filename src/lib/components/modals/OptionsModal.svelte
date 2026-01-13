@@ -1,20 +1,24 @@
 <script lang="ts">
-  import { page } from "$app/state";
-  import { getContext } from "svelte";
   import { Checkbox } from "@onsvisual/svelte-components";
   import Modal from "./Modal.svelte";
   import RangeSlider from "./RangeSlider.svelte";
 
-  let pageState = getContext("pageState");
+  let { data, state = $bindable() } = $props();
 
-  let formatTick = $derived(pageState?.formatPeriod?.() || ((d) => d));
+  let formatTick = $derived(state?.formatPeriod?.() || ((d) => d));
 </script>
 
 <Modal title="Chart options" label="Chart options" icon="cog">
   <RangeSlider
     label="Selected time range"
-    options={page.data.periods}
+    options={data.periods}
     {formatTick}
-    bind:selectedRange={pageState.selectedPeriodRange}/>
-  <Checkbox bind:checked={pageState.showConfidenceIntervals} label="Show confidence intervals" compact/>
+    bind:selectedRange={state.selectedPeriodRange}
+  />
+  <Checkbox
+    id="ci-checkbox"
+    bind:checked={state.showConfidenceIntervals}
+    label="Show confidence intervals"
+    compact
+  />
 </Modal>

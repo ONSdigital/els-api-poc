@@ -20,10 +20,12 @@ export const load: PageLoad = async ({ params, fetch }) => {
   const areas = (await (await fetch(areasPath)).json()).sort((a, b) =>
     a.areanm.localeCompare(b.areanm)
   );
-  const gLevels = indicator.geography.levels.map((id) => ({
-    id,
-    ...geoLevels[id],
-  }));
+  const gLevels = indicator.geography.levels
+    .filter(id => id !== "uk")
+    .map((id) => ({
+      id,
+      ...geoLevels[id],
+    }));
   // const periods = Object.keys(metadata.dimensions[1].category.index);
 
   return {

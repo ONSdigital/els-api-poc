@@ -146,8 +146,8 @@
         selectedGeoGroup={pageState.selectedGeoGroup}
       />
       <div>
-        <AreasModal />
-        <OptionsModal />
+        <AreasModal mode="area" {data} bind:state={pageState} />
+        <OptionsModal {data} bind:state={pageState} />
       </div>
     </div>
     <NavSection title="Topics" />

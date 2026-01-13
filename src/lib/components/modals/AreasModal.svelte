@@ -1,25 +1,17 @@
 <script lang="ts">
-  import { page } from "$app/state";
-  import { getContext } from "svelte";
   import { Button, Dropdown, Select } from "@onsvisual/svelte-components";
   import Modal from "./Modal.svelte";
   import { ONSpalette } from "$lib/config";
-  import { isValidAreaCode } from "$lib/util/validationHelpers";
 
-  let pageState = getContext("pageState");
-  let mode = $derived(
-    isValidAreaCode((page.params?.code || "").slice(0, 9))
-      ? "area"
-      : "indicator",
-  );
+  let { data, state = $bindable(), mode } = $props();
 
   function addArea(area) {
-    if (!pageState.selectedAreas.find((d) => d.areacd === area.areacd))
-      pageState.selectedAreas.push(area);
+    if (!state.selectedAreas.find((d) => d.areacd === area.areacd))
+      state.selectedAreas.push(area);
   }
 
   function removeArea(area) {
-    pageState.selectedAreas = pageState.selectedAreas.filter(
+    state.selectedAreas = state.selectedAreas.filter(
       (d) => d.areacd !== area.areacd,
     );
   }
@@ -30,16 +22,16 @@
     <Dropdown
       id="geo-level-select"
       label="Geography type"
-      options={page.data.geoLevels}
-      bind:value={pageState.selectedGeoLevel}
+      options={data.geoLevels}
+      bind:value={state.selectedGeoLevel}
     />
   {/if}
   {#if mode === "area"}
     <Dropdown
       id="geo-related-select"
       label="Geography group"
-      options={page.data.geoGroups}
-      bind:value={pageState.selectedGeoGroup}
+      options={data.geoGroups}
+      bind:value={state.selectedGeoGroup}
     />
   {/if}
   <div class="select-container">
@@ -47,13 +39,13 @@
       id="area-select"
       label={mode === "area" ? "Comparison areas" : "Individual areas"}
       placeholder="Choose one or more"
-      options={page.data.areas}
+      options={data.areas}
       labelKey="areanm"
       on:change={(e) => addArea(e.detail)}
       autoClear
     />
   </div>
-  {#each pageState.selectedAreas as area, i}
+  {#each state.selectedAreas as area, i}
     <Button
       icon="cross"
       color={(mode === "area" ? ONSpalette[i + 1] : ONSpalette[i]) ||
