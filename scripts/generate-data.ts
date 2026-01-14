@@ -234,6 +234,16 @@ function processFile(file, excluded_indicators) {
     const tableSchema = meta_data.tables[0].tableSchema.columns
     const dataset_name = data_file.split("/")[1]
 
+    // get unique areas and their names
+    const areaColsMap = Object.fromEntries(
+        ["AREACD", "AREANM"].filter(col => indicator_data.columnNames().includes(col))
+            .map(col => [col, col.toLocaleLowerCase()])
+    );
+    const uniqueAreas = indicator_data
+        .rename(areaColsMap)
+        .select(["areacd", "areanm"])
+        .dedupe("areacd");
+
     // get the column titles of those columns we want to suppress
     const suppressedCols = tableSchema
         .filter(d => d.suppressOutput)
@@ -276,7 +286,8 @@ function processFile(file, excluded_indicators) {
     for (const [indicator, t] of Object.entries(indicatorTables)) {
         indicatorDatasets.push(indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name))
     }
-    return indicatorDatasets
+
+    return { indicatorDatasets, uniqueAreas }
 
 }
 
@@ -312,8 +323,11 @@ const cube = {
 };
 
 const indicators = [];
+const areas = [];
 for (const file of file_paths) {
-    indicators.push(...processFile(file, excluded_indicators));
+    const { indicatorDatasets, uniqueAreas } = processFile(file, excluded_indicators);
+    indicators.push(...indicatorDatasets);
+    areas.push(uniqueAreas);
 }
 cube.updated = indicators.map(ind => ind.updated).sort(descending)[0];
 
@@ -332,6 +346,14 @@ cube.link.item = cube.link.item.map(item => {
 });
 writeFileSync(metadataOutput, JSON.stringify(cube));
 console.log(`Wrote ${metadataOutput}.`)
+
+const areasInData = areas[0].concat(areas.slice(1))
+    .dedupe("areacd")
+    .orderby("areacd")
+    .objects();
+const areasInDataOutput = "./src/lib/data/areas-in-data.json";
+writeFileSync(areasInDataOutput, JSON.stringify(areasInData));
+console.log(`Wrote ${areasInDataOutput}.`)
 
 // Generate JSON file with summary stats/data
 const summaryData = {
