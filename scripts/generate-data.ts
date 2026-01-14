@@ -1,6 +1,6 @@
 import * as aq from 'arquero';
 import fs, { writeFileSync } from 'fs';
-import { csvParse } from 'd3-dsv';
+import { descending } from 'd3-array';
 import { loadCsvWithoutBom, readJsonSync, readCsvAutoType } from './io.ts';
 import {
     abortIfMissingMetadata,
@@ -308,7 +308,6 @@ const cube = {
     version: "2.0",
     class: "collection",
     label: "ELS datasets",
-    updated: (new Date()).toISOString().slice(0, 10),
     link: {}
 };
 
@@ -316,8 +315,10 @@ const indicators = [];
 for (const file of file_paths) {
     indicators.push(...processFile(file, excluded_indicators));
 }
+cube.updated = indicators.map(ind => ind.updated).sort(descending)[0];
+
 // Sort indicators to match order in manifest (ie. taxonomy order)
-cube.link.item = indicator_slugs.map(slug => indicators.find(ind => ind.extension.slug === slug));
+cube.link = { item: indicator_slugs.map(slug => indicators.find(ind => ind.extension.slug === slug)) };
 
 const output = "./src/lib/data/json-stat.json";
 writeFileSync(output, JSON.stringify(cube));
@@ -334,7 +335,9 @@ console.log(`Wrote ${metadataOutput}.`)
 
 // Generate JSON file with summary stats/data
 const summaryData = {
-    count: cube.link.item.length,
+    lastUpdate: cube.updated,
+    datasetCount: cube.link.item.length,
+    indicatorCount: cube.link.item.filter(ds => !ds.extension.isMultivariate).length,
     topics: Array.from(new Set(cube.link.item.map(ds => ds.extension.topic)))
         .map(t => ({ slug: t.replaceAll(" ", "-"), label: t[0].toUpperCase() + t.slice(1) })),
     years: Array.from(
