@@ -2,8 +2,11 @@
   import { scaleLinear, scaleBand } from "d3-scale";
   import { ticks, groupSort } from "d3-array";
   import { format } from "d3-format";
-  import { parseChartData, contrastColor } from "./chartHelpers";
+  import { parseChartData, contrastColor, labelPlacer } from "./chartHelpers";
   import { ONSpalette } from "$lib/config";
+  import { pluralise } from "@onsvisual/robo-utils";
+  import { mean } from "simple-statistics";
+  import { tick } from "svelte";
 
   let {
     data,
@@ -27,6 +30,10 @@
   let _data = $derived(parseChartData(data, yKey, xKey, idKey));
   let sorted = $derived(
     _data ? [..._data.array].sort((a, b) => b[yKey] - a[yKey]) : []
+  );
+  let hovered = $derived(_data.keyed[hoveredArea]?.[0]);
+  let _selected = $derived(
+    _data ? selected.map((cd) => _data.keyed[cd]).filter((d) => d) : []
   );
 
   const maxHeight = 500;
@@ -89,6 +96,40 @@
     return ONSpalette[index % ONSpalette.length];
   }
 
+  let yScale = $derived(sorted ? makeYScale(sorted, selected) : null);
+
+  let yLabelPositions = $state();
+  async function marginLabels(el) {
+    await tick();
+    const divs = el.getElementsByTagName("div");
+    if (divs.length < 2) {
+      yLabelPositions = null;
+      return;
+    }
+    let ys = _selected.map((s) => yScale(s[0][idKey]).y);
+    let ysIndexes = ys.map((y, i) => ({ y, i })).sort((a, b) => a.y - b.y);
+    console.log({ ysIndexes });
+
+    const cumulativeHeights = Array(_selected.length).fill(0);
+    for (let j = 1; j < _selected.length; j++) {
+      const current = ysIndexes[j].i;
+      const previous = ysIndexes[j - 1].i;
+      cumulativeHeights[current] =
+        cumulativeHeights[previous] +
+        (divs[previous].clientHeight + divs[current].clientHeight) / 2;
+    }
+    console.log({ cumulativeHeights });
+    // subtract offsets
+    let zs = ysIndexes.map(({ y, i }) => y - cumulativeHeights[i]);
+    // run isotonic regression function to overwrite yLabelPositions
+    let adj = labelPlacer(zs);
+    // add offsets back on to the regressed values
+    yLabelPositions = Array(_selected.length).fill(0);
+    ysIndexes.forEach(({ i }, j) => {
+      yLabelPositions[i] = adj[j] + cumulativeHeights[i];
+    });
+  }
+
   let xScale = $derived(
     _data
       ? scaleLinear()
@@ -97,16 +138,11 @@
       : null
   );
 
-  let yScale = $derived(sorted ? makeYScale(sorted, selected) : null);
-
-  let hovered = $derived(_data.keyed[hoveredArea]?.[0]);
-
   let hoveredIndex = $derived(
     hoveredArea ? sorted.findIndex((d) => d[idKey] === hoveredArea) : -1
   );
 
-  $inspect(_data);
-  $inspect(selected);
+  $inspect({ yLabelPositions });
 </script>
 
 {#snippet bar(b, fill = "#b0b0b0", opacity = 1, id = "", i)}
@@ -127,6 +163,30 @@
   />
 {/snippet}
 
+{#if width < widthThreshold}
+  <ul class="top-labels">
+    {#if !hoveredArea}
+      <li class="top-label-geo" style="background:{'grey'}">
+        {pluralise(geoLevel.label)}
+      </li>
+    {/if}
+
+    {#if _selected.length && !hoveredArea}
+      {#each _selected as a, i}
+        <li class="top-label-selected" style="background:{ONSpalette[i]}">
+          {a?.[0]?.areanm}
+        </li>
+      {/each}
+    {/if}
+
+    {#if hoveredArea}
+      <li class="top-label-hovered" style="background:#f39431">
+        {hovered?.areanm}
+      </li>
+    {/if}
+  </ul>
+{/if}
+
 <div
   bind:clientWidth={width}
   class="bar-wrapper"
@@ -140,13 +200,59 @@
       <div class="y-baseline"></div>
     </div>
     <div class="line-x-axis">
-      <div class="x-baseline" style:top="{yScale(0)}px"></div>
+      <div class="x-baseline" style:top="0"></div>
       {#each xScale.ticks(5) as xTick}
         <div class="line-x-tick" style:left="{xScale(xTick)}px"></div>
         <div class="line-x-tick-label" style:left="{xScale(xTick)}px">
           {formatValue(xTick)}
         </div>
       {/each}
+    </div>
+    <div class="margin-labels">
+      {#if width >= widthThreshold && hoveredArea}
+        <div
+          class="margin-label-hovered"
+          style="top: {yScale(hovered[idKey]).y +
+            yScale(hovered[idKey]).height / 2}px;"
+        >
+          {hovered?.[labelKey]}
+        </div>
+      {/if}
+      {#if width >= widthThreshold}
+        <div
+          class="margin-label-geo"
+          style="top: {yScale(sorted[0][idKey]).y +
+            yScale(sorted[0][idKey]).height / 2}px;"
+        >
+          {pluralise(geoLevel.label)}
+        </div>
+      {/if}
+      {#if width >= widthThreshold && sorted.length <= maxUnscaledBarsCount && !hovered}
+        {#each sorted as s}
+          <div
+            class="margin-label-geo-all"
+            style="top:{yScale(s[idKey]).y + yScale(s[idKey]).height / 2}px;"
+          >
+            {s[labelKey]}
+          </div>
+        {/each}
+      {/if}
+      <div class="margin-labels-selected" use:marginLabels>
+        {#if width >= widthThreshold}
+          {#each _selected as a, i (a[0][idKey])}
+            {@const yPos = yLabelPositions?.[i] || yScale?.(a[0][idKey])?.y}
+            {@const height = yScale?.(a[0][idKey])?.height}
+            <div
+              class="margin-label-selected"
+              style="top: {yPos ? yPos + height / 2 : 0}px;color:{ONSpalette[
+                i
+              ]}"
+            >
+              {a[0][labelKey]}
+            </div>
+          {/each}
+        {/if}
+      </div>
     </div>
     <svg
       viewBox="0 0 {widthInner} {height}"
@@ -156,7 +262,7 @@
     >
       {#if _data && xScale && yScale}
         <g opacity={hoveredArea ? 0.2 : 1}>
-          {#each sorted as b, i}
+          {#each sorted as b, i (b[idKey])}
             {@render bar(b, setBarColour(b[idKey]), 1, b[idKey], i)}
           {/each}
         </g>
@@ -224,5 +330,68 @@
     width: 100%;
     border-bottom: 2px solid grey;
     transform: translateY(-1px);
+  }
+
+  .top-labels {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+    min-height: 40px;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  .top-label-selected,
+  .top-label-geo,
+  .top-label-hovered {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    margin: 0.2rem;
+  }
+
+  .margin-labels {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+  }
+
+  .margin-label-hovered {
+    position: absolute;
+    transform: translateY(-50%);
+    font-size: 16px;
+    font-weight: bold;
+    color: orange;
+    max-width: 140px;
+    text-align: right;
+    line-height: 1.1;
+    right: calc(100% + 10px);
+  }
+
+  .margin-label-selected {
+    position: absolute;
+    transform: translateY(-50%);
+    font-size: 16px;
+    font-weight: bold;
+    max-width: 140px;
+    text-align: right;
+    line-height: 1.1;
+    right: calc(100% + 10px);
+  }
+
+  .margin-label-geo,
+  .margin-label-geo-all {
+    position: absolute;
+    transform: translateY(-50%);
+    font-size: 16px;
+    font-weight: bold;
+    color: grey;
+    max-width: 140px;
+    text-align: right;
+    line-height: 1.1;
+    right: calc(100% + 10px);
   }
 </style>
