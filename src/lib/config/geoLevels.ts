@@ -19,11 +19,14 @@ const oa = { label: "Output area", codes: ["E00", "W00"] };
 
 // Alternative labels where geography type names vary from level/group names
 const altLabels = {
+  E06: "Unitary authority",
+  E07: "Non-metropolitan district",
   E08: "Metropolitan district",
-  E09: "Borough",
+  E09: "London borough",
   N09: "Local government district",
   S12: "Council area",
-  W04: "Community"
+  W04: "Community",
+  W06: "Unitary authority"
 };
 
 // Overlapping groupings of geographies for visualising data

@@ -5,6 +5,7 @@ import { geoLevels } from "./config/geoLevels";
 import { feature } from 'topojson-client';
 import { ckmeans } from "simple-statistics";
 import { oldGeoCodesLookup } from "./config/geoLookups";
+import { geoLevelsAllLookup } from "$lib/config/geoLevels";
 
 type jsonDataColumns = { [key: string]: any[] };
 type jsonDataRows = { [key: string]: any }[];
@@ -160,4 +161,8 @@ export function valuesToBreaks(values, count = 5) {
     clusters[clusters.length - 1][clusters[clusters.length - 1].length - 1]
   ];
   return Array.from(new Set(breaks)); // de-duplicate breaks
+}
+
+export function getAreaType(area) {
+  return geoLevelsAllLookup[area.areacd?.slice?.(0, 3)]?.label || null;
 }

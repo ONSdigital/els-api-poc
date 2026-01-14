@@ -3,10 +3,14 @@
   import Modal from "./Modal.svelte";
   import { ONSpalette } from "$lib/config";
   import { cloneState } from "./modalHelpers";
+  import { getAreaType } from "$lib/utils";
 
   let { data, pageState = $bindable(), mode } = $props();
 
   let _pageState = $state(cloneState(pageState));
+  let _areas = $derived(
+    data.areas.map((area) => ({ ...area, type: getAreaType(area) || "" })),
+  );
 
   function addArea(area) {
     if (!_pageState.selectedAreas.find((d) => d.areacd === area.areacd))
@@ -48,8 +52,9 @@
       id="area-select"
       label={mode === "area" ? "Comparison areas" : "Individual areas"}
       placeholder="Choose one or more"
-      options={data.areas}
+      options={_areas}
       labelKey="areanm"
+      groupKey="type"
       on:change={(e) => addArea(e.detail)}
       autoClear
     />
