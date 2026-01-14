@@ -40,21 +40,8 @@
     });
   };
 
-  function getInitialSelection(data) {
-    let area =
-      data.indicator.geography.countries.length === 1
-        ? data.areas.find(
-            (d) =>
-              d.areacd ===
-              countryLetterLookup[data.indicator.geography.countries[0]],
-          )
-        : data.areas.find((d) => d.areacd === "K02000001") ||
-          data.areas.find((d) => d.areacd === "K03000001");
-    return area ? [area] : [];
-  }
-
   let pageState = $state({
-    selectedAreas: getInitialSelection(data),
+    selectedAreas: data.initialArea ? [data.initialArea] : [],
     selectedGeoLevel: data.geoLevels.find(
       (g) => g.id === data.indicator.geography.initialLevel,
     ),

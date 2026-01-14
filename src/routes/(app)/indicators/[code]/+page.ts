@@ -1,8 +1,22 @@
 import type { PageLoad } from './$types';
 import { resolve } from "$app/paths";
 import { geoLevels } from "$lib/config/geoLevels";
+import { countryLetterLookup } from '$lib/config/geoLookups';
 
-export const load: PageLoad = async ({ params, fetch }) => {
+function getInitialArea(indicator, areas, areacd) {
+  let area = areas.find((d) => d.areacd === areacd) ||
+    (indicator.geography.countries.length === 1
+      ? areas.find(
+        (d) =>
+          d.areacd ===
+          countryLetterLookup[indicator.geography.countries[0]],
+      )
+      : areas.find((d) => d.areacd === "K02000001")) ||
+    areas.find((d) => d.areacd === "K03000001");
+  return area || null;
+}
+
+export const load: PageLoad = async ({ params, url, fetch }) => {
   const path = resolve(
     `/api/v1/metadata/indicators/${params.code}?fullDims=true`
   );
@@ -26,11 +40,15 @@ export const load: PageLoad = async ({ params, fetch }) => {
       id,
       ...geoLevels[id],
     }));
-  // const periods = Object.keys(metadata.dimensions[1].category.index);
+
+  const initialAreaCode = url.searchParams.get("initialArea") || null;
+  const initialArea = getInitialArea(indicator, areas, initialAreaCode);
+  console.log({ initialAreaCode, initialArea })
 
   return {
     indicator,
     areas,
+    initialArea,
     geoLevels: gLevels,
     periods,
 
