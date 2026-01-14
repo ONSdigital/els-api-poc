@@ -1,12 +1,10 @@
 // @ts-nocheck
 import type { LayoutLoad } from "./$types";
 import { resolve } from "$app/paths";
+import summaryStats from "$lib/data/json-stat-summary.json";
 
-export const load: LayoutLoad = async ({ fetch }) => {
-  const path = resolve("/api/v1/metadata/taxonomy?excludeMultivariate=true");
-  const taxonomy = await (await fetch(path)).json();
-
+export const load: LayoutLoad = () => {
   return {
-    taxonomy,
+    summaryStats,
   };
 };
