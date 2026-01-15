@@ -6,7 +6,7 @@
     Select,
     Button,
   } from "@onsvisual/svelte-components";
-  import { fetchChartDataV1 } from "$lib/utils";
+  import { fetchChartData } from "$lib/utils";
   import Pyramid from "./Pyramid.svelte";
   import BarcodeJoined from "./BarcodeJoined.svelte";
 
@@ -60,7 +60,7 @@
     marginTop={true}
     width="medium"
   >
-    {#await fetchChartDataV1( "population-by-age-and-sex", { time: "2023", sex: ["female", "male"] } )}
+    {#await fetchChartData( "population-by-age-and-sex", { time: "2023", sex: ["female", "male"] }, )}
       Fetching chart data
     {:then chartData}
       <BarcodeJoined
@@ -77,7 +77,7 @@
     marginTop={true}
     width="medium"
   >
-    {#await fetchChartDataV1( "population-by-age-and-sex", { time: "2023", sex: ["female", "male"] } )}
+    {#await fetchChartData( "population-by-age-and-sex", { time: "2023", sex: ["female", "male"] }, )}
       Fetching chart data
     {:then chartData}
       <Pyramid

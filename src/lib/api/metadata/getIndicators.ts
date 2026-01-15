@@ -2,7 +2,7 @@ import { makeDatasetFilter } from "./helpers/datasetFilters";
 import { formatDimension } from "./helpers/formatMetadata";
 import readData from "$lib/data";
 
-const rawMetadata = await readData("json-stat");
+const rawMetadata = await readData("json-stat-metadata");
 
 function formatMetadata(ds, minimalMetadata = false, fullDims = false) {
   if (!ds) return {};

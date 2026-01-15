@@ -1,3 +1,5 @@
+// NOTE: This endpoint exists to ensure that files in the $lib/data folder are included in the SvelteKit build
+// These files are read by server-side functions that are called on the API endpoints
 import type { RequestHandler } from "./$types";
 import { read } from "$app/server";
 import { json, error } from "@sveltejs/kit";

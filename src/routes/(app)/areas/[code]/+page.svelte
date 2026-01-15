@@ -217,24 +217,4 @@
   .area-search-card {
     background: var(--ons-color-banner-bg);
   }
-  .additional-area-info {
-    margin-top: 12px;
-    margin-bottom: 0;
-  }
-  .active-badge {
-    font-weight: bold;
-    color: white;
-    padding: 0 8px 2px 8px;
-    border-radius: 4px;
-    background-color: #003c57;
-    margin-right: 2px;
-  }
-  .inactive-badge {
-    font-weight: bold;
-    color: white;
-    padding: 0 8px 2px 8px;
-    border-radius: 4px;
-    background-color: #fa6401;
-    margin-right: 2px;
-  }
 </style>

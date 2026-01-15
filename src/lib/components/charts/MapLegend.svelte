@@ -215,7 +215,7 @@
                         (d.offset || 0) * labelHeight}px)"
                     style:background-color={d.areacd === hovered
                         ? "orange"
-                        : d.highlightColor}
+                        : d.color}
                 ></div>
                 <div
                     class="value"
@@ -225,9 +225,7 @@
                         ? `translateX(-100%) translateX(1.5px) translateY(${(d.offset || 0) * labelHeight}px)`
                         : `translateX(-1.5px) translateY(${(d.offset || 0) * labelHeight}px)`}
                     style:color={d.areacd === hovered ? "black" : d.textColor}
-                    style:background={d.areacd === hovered
-                        ? "orange"
-                        : d.highlightColor}
+                    style:background={d.areacd === hovered ? "orange" : d.color}
                     style:padding="0 {markerPadding}px"
                     bind:this={labels[i]}
                 >

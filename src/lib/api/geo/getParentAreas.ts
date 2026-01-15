@@ -1,4 +1,4 @@
-import { isValidAreaCode } from "../utils";
+import { isValidAreaCode } from "$lib/util/validationHelpers";
 import { addAreaNames } from "./helpers/areaCodesNames";
 import readData from "$lib/data";
 

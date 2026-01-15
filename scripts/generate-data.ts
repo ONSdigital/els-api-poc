@@ -1,6 +1,6 @@
 import * as aq from 'arquero';
 import fs, { writeFileSync } from 'fs';
-import { csvParse } from 'd3-dsv';
+import { descending } from 'd3-array';
 import { loadCsvWithoutBom, readJsonSync, readCsvAutoType } from './io.ts';
 import {
     abortIfMissingMetadata,
@@ -72,7 +72,7 @@ function processColumns(k, metaLookup, columnValues, id, size, role, dimension) 
         const entries = values.map((d, i) => [d, i]);
         dimension[k].category = { index: Object.fromEntries(entries) };
     }
-    
+
     // if it is 'measure' get the names for measure from the metadata
     if (k === 'measure') {
         const lookup = new Map(metaLookup.objects().map(d => [d.name, d.titles[d.titles.length - 1]]))
@@ -90,7 +90,7 @@ function processColumns(k, metaLookup, columnValues, id, size, role, dimension) 
 }
 function indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name) {
     console.log('Processing', indicator, '........')
-    console.log({dataset_name})
+    console.log({ dataset_name })
     // filter file-level metadata to be indicator level
     const meta_indicator = meta_data.metadata.indicators.find(d => d.code === indicator)
     const manifest_metadata_indicator = manifest_metadata.filter(aq.escape(d => d.dataset === dataset_name && d.code === indicator)).objects()
@@ -177,7 +177,7 @@ function indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name) {
 
     // sort by each dimension (including the newly made measure, which is a dimension)
     // age is numbers as strings, so needs sorting properly
-    
+
     indicatorTableLong_periods = indicatorTableLong_periods
         .orderby(...['areacd', 'period',
             ...otherDimensions,
@@ -212,7 +212,7 @@ function indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name) {
             Object.entries(dimension[key].category.label).map(l => l.reverse())
         );
     }
-        
+
 
     const valuesLength = size.reduce((a, b) => a * b, 1);
     const value = new Array(valuesLength).fill(null);
@@ -233,6 +233,16 @@ function processFile(file, excluded_indicators) {
     const meta_data = JSON.parse(fs.readFileSync(`${CSV_PREPROCESS_DIR}${data_file.replace('.csv', '.csv-metadata.json')}`))
     const tableSchema = meta_data.tables[0].tableSchema.columns
     const dataset_name = data_file.split("/")[1]
+
+    // get unique areas and their names
+    const areaColsMap = Object.fromEntries(
+        ["AREACD", "AREANM"].filter(col => indicator_data.columnNames().includes(col))
+            .map(col => [col, col.toLocaleLowerCase()])
+    );
+    const uniqueAreas = indicator_data
+        .rename(areaColsMap)
+        .select(["areacd", "areanm"])
+        .dedupe("areacd");
 
     // get the column titles of those columns we want to suppress
     const suppressedCols = tableSchema
@@ -276,7 +286,8 @@ function processFile(file, excluded_indicators) {
     for (const [indicator, t] of Object.entries(indicatorTables)) {
         indicatorDatasets.push(indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name))
     }
-    return indicatorDatasets
+
+    return { indicatorDatasets, uniqueAreas }
 
 }
 
@@ -308,28 +319,51 @@ const cube = {
     version: "2.0",
     class: "collection",
     label: "ELS datasets",
-    updated: (new Date()).toISOString().slice(0, 10),
     link: {}
 };
 
 const indicators = [];
+const areas = [];
 for (const file of file_paths) {
-    indicators.push(...processFile(file,excluded_indicators));
+    const { indicatorDatasets, uniqueAreas } = processFile(file, excluded_indicators);
+    indicators.push(...indicatorDatasets);
+    areas.push(uniqueAreas);
 }
+cube.updated = indicators.map(ind => ind.updated).sort(descending)[0];
+
 // Sort indicators to match order in manifest (ie. taxonomy order)
-cube.link.item = indicator_slugs.map(slug => indicators.find(ind => ind.extension.slug === slug));
+cube.link = { item: indicator_slugs.map(slug => indicators.find(ind => ind.extension.slug === slug)) };
 
 const output = "./src/lib/data/json-stat.json";
 writeFileSync(output, JSON.stringify(cube));
-console.log(`Wrote ${output}.`)
+console.log(`Wrote ${output}.`);
+
+const metadataOutput = "./src/lib/data/json-stat-metadata.json";
+cube.link.item = cube.link.item.map(item => {
+    item.value = [];
+    delete item.status;
+    return item;
+});
+writeFileSync(metadataOutput, JSON.stringify(cube));
+console.log(`Wrote ${metadataOutput}.`)
+
+const areasInData = areas[0].concat(areas.slice(1))
+    .dedupe("areacd")
+    .orderby("areacd")
+    .objects();
+const areasInDataOutput = "./src/lib/data/areas-in-data.json";
+writeFileSync(areasInDataOutput, JSON.stringify(areasInData));
+console.log(`Wrote ${areasInDataOutput}.`)
 
 // Generate JSON file with summary stats/data
 const summaryData = {
-    count: cube.link.item.length,
+    lastUpdate: cube.updated,
+    datasetCount: cube.link.item.length,
+    indicatorCount: cube.link.item.filter(ds => !ds.extension.isMultivariate).length,
     topics: Array.from(new Set(cube.link.item.map(ds => ds.extension.topic)))
-        .map(t => ({slug: t.replaceAll(" ", "-"), label: t[0].toUpperCase() + t.slice(1)})),
+        .map(t => ({ slug: t.replaceAll(" ", "-"), label: t[0].toUpperCase() + t.slice(1) })),
     years: Array.from(
-        new Set(cube.link.item.map(ds => 
+        new Set(cube.link.item.map(ds =>
             Object.keys(ds.dimension.period.category.index).map(val => +val.slice(0, 4))
         ).flat())).sort((a, b) => a - b),
     geoYears: Array.from(new Set(cube.link.item.map(ds => ds.extension.geography.year)))

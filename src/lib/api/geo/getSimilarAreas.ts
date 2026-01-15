@@ -1,4 +1,4 @@
-import { isValidAreaCode } from "../utils";
+import { isValidAreaCode } from "$lib/util/validationHelpers";
 import { addAreaNames } from "./helpers/areaCodesNames";
 import readData from "$lib/data";
 
@@ -16,7 +16,7 @@ export default function getSimilarAreas(params = {}) {
   const clusters = [];
   const clusterTypes = areasClusters.types;
   const clusterLookup = areasClusters.lookup[cdUpper];
-  
+
   for (const type of clusterTypes) {
     const similarAreas = similar[type];
     const obj = {
@@ -24,11 +24,11 @@ export default function getSimilarAreas(params = {}) {
       label: `${type === "global" ? "All" : type[0].toUpperCase() + type.slice(1)} indicators`,
       similar: params.includeNames ? addAreaNames(similarAreas) : similarAreas
     };
-    
+
     if (clusterLookup) {
       const key = clusterLookup[type];
       const areas = areasClusters.clusters[type][key];
-      obj.cluster = {key};
+      obj.cluster = { key };
       obj.cluster.label = key.toUpperCase();
       obj.cluster.areas = params.includeNames ? addAreaNames(areas) : areas;
       obj.cluster.description = areasClusters.descriptions[type][key];

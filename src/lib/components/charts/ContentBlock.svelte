@@ -63,7 +63,7 @@
   .content-block {
     position: relative;
     padding: 12px;
-    background: white;
+    background: var(--ons-color-page-light);
   }
   .fullscreen-toggle {
     position: absolute;

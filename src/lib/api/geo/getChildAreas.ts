@@ -1,5 +1,5 @@
 import { geoLevels } from "$lib/config/geoLevels";
-import { isValidAreaCode } from "../utils";
+import { isValidAreaCode } from "$lib/util/validationHelpers";
 import { addAreaNames } from "./helpers/areaCodesNames";
 import readData from "$lib/data";
 
@@ -25,6 +25,6 @@ export default function getChildAreas(params = {}) {
         g.parents.includes(cdUpper)
     )
     .map((g) => g.areacd);
-  
+
   return params.includeNames ? addAreaNames(children) : children;
 }

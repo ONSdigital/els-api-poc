@@ -1,8 +1,9 @@
 // Functions to filter geography metadata
 import { geoLevels, geoLevelsAll } from "$lib/config/geoLevels";
+import { isValidAreaCode } from "$lib/util/validationHelpers";
 import readData from "$lib/data";
 
-const cube = await readData("json-stat");
+const metadata = await readData("json-stat-metadata");
 
 export function geoYearFilter(item, year) {
   if (!item.start && !item.end) return true;
@@ -16,10 +17,9 @@ export function makeGeoFilter(param) {
   const codes = new Set();
   const types = new Set();
   for (const geo of param) {
-    if (geo.match(/^[EKNSW]\d{2}$/)) types.add(geo);
-    else if (geoLevels[geo]) {
+    if (geoLevels[geo]) {
       for (const code of geoLevels[geo].codes) types.add(code);
-    } else if (geo.match(/^[EKNSW]\d{8}$/) && !types.has(geo.slice(0, 3)))
+    } else if (isValidAreaCode(geo) && !types.has(geo.slice(0, 3)))
       codes.add(geo);
   }
   return codes.size > 0 && types.size > 0
@@ -42,7 +42,7 @@ export function makeCountryFilter(countries) {
 }
 
 export function makeGeoDatasetFilter(slug) {
-  const ds = cube.link.item.find(ds => ds.extension.slug === slug);
+  const ds = metadata.link.item.find(ds => ds.extension.slug === slug);
   return ds ? (d) => ds.dimension.areacd.category.index[d.areacd] : () => false;
 }
 

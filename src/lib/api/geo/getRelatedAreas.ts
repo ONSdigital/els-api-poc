@@ -3,7 +3,7 @@ import getChildAreas from "./getChildAreas";
 import getParentAreas from "./getParentAreas";
 import getSiblingAreas from "./getSiblingAreas";
 import getSimilarAreas from "./getSimilarAreas";
-import { isValidAreaCode } from "../utils";
+import { isValidAreaCode } from "$lib/util/validationHelpers";
 import readData from "$lib/data";
 
 const geoMetadata = await readData("geo-metadata");

@@ -1,4 +1,4 @@
-import { isValidAreaCode } from "$lib/api/utils";
+import { isValidAreaCode } from "$lib/util/validationHelpers";
 import { slugify } from "$lib/utils";
 
 type AreaCodeResult = string | { error: number, message: string };
@@ -11,7 +11,7 @@ export function extractAreaCodeFromSlug(slug: string): AreaCodeResult {
   return { error: 400, message: "Invalid GSS code" };
 }
 
-export const makeCanonicalSlug = (props: {areacd: string, areanm?: string, [key: string]: any}) => {
+export const makeCanonicalSlug = (props: { areacd: string, areanm?: string, [key: string]: any }) => {
   if (!props?.areacd) throw "No area code was given";
   if (!props?.areanm) return props.areacd;
 

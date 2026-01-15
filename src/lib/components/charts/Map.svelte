@@ -5,6 +5,7 @@
     import bbox from "@turf/bbox";
     import { parseData, makeMapFeatures, valuesToBreaks } from "$lib/utils";
     import { ONSpalette } from "$lib/config";
+    import { validYear } from "$lib/util/linkHelpers";
     import { contrastColor } from "./chartHelpers";
     import topo from "$lib/data/topo.json";
     import {
@@ -41,8 +42,16 @@
     let map = $state();
     let _data = $derived(parseData(data));
     let breaks = $derived(valuesToBreaks(_data.map((d) => d.value)));
-    let { renderedFeatures, selectedAreas, bounds } = $derived(
-        makeRenderedFeatures(features, _data),
+    let { renderedFeatures, bounds } = $derived(
+        makeRenderedFeatures(
+            features,
+            _data,
+            geoLevel,
+            metadata.geography.year,
+        ),
+    );
+    let selectedFeatures = $derived(
+        makeSelectedFeatures(features, _data, selected),
     );
 
     function doHover(e) {
@@ -58,36 +67,53 @@
         return colors[breaks.length - 2];
     }
 
-    const makeRenderedFeatures = (features, data) => {
+    const makeRenderedFeatures = (features, data, geoLevel, geoYear) => {
+        const renderedFeatures = { type: "FeatureCollection", features: [] };
+
         if (!data)
             return {
-                renderedFeatures: null,
-                selectedAreas: [],
-                bounds: null,
+                renderedFeatures,
+                bounds: ukBounds,
             };
-        const renderedFeatures = { type: "FeatureCollection", features: [] };
-        const selectedAreas = [];
+        const geoLevelCodes = new Set(geoLevel?.codes || []);
 
         for (const d of data) {
             const ft = features[d.areacd] ? { ...features[d.areacd] } : null;
             if (!ft) continue;
-            ft.properties = {
-                ...ft.properties,
-                ...d,
-                color: valueToColor(d.value, breaks, colors),
-            };
-            const highlightColor = selected.includes(d.areacd)
-                ? ONSpalette[selected.indexOf(d.areacd)]
-                : null;
-            if (highlightColor) {
-                ft.properties.highlightColor = highlightColor;
-                ft.properties.textColor = contrastColor(highlightColor);
-                selectedAreas.push(ft.properties);
+            if (
+                geoLevelCodes.has(d.areacd.slice(0, 3)) &&
+                validYear(ft.properties, geoYear)
+            ) {
+                ft.properties = {
+                    ...ft.properties,
+                    ...d,
+                    color: valueToColor(d.value, breaks, colors),
+                };
+                renderedFeatures.features.push(ft);
             }
-            renderedFeatures.features.push(ft);
         }
         const bounds = bbox(renderedFeatures);
-        return { renderedFeatures, selectedAreas, bounds };
+        return { renderedFeatures, bounds };
+    };
+
+    const makeSelectedFeatures = (features, data, selected) => {
+        const selectedFeatures = { type: "FeatureCollection", features: [] };
+
+        for (const cd of selected) {
+            const ft = features[cd] ? { ...features[cd] } : null;
+            const d = data.find((d) => d.areacd === cd);
+            if (ft && d) {
+                const color = ONSpalette[selected.indexOf(cd)];
+                ft.properties = {
+                    ...ft.properties,
+                    ...d,
+                    color,
+                    textColor: contrastColor(color),
+                };
+                selectedFeatures.features.push(ft);
+            }
+        }
+        return selectedFeatures;
     };
 
     function fitBounds(bounds) {
@@ -112,82 +138,85 @@
             controls
             mapDescription="Map of {metadata.label}"
         >
-            {#if renderedFeatures}
-                <MapSource
-                    id="features"
-                    type="geojson"
-                    data={renderedFeatures}
-                    promoteId="areacd"
+            <MapSource
+                id="features"
+                type="geojson"
+                data={renderedFeatures}
+                promoteId="areacd"
+            >
+                <MapLayer
+                    id="fills"
+                    type="fill"
+                    paint={{
+                        "fill-color": ["get", "color"],
+                        "fill-opacity": 0.7,
+                    }}
+                    order="place_other"
+                    hover
+                    {hovered}
+                    let:hovered
+                    on:hover={doHover}
                 >
-                    <MapLayer
-                        id="fills"
-                        type="fill"
-                        paint={{
-                            "fill-color": ["get", "color"],
-                            "fill-opacity": 0.7,
-                        }}
-                        order="place_other"
-                        hover
-                        {hovered}
-                        let:hovered
-                        on:hover={doHover}
-                    >
-                        <MapTooltip
-                            content={features?.[hovered]?.properties?.areanm ||
-                                ""}
-                        />
-                    </MapLayer>
-                    <MapLayer
-                        id="lines"
-                        type="line"
-                        paint={{
-                            "line-color": "white",
-                            "line-width": [
-                                "case",
-                                ["has", "highlightColor"],
-                                5,
-                                0.5,
-                            ],
-                        }}
-                        order="place_other"
+                    <MapTooltip
+                        content={features?.[hovered]?.properties?.areanm || ""}
                     />
-                    <MapLayer
-                        id="highlighted"
-                        type="line"
-                        paint={{
-                            "line-color": [
-                                "case",
-                                ["has", "highlightColor"],
-                                ["get", "highlightColor"],
-                                "rgba(0,0,0,0)",
-                            ],
-                            "line-width": 3,
-                        }}
-                        order="place_other"
-                    />
-                    <MapLayer
-                        id="hovered"
-                        type="line"
-                        paint={{
-                            "line-color": [
-                                "case",
-                                ["==", ["feature-state", "hovered"], true],
-                                "orange",
-                                "rgba(255,255,255,0)",
-                            ],
-                            "line-width": 2,
-                        }}
-                        order="place_suburb"
-                    />
-                </MapSource>
-            {/if}
+                </MapLayer>
+                <MapLayer
+                    id="outline"
+                    type="line"
+                    paint={{
+                        "line-color": "white",
+                        "line-width": 1,
+                    }}
+                    order="place_other"
+                />
+                <MapLayer
+                    id="hovered"
+                    type="line"
+                    paint={{
+                        "line-color": [
+                            "case",
+                            ["==", ["feature-state", "hovered"], true],
+                            "orange",
+                            "rgba(255,255,255,0)",
+                        ],
+                        "line-width": 2.5,
+                    }}
+                    order="place_suburb"
+                />
+            </MapSource>
+            <MapSource
+                id="selected"
+                type="geojson"
+                data={selectedFeatures}
+                promoteId="areacd"
+            >
+                <MapLayer
+                    id="highlighted-outline"
+                    type="line"
+                    paint={{
+                        "line-color": "white",
+                        "line-width": 4.5,
+                    }}
+                    order="place_other"
+                />
+                <MapLayer
+                    id="highlighted"
+                    type="line"
+                    paint={{
+                        "line-color": ["get", "color"],
+                        "line-width": 2.5,
+                    }}
+                    order="place_other"
+                />
+            </MapSource>
         </Map>
     </div>
     <MapLegend
         data={_data}
         {breaks}
         {hovered}
-        {selectedAreas}
+        selectedAreas={selectedFeatures.features.map((ft) => ft.properties)}
         prefix={metadata.prefix}
         suffix={metadata.suffix}
         format={formatValue}

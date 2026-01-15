@@ -1,7 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { goto } from "$app/navigation";
-  import { setContext } from "svelte";
   import {
     Hero,
     Grid,
@@ -42,7 +41,6 @@
     selectedCluster: data.related.similar[0],
     showConfidenceIntervals: false,
   });
-  setContext("pageState", pageState);
 
   let expandedTopics = $state(
     Object.fromEntries(data.taxonomy.map((t) => [t?.slug, false])),
@@ -146,8 +144,8 @@
         selectedGeoGroup={pageState.selectedGeoGroup}
       />
       <div>
-        <AreasModal />
-        <OptionsModal />
+        <AreasModal mode="area" {data} bind:pageState />
+        <OptionsModal {data} bind:pageState />
       </div>
     </div>
     <NavSection title="Topics" />
@@ -206,10 +204,10 @@
       Download all datasets that include {getName(areaProps, "the")} in an
       <a
         href={resolve(
-          `/api/v1/data.ods?hasGeo=${areaProps.areacd}&excludeMultivariate=true&time=all`,
+          `/api/v1/data.xlsx?hasGeo=${areaProps.areacd}&excludeMultivariate=true&time=all`,
         )}
-        download="data.ods">ODS</a
-      >
+        download="data.xlsx">XLSX</a
+      >,
       <a
         href={resolve(
           `/api/v1/data.csv?hasGeo=${areaProps.areacd}&excludeMultivariate=true&time=all`,

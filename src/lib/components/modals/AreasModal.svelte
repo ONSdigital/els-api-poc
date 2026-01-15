@@ -1,45 +1,50 @@
 <script lang="ts">
-  import { page } from "$app/state";
-  import { getContext } from "svelte";
   import { Button, Dropdown, Select } from "@onsvisual/svelte-components";
   import Modal from "./Modal.svelte";
   import { ONSpalette } from "$lib/config";
-  import { isValidAreaCode } from "$lib/api/utils";
+  import { cloneState } from "./modalHelpers";
+  import { getAreaType } from "$lib/utils";
 
-  let pageState = getContext("pageState");
-  let mode = $derived(
-    isValidAreaCode((page.params?.code || "").slice(0, 9))
-      ? "area"
-      : "indicator",
+  let { data, pageState = $bindable(), mode } = $props();
+
+  let _pageState = $state(cloneState(pageState));
+  let _areas = $derived(
+    data.areas.map((area) => ({ ...area, type: getAreaType(area) || "" })),
   );
 
   function addArea(area) {
-    if (!pageState.selectedAreas.find((d) => d.areacd === area.areacd))
-      pageState.selectedAreas.push(area);
+    if (!_pageState.selectedAreas.find((d) => d.areacd === area.areacd))
+      _pageState.selectedAreas.push(area);
   }
 
   function removeArea(area) {
-    pageState.selectedAreas = pageState.selectedAreas.filter(
+    _pageState.selectedAreas = _pageState.selectedAreas.filter(
       (d) => d.areacd !== area.areacd,
     );
   }
 </script>
 
-<Modal title="Select areas" label="Change areas" icon="pin">
+<Modal
+  title="Select areas"
+  label="Change areas"
+  icon="pin"
+  onConfirm={() => (pageState = cloneState(_pageState))}
+  onCancel={() => (_pageState = cloneState(pageState))}
+>
   {#if mode === "indicator"}
     <Dropdown
       id="geo-level-select"
       label="Geography type"
-      options={page.data.geoLevels}
-      bind:value={pageState.selectedGeoLevel}
+      options={data.geoLevels}
+      bind:value={_pageState.selectedGeoLevel}
     />
   {/if}
   {#if mode === "area"}
     <Dropdown
       id="geo-related-select"
       label="Geography group"
-      options={page.data.geoGroups}
-      bind:value={pageState.selectedGeoGroup}
+      options={data.geoGroups}
+      bind:value={_pageState.selectedGeoGroup}
     />
   {/if}
   <div class="select-container">
@@ -47,13 +52,14 @@
       id="area-select"
       label={mode === "area" ? "Comparison areas" : "Individual areas"}
       placeholder="Choose one or more"
-      options={page.data.areas}
+      options={_areas}
       labelKey="areanm"
+      groupKey="type"
       on:change={(e) => addArea(e.detail)}
       autoClear
     />
   </div>
-  {#each pageState.selectedAreas as area, i}
+  {#each _pageState.selectedAreas as area, i}
     <Button
       icon="cross"
       color={(mode === "area" ? ONSpalette[i + 1] : ONSpalette[i]) ||

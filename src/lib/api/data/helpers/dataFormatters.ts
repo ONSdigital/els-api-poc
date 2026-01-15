@@ -1,4 +1,3 @@
-import { csvFormat } from "d3-dsv";
 import readData from "$lib/data";
 
 const geoLookup = await readData("geo-metadata");
@@ -117,12 +116,12 @@ function makeColFill(includeNames, includeStatus, measures = null) {
   const pushMeasures = ((measures) => {
     return measures
       ? (data, item, cube) => {
-          for (let j = 0; j < measures.values.length; j++) {
-            data[measures.values[j][0]].push(
-              cube.value[item[0] * measuresCount + measures.values[j][1]]
-            );
-          }
+        for (let j = 0; j < measures.values.length; j++) {
+          data[measures.values[j][0]].push(
+            cube.value[item[0] * measuresCount + measures.values[j][1]]
+          );
         }
+      }
       : (data, item, cube) => data.value.push(cube.value[item[0]]);
   })(measures);
   const pushVals = (data, item, dims, cube) => {
@@ -137,20 +136,20 @@ function makeColFill(includeNames, includeStatus, measures = null) {
 
   return includeNames && includeStatus
     ? (data, item, dims, cube) => {
-        pushVals(data, item, dims, cube);
-        pushName(data, item);
-        pushStatus(data, item, cube);
-      }
+      pushVals(data, item, dims, cube);
+      pushName(data, item);
+      pushStatus(data, item, cube);
+    }
     : includeNames
       ? (data, item, dims, cube) => {
-          pushVals(data, item, dims, cube);
-          pushName(data, item);
-        }
+        pushVals(data, item, dims, cube);
+        pushName(data, item);
+      }
       : includeStatus
         ? (data, item, dims, cube) => {
-            pushVals(data, item, dims, cube);
-            pushStatus(data, item, cube);
-          }
+          pushVals(data, item, dims, cube);
+          pushStatus(data, item, cube);
+        }
         : pushVals;
 }
 
@@ -251,28 +250,6 @@ export function toRows(
   const rows = colsToRows(cols, includeIndicator ? cube.label : null);
 
   return [cube.extension.slug, rows];
-}
-
-// Infer columns from row data
-function inferColumns(rows) {
-  const cols = new Set();
-  for (const row of rows) {
-    for (const col in row) cols.add(col);
-  }
-  return Array.from(cols);
-}
-
-// Sort order of columns for CSV output
-function sortColumns(cols) {
-  return cols.includes("status")
-    ? [...cols.filter((col) => col !== "status"), "status"]
-    : cols;
-}
-
-export function csvSerialise(datasets) {
-  const rows = datasets.flat();
-  const cols = sortColumns(inferColumns(rows));
-  return csvFormat(rows, cols);
 }
 
 function getDimColumns(datasets) {

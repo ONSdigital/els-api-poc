@@ -5,6 +5,7 @@ import { geoLevels } from "./config/geoLevels";
 import { feature } from 'topojson-client';
 import { ckmeans } from "simple-statistics";
 import { oldGeoCodesLookup } from "./config/geoLookups";
+import { geoLevelsAllLookup } from "$lib/config/geoLevels";
 
 type jsonDataColumns = { [key: string]: any[] };
 type jsonDataRows = { [key: string]: any }[];
@@ -38,20 +39,7 @@ export function parseDataKeyed(data, zKey, rowTemplate = {}) {
   return { keyed, array };
 }
 
-export async function fetchChartData(
-  indicator,
-  geography = "ltla",
-  time = "latest"
-) {
-  const url = resolve(
-    `/api/v0/data.json?indicator=${indicator}&geo=${geography}&time=${time}`
-  );
-  const data = await (await fetch(url)).json();
-  console.log({ data });
-  return parseData(data[indicator]);
-}
-
-export async function fetchChartDataV1(indicator, dimensions) {
+export async function fetchChartData(indicator, dimensions) {
   dimensions = { ...{ geo: "ltla", time: "latest" }, ...dimensions }; // Use default geo + time filters unless explicitly set
   const coreDims = ["geo", "time"];
   const dims = Object.entries(dimensions).map((d) =>
@@ -65,36 +53,6 @@ export async function fetchChartDataV1(indicator, dimensions) {
   const data = await (await fetch(url)).json();
   console.log({ data });
   return parseData(data);
-}
-
-export async function fetchTopicsData(
-  selected,
-  geography = "ltla",
-  time = "latest"
-) {
-  const exclude = ["population-by-age-and-sex"];
-
-  const dataUrl = resolve(`/api/v0/data.json?geo=${geography}&time=${time}`);
-  const data = await (await fetch(dataUrl)).json();
-
-  const metaUrl = resolve(
-    `/api/v1/metadata/indicators?hasGeo=${selected.areacd}`
-  );
-  const metadata = await (await fetch(metaUrl)).json();
-
-  // Filter out empty datasets
-  const indicators = metadata
-    .filter((meta) => !exclude.includes(meta.slug))
-    .map((meta) => ({ meta, data: parseData(data[meta.slug]) }));
-
-  const topics = Array.from(
-    new Set(indicators.map((ind) => ind.meta.topic))
-  ).map((topic) => ({
-    key: topic,
-    label: topic[0].toUpperCase() + topic.slice(1),
-    indicators: indicators.filter((ind) => ind.meta.topic === topic),
-  }));
-  return topics;
 }
 
 export function makeValueFormatter(dp) {
@@ -203,4 +161,8 @@ export function valuesToBreaks(values, count = 5) {
     clusters[clusters.length - 1][clusters[clusters.length - 1].length - 1]
   ];
   return Array.from(new Set(breaks)); // de-duplicate breaks
+}
+
+export function getAreaType(area) {
+  return geoLevelsAllLookup[area.areacd?.slice?.(0, 3)]?.label || null;
 }

@@ -66,7 +66,7 @@ export function parseBeeswarmData(
   height = 100,
   radius = 3
 ) {
-  if (data.message) return null;
+  if (!data || data?.message) return null;
 
   const vals = data[xKey].filter((d) => d != null);
   const sorted = [...vals].sort((a, b) => a - b);
