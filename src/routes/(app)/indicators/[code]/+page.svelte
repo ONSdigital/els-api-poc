@@ -1,6 +1,5 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import { setContext } from "svelte";
   import {
     Hero,
     NavSections,
@@ -10,7 +9,6 @@
   } from "@onsvisual/svelte-components";
   import { capitalise } from "@onsvisual/robo-utils";
   import { makePeriodFormatter, makeValueFormatter } from "$lib/utils";
-  import { countryLetterLookup } from "$lib/config/geoLookups";
   import AreasLegend from "$lib/components/modals/AreasLegend.svelte";
   import AreasModal from "$lib/components/modals/AreasModal.svelte";
   import OptionsModal from "$lib/components/modals/OptionsModal.svelte";
@@ -52,7 +50,6 @@
     showConfidenceIntervals: false,
     formatPeriod: () => formatPeriod,
   });
-  setContext("pageState", pageState);
 </script>
 
 <Hero

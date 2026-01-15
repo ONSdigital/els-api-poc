@@ -1,7 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { goto } from "$app/navigation";
-  import { setContext } from "svelte";
   import {
     Hero,
     Grid,
@@ -42,7 +41,6 @@
     selectedCluster: data.related.similar[0],
     showConfidenceIntervals: false,
   });
-  setContext("pageState", pageState);
 
   let expandedTopics = $state(
     Object.fromEntries(data.taxonomy.map((t) => [t?.slug, false])),
