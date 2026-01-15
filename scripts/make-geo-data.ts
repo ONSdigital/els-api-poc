@@ -1,4 +1,4 @@
-import { writeFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 import { csvParse, csvFormat, autoType } from "d3-dsv";
 import { geoLevels, geoLevelsNamed } from "../src/lib/config/geoLevels";
 
@@ -6,6 +6,7 @@ const topoUrl =
   "https://raw.githubusercontent.com/ONSdigital/uk-topojson/refs/heads/main/output/topo.json";
 const metaUrl =
   "https://raw.githubusercontent.com/ONSdigital/geo-scripts/refs/heads/main/input/lookups/lookup.csv";
+const dataAreasPath = "./src/lib/data/areas-in-data.json";
 const outputDir = "./src/lib";
 
 const geoCodes = new Set(
@@ -13,14 +14,6 @@ const geoCodes = new Set(
     .map((g) => g.codes)
     .flat()
 );
-
-const gb = {
-  areacd: "K03000001",
-  areanm: "Great Britain",
-  level: ["ctry"],
-  parents: ["K02000001"],
-  children: ["E92000001", "S92000003", "W92000004"]
-};
 
 function getLevels(cd) {
   return Object.keys(geoLevels).filter((key) =>
@@ -59,11 +52,12 @@ for (const row of rows) {
   obj.parents = row.parentcd ? getParents([row.parentcd], rows) : [];
   obj.children = getChildren(row.areacd, rows);
   lookup[row.areacd] = obj;
+}
 
-  // Add GB after UK
-  if (row.areacd === "K02000001") {
-    lookup[gb.areacd] = gb;
-  }
+// Add additional non-standard areas in data to lookup
+const dataAreas = JSON.parse(readFileSync(dataAreasPath));
+for (const row of dataAreas) {
+  if (!lookup[row.areacd]) lookup[row.areacd] = row;
 }
 
 const geoPath = `${outputDir}/data/geo-metadata.json`;

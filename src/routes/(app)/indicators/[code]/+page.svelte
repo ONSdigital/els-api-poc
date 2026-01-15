@@ -1,6 +1,5 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import { setContext } from "svelte";
   import {
     Hero,
     NavSections,
@@ -10,7 +9,6 @@
   } from "@onsvisual/svelte-components";
   import { capitalise } from "@onsvisual/robo-utils";
   import { makePeriodFormatter, makeValueFormatter } from "$lib/utils";
-  import { countryLetterLookup } from "$lib/config/geoLookups";
   import AreasLegend from "$lib/components/modals/AreasLegend.svelte";
   import AreasModal from "$lib/components/modals/AreasModal.svelte";
   import OptionsModal from "$lib/components/modals/OptionsModal.svelte";
@@ -40,21 +38,8 @@
     });
   };
 
-  function getInitialSelection(data) {
-    let area =
-      data.indicator.geography.countries.length === 1
-        ? data.areas.find(
-            (d) =>
-              d.areacd ===
-              countryLetterLookup[data.indicator.geography.countries[0]],
-          )
-        : data.areas.find((d) => d.areacd === "K02000001") ||
-          data.areas.find((d) => d.areacd === "K03000001");
-    return area ? [area] : [];
-  }
-
   let pageState = $state({
-    selectedAreas: getInitialSelection(data),
+    selectedAreas: data.initialArea ? [data.initialArea] : [],
     selectedGeoLevel: data.geoLevels.find(
       (g) => g.id === data.indicator.geography.initialLevel,
     ),
@@ -65,7 +50,6 @@
     showConfidenceIntervals: false,
     formatPeriod: () => formatPeriod,
   });
-  setContext("pageState", pageState);
 </script>
 
 <Hero
@@ -107,8 +91,8 @@
         selectedGeoGroup={pageState.selectedGeoLevel}
       />
       <div>
-        <AreasModal />
-        <OptionsModal />
+        <AreasModal mode="indicator" {data} bind:pageState />
+        <OptionsModal {data} bind:pageState />
       </div>
     </div>
     {#if data.indicator.standardised}
@@ -228,9 +212,9 @@
     <p>
       You can download this dataset in an <a
         href={resolve(
-          `/api/v1/data.ods?indicator=${data.indicator.slug}&time=all`,
+          `/api/v1/data.xlsx?indicator=${data.indicator.slug}&time=all`,
         )}
-        download={`${data.indicator.slug}.ods`}>ODS</a
+        download={`${data.indicator.slug}.xlsx`}>XLSX</a
       >,
       <a
         href={resolve(
@@ -253,8 +237,8 @@
       >
       format, or download
       <a
-        href={resolve(`/api/v1/data.ods?excludeMultivariate=true&time=all`)}
-        download="datasets.ods">all available datasets (ODS, ~10MB)</a
+        href={resolve(`/api/v1/data.xlsx?excludeMultivariate=true&time=all`)}
+        download="datasets.xlsx">all available datasets (XLSX, ~10MB)</a
       >.
     </p>
     <p>
@@ -268,7 +252,7 @@
   </NavSection>
   <NavSection title="Other indicators">
     <p>
-      {data.indicator.label} is one of {data.taxonomy.meta.count} local indicators
+      {data.indicator.label} is one of {data.summaryStats.indicatorCount} local indicators
       on the <a href={resolve("/")}>Explore local statistics</a> service. See
       the <a href={resolve("/indicators")}>full list of local indicators</a>.
     </p>

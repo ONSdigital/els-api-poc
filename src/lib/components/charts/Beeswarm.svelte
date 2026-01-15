@@ -30,7 +30,6 @@
     const val2 = _data?.keyed?.[selected[1]]?.[xKey];
     if (!val1 || !val2) return null;
     const diff = val1 - val2;
-    console.log(diff, _data.mad);
     return diff > _data.mad
       ? "Higher than"
       : diff < -_data.mad

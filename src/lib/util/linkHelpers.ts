@@ -3,7 +3,7 @@ import { getName } from '@onsvisual/robo-utils';
 import { makeCanonicalSlug } from '$lib/api/geo/helpers/areaSlugUtils';
 import productLinks from "$lib/data/product-links.json";
 
-const validYear = (area, year) =>
+export const validYear = (area, year) =>
     !year || ((!area.start || year > area.start) && (!area.end || year <= area.end));
 
 export function getNearestRelatedParent(area, geocodes = geoCodesArray, year = null) {

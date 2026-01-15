@@ -1,5 +1,5 @@
 import { areaMetadataBase } from "../config";
-import { isValidAreaCode } from "../utils";
+import { isValidAreaCode } from "$lib/util/validationHelpers";
 import groupAreasByLevel from "./helpers/groupAreasByLevel";
 
 export default async function getAreaByCode(code) {

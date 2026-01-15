@@ -1,8 +1,7 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import { getName } from "@onsvisual/robo-utils";
+  import { getName, capitalise } from "@onsvisual/robo-utils";
   import { makeCanonicalSlug } from "$lib/api/geo/helpers/areaSlugUtils";
-  import { capitalise } from "@onsvisual/robo-utils";
 
   let { areaProps } = $props();
 </script>
@@ -55,10 +54,10 @@
           ? "the new"
           : getName(areaProps.successor, "the", "prefix")}
         <a
-          href={resolve(`/areas/${makeCanonicalSlug(areaProps)}`)}
+          href={resolve(`/areas/${makeCanonicalSlug(areaProps.successor)}`)}
           data-sveltekit-noscroll>{getName(areaProps.successor)}</a
         >
-        ({areaProps.areacd})
+        ({areaProps.successor.areacd})
       </p>
     {:else if areaProps.end}
       <p class="ons-u-fs-s additional-area-info">
@@ -67,3 +66,18 @@
     {/if}
   {/if}
 </div>
+
+<style>
+  .additional-area-info {
+    margin-top: 12px;
+    margin-bottom: 0;
+  }
+  .inactive-badge {
+    font-weight: bold;
+    color: white;
+    padding: 0 8px 2px 8px;
+    border-radius: 4px;
+    background-color: #fa6401;
+    margin-right: 2px;
+  }
+</style>

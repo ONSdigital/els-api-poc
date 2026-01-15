@@ -1,4 +1,4 @@
-import { isValidPartialPostcode } from "$lib/api/utils";
+import { isValidPartialPostcode } from "$lib/util/validationHelpers";
 import { postcodeLookupBase } from "../config";
 
 function makePostcodeRow(json, i) {

@@ -1,20 +1,21 @@
 // Functions to filter JSON-Stat at a dataset level
 import { geoLevels } from "$lib/config/geoLevels";
+import { isValidAreaCode, isValidYear } from "$lib/util/validationHelpers";
 
 export function makeIndicatorFilter(indicator, topic) {
   if ((!indicator || indicator === "all") && topic === "all") return () => true;
 
   const topics = [topic].flat();
   const indicators = [indicator].flat();
-  return (!indicator || indicator === "all")? (ds) => [ds.extension.topic, ds.extension.subtopic].some(t => topics.includes(t)) :
+  return (!indicator || indicator === "all") ? (ds) => [ds.extension.topic, ds.extension.subtopic].some(t => topics.includes(t)) :
     indicator && topic === "all" ? (ds) => indicators.includes(ds.extension.slug) :
-    (ds) => indicators.includes(ds.extension.slug) || [ds.extension.topic, ds.extension.subtopic].some(t => topics.includes(t));
+      (ds) => indicators.includes(ds.extension.slug) || [ds.extension.topic, ds.extension.subtopic].some(t => topics.includes(t));
 }
 
 export function makeYearFilter(year) {
   const timeString = String(year);
-  if (!timeString.match(/^\d{4}$/))
-    return {error: "Invalid 'hasYear' parameter. Must be YYYY or 'all'."};
+  if (!isValidYear(timeString))
+    return { error: "Invalid 'hasYear' parameter. Must be YYYY or 'all'." };
   return (ds) =>
     Object.keys(ds.dimension.period.category.index)
       .map((d) => d.slice(0, 4))
@@ -26,11 +27,11 @@ export function hasGeo(ds, geo) {
 }
 
 export function makeDatasetGeoFilter(geo) {
-  if (geo.match(/[EKNSW]\d{8}/))
+  if (isValidAreaCode(geo))
     return (ds) => hasGeo(ds, geo);
   if (geo in geoLevels)
     return (ds) => ds.extension.geography.levels.includes(geo);
-  return {error: "Invalid 'hasGeo' parameter. Must be a valid GSS code or geography level."};
+  return { error: "Invalid 'hasGeo' parameter. Must be a valid GSS code or geography level." };
 }
 
 export function makeDatasetFilter(indicator, topic, excludeMultivariate, geo, year) {

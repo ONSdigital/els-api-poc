@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync } from "fs";
+import { ascending } from "d3-array";
 
 const data_path = "./src/lib/data/data.json";
 const config_path = "./src/lib/data/config.json";
@@ -6,19 +7,15 @@ const output_data = "./src/lib/data/json-stat.json";
 const output_meta = "./src/lib/data/json-stat-metadata.json";
 
 const columns = [
-  {key: "areacd", label: "Area code", role: "geo"},
-  {key: "period", label: "Time period", role: "time"},
-  {key: "value", label: "Value", group: "measure"},
-  {key: "lci", label: "Lower confidence interval", group: "measure"},
-  {key: "uci", label: "Upper confidence interval", group: "measure"}
+  { key: "areacd", label: "Area code", role: "geo" },
+  { key: "period", label: "Time period", role: "time" },
+  { key: "value", label: "Value", group: "measure" },
+  { key: "lci", label: "Lower confidence interval", group: "measure" },
+  { key: "uci", label: "Upper confidence interval", group: "measure" }
 ];
 const measures = columns.filter(col => col?.group === "measure").map(col => col.key);
-const columnsLookup = {measure: {label: "Measure"}};
+const columnsLookup = { measure: { label: "Measure" } };
 for (const col of columns) columnsLookup[col.key] = col;
-
-function ascending(a, b) {
-  return a == null || b == null ? NaN : a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
-}
 
 function parseSourceDate(str) {
   const dates = str.split("|")
@@ -65,7 +62,7 @@ function toRows(data, periods) {
   for (const p of periods) periodsLookup[p.xDomainNumb] = parsePeriod(p.period, isQuarterly);
 
   const rows = [];
-  for (let i = 0; i < data[cols[0]].length; i ++) {
+  for (let i = 0; i < data[cols[0]].length; i++) {
     for (const val of vals) {
       const row = {};
       for (const col of cols) {
@@ -125,7 +122,7 @@ function toCube(data, meta) {
     size.push(entries.length);
     dimension[key] = {
       label: col.label || key,
-      category: {index: Object.fromEntries(entries)}
+      category: { index: Object.fromEntries(entries) }
     };
     if (key === "measure") {
       const labels = values.map(d => [d, columnsLookup?.[d]?.label || d]);
@@ -143,7 +140,7 @@ function toCube(data, meta) {
       coords.push(dimension[key].category.index[row[key]]);
     }
     let index = 0;
-    for (let i = 0; i < coords.length; i ++) {
+    for (let i = 0; i < coords.length; i++) {
       index = (index * size[i]) + coords[i];
     }
     return index;
@@ -151,12 +148,12 @@ function toCube(data, meta) {
 
   const valuesLength = size.reduce((a, b) => a * b, 1);
   const value = new Array(valuesLength).fill(null);
-  
+
   for (const row of data) {
     const i = getIndex(row);
     value[i] = row.value;
   }
-  return {...dataset, id, size, role, dimension, value};
+  return { ...dataset, id, size, role, dimension, value };
 }
 
 console.log(`Reading ${data_path}...`);
@@ -173,7 +170,7 @@ const cube = {
   class: "collection",
   label: "ELS datasets",
   updated: (new Date()).toISOString().slice(0, 10),
-  link: {item: []}
+  link: { item: [] }
 };
 
 for (const key of keys) {

@@ -1,6 +1,6 @@
 import { geoLevels, geoLevelsLookup } from "$lib/config/geoLevels";
 import getChildAreas from "./getChildAreas";
-import { isValidAreaCode } from "../utils";
+import { isValidAreaCode } from "$lib/util/validationHelpers";
 import { codeToArea } from "./helpers/areaCodesNames";
 import readData from "$lib/data";
 
@@ -23,8 +23,8 @@ export default function getSiblingAreas(params = {}) {
     };
   const parentCode = params.parentLevel
     ? area.parents.find((p) =>
-        geoLevels[params.parentLevel].codes.includes(p.slice(0, 3))
-      )
+      geoLevels[params.parentLevel].codes.includes(p.slice(0, 3))
+    )
     : area.parents[0];
 
   return parentCode ? {

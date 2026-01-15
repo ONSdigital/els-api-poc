@@ -5,9 +5,9 @@ import { sveltekit } from "@sveltejs/kit/vite";
 const config = {
   plugins: [sveltekit()],
   //removes console.logs in production
-  esbuild: {
-    drop: ["console", "debugger"],
-  },
+  // esbuild: {
+  //   drop: ["console", "debugger"],
+  // },
   ssr: {
     noExternal: ["layercake", "d3-regression"],
   },

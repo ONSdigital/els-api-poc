@@ -2,35 +2,30 @@ import { Temporal } from "temporal-polyfill";
 import { geoLevels } from "$lib/config/geoLevels";
 import getChildAreas from "$lib/api/geo/getChildAreas";
 import hasObservation from "./hasObservation";
-import { isValidMonth, isValidYear } from "$lib/api/utils";
+import { isValidMonth, isValidYear, isValidAreaCode } from "$lib/util/validationHelpers";
 import readData from "$lib/data";
 
 const areasClusters = await readData("areas-clusters");
 
-export function ascending(a, b) {
-  return a == null || b == null ? NaN : a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
-}
-
 export function makeFilter(param) {
-  const set = new Set([param].flat());
-  return d => set.has(d[0]);
+	const set = new Set([param].flat());
+	return d => set.has(d[0]);
 }
 
 export function makeGeoFilter(geo, geoExtent, geoCluster) {
-  const codes = new Set();
-  const types = new Set();
-  for (const g of [geo].flat()) {
-    // if (g.match(/^[EKNSW]\d{2}$/)) types.add(g);
-    if (geoLevels[g] && geoCluster === "all") {
-			if (geoExtent.match(/^[EKNSW]\d{8}$/)) {
-				const children = getChildAreas({code: geoExtent, geoLevel: g, includeNames: false});
+	const codes = new Set();
+	const types = new Set();
+	for (const g of [geo].flat()) {
+		if (geoLevels[g] && geoCluster === "all") {
+			if (isValidAreaCode(geoExtent)) {
+				const children = getChildAreas({ code: geoExtent, geoLevel: g, includeNames: false });
 				for (const child of children) codes.add(child);
 			} else {
 				for (const code of geoLevels[g].codes) types.add(code);
 			}
-    }
-    else if (g.match(/^[EKNSW]\d{8}$/) && !types.has(g.slice(0, 3))) codes.add(g);
-  }
+		}
+		else if (isValidAreaCode(g) && !types.has(g.slice(0, 3))) codes.add(g);
+	}
 	if (geoCluster) {
 		const [grouping, cluster] = geoCluster.split("_");
 		const cds = areasClusters.clusters?.[grouping]?.[cluster];
@@ -38,15 +33,15 @@ export function makeGeoFilter(geo, geoExtent, geoCluster) {
 			for (const cd of cds) codes.add(cd);
 		}
 	}
-  return codes.size > 0 && types.size > 0 ? d => codes.has(d[0]) || types.has(d[0].slice(0, 3)) :
-    types.size > 0 ? d => types.has(d[0].slice(0, 3)) :
-    codes.size > 0 ? d => codes.has(d[0]) :
-    () => false;
+	return codes.size > 0 && types.size > 0 ? d => codes.has(d[0]) || types.has(d[0].slice(0, 3)) :
+		types.size > 0 ? d => types.has(d[0].slice(0, 3)) :
+			codes.size > 0 ? d => codes.has(d[0]) :
+				() => false;
 }
 
 function toPlainDate(str, upperBound = false) {
 	if (isValidYear(str)) return Temporal.PlainDate.from(`${str}-${upperBound ? "12-31" : "01-01"}`);
-	if (isValidMonth(str)) return Temporal.PlainDate.from(`${str}-01`).add({months: 1}).subtract({days: 1});
+	if (isValidMonth(str)) return Temporal.PlainDate.from(`${str}-01`).add({ months: 1 }).subtract({ days: 1 });
 	return Temporal.PlainDate.from(str.slice(0, 10));
 }
 
@@ -56,7 +51,7 @@ function periodToDateRange(period) {
 	if (!parts[1]) return [start];
 
 	const offset = Temporal.Duration.from(parts[1]);
-	return [start, start.add(offset).subtract({days: 1})];
+	return [start, start.add(offset).subtract({ days: 1 })];
 }
 
 // Get a single time period
@@ -64,7 +59,7 @@ export function getTime(values, params = {}) {
 	if (params.time === "latest") return [values[values.length - 1]];
 	if (params.time === "earliest") return [values[0]];
 
-	const periods = values.map(v => ({value: v, period: periodToDateRange(v[0])}));
+	const periods = values.map(v => ({ value: v, period: periodToDateRange(v[0]) }));
 	const nearest = params.nearest || "none";
 	const periodIsRange = periods[0].period.length > 1; // Time periods have a duration component
 	const dateIsExact = params.time.length === 10; // Requested date is to nearest day
@@ -81,8 +76,9 @@ export function getTime(values, params = {}) {
 	return [];
 }
 
+// Get a range of time periods
 export function getTimeRange(values, params = {}) {
-	const periods = values.map(v => ({value: v, period: periodToDateRange(v[0])}));
+	const periods = values.map(v => ({ value: v, period: periodToDateRange(v[0]) }));
 	const range = [
 		toPlainDate(params.time[0] === "earliest" ? values[0][0] : params.time[0]),
 		toPlainDate(params.time[1] === "latest" ? values[values.length - 1][0] : params.time[1], true)
@@ -97,7 +93,7 @@ export function getTimeRange(values, params = {}) {
 	return periods.slice(firstIndex, lastIndex + 1).map(p => p.value);
 }
 
-// Get a range of time periods
+// Filter time dimension based on time parameters
 export function filterTime(values, params = {}) {
 	if (params.time === "all" || values.length === 0) return values;
 
@@ -109,5 +105,5 @@ export function filterTime(values, params = {}) {
 
 export function filterTimeForGeo(ds, values, geo) {
 	if (geo in geoLevels) return values;
-	return values.filter(val => hasObservation(ds, {areacd: geo, period: val[0], measure: "value"}));
+	return values.filter(val => hasObservation(ds, { areacd: geo, period: val[0], measure: "value" }));
 }
