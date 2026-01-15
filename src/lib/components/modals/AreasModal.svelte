@@ -18,7 +18,7 @@
   }
 
   function removeArea(area) {
-    _pageState.selectedAreas = pageState.selectedAreas.filter(
+    _pageState.selectedAreas = _pageState.selectedAreas.filter(
       (d) => d.areacd !== area.areacd,
     );
   }
@@ -28,7 +28,7 @@
   title="Select areas"
   label="Change areas"
   icon="pin"
-  onConfirm={() => (pageState = _pageState)}
+  onConfirm={() => (pageState = cloneState(_pageState))}
   onCancel={() => (_pageState = cloneState(pageState))}
 >
   {#if mode === "indicator"}
