@@ -1,11 +1,9 @@
 <script lang="ts">
   import { scaleLinear, scaleBand } from "d3-scale";
-  import { ticks, groupSort } from "d3-array";
   import { format } from "d3-format";
   import { parseChartData, contrastColor, labelPlacer } from "./chartHelpers";
-  import { ONSpalette } from "$lib/config";
+  import { ONSpalette, ONStextPalette } from "$lib/config";
   import { pluralise } from "@onsvisual/robo-utils";
-  import { mean } from "simple-statistics";
   import { tick } from "svelte";
 
   let {
@@ -160,6 +158,7 @@
     on:pointerleave={() => {
       hoveredArea = null;
     }}
+    style:pointer-events={fill === "#b0b0b0" ? null : "none"}
   />
 {/snippet}
 
@@ -238,15 +237,15 @@
         {/each}
       {/if}
       <div class="margin-labels-selected" use:marginLabels>
-        {#if width >= widthThreshold}
+        {#if width >= widthThreshold && !hoveredArea}
           {#each _selected as a, i (a[0][idKey])}
             {@const yPos = yLabelPositions?.[i] || yScale?.(a[0][idKey])?.y}
             {@const height = yScale?.(a[0][idKey])?.height}
             <div
               class="margin-label-selected"
-              style="top: {yPos ? yPos + height / 2 : 0}px;color:{ONSpalette[
-                i
-              ]}"
+              style="top: {yPos
+                ? yPos + height / 2
+                : 0}px;color:{ONStextPalette[i]}"
             >
               {a[0][labelKey]}
             </div>
@@ -378,8 +377,10 @@
     font-weight: bold;
     max-width: 140px;
     text-align: right;
-    line-height: 1.1;
+    line-height: 0.95;
     right: calc(100% + 10px);
+    padding-top: 4px;
+    padding-bottom: 4px;
   }
 
   .margin-label-geo,

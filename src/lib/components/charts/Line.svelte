@@ -2,9 +2,10 @@
   import { scaleLinear, scaleTime } from "d3-scale";
   import { nice } from "d3-array";
   import { format } from "d3-format";
-  import { parseChartData, contrastColor } from "./chartHelpers";
-  import { markerPaths, ONSpalette } from "$lib/config";
+  import { parseChartData, contrastColor, labelPlacer } from "./chartHelpers";
+  import { markerPaths, ONSpalette, ONStextPalette } from "$lib/config";
   import { pluralise } from "@onsvisual/robo-utils";
+  import { tick } from "svelte";
 
   let {
     data,
@@ -23,7 +24,7 @@
   const widthThreshold = 550;
 
   let width = $state(680);
-  let leftMargin = $state(0);
+  let leftMargin = 30;
   let rightMargin = $derived(width < widthThreshold ? 20 : 150);
   let widthInner = $derived(width - rightMargin - leftMargin);
 
@@ -55,10 +56,10 @@
   );
 
   const formatYTick = format(",.0f");
-  function updateLeftMargin(el) {
-    const width = el.getBoundingClientRect().width;
-    if (width > leftMargin) leftMargin = width;
-  }
+  // function updateLeftMargin(el) {
+  //   const width = el.getBoundingClientRect().width;
+  //   if (width > leftMargin) leftMargin = width;
+  // }
 
   const maxTickGap = 100; // in pixels
   let nXTicks = $derived(Math.floor(width / maxTickGap));
@@ -78,7 +79,40 @@
   }
   let xTicks = $derived(makeXTicks(xScale, _data));
 
-  // $inspect(_data);
+  let yLabelPositions = $state();
+  async function marginLabels(el) {
+    await tick();
+    const divs = el.getElementsByTagName("div");
+    if (divs.length < 2) {
+      yLabelPositions = null;
+      console.log("fewer than 2 areas selected");
+      return;
+    }
+    let ys = _selected.map((s) => yScale(s[s.length - 1][yKey]));
+    let ysIndexes = ys.map((y, i) => ({ y, i })).sort((a, b) => a.y - b.y);
+    console.log({ ys });
+    console.log({ ysIndexes });
+
+    const cumulativeHeights = Array(_selected.length).fill(0);
+    for (let j = 1; j < _selected.length; j++) {
+      const current = ysIndexes[j].i;
+      const previous = ysIndexes[j - 1].i;
+      cumulativeHeights[current] =
+        cumulativeHeights[previous] +
+        (divs[previous].clientHeight + divs[current].clientHeight) / 2;
+    }
+    console.log({ cumulativeHeights });
+    // subtract offsets
+    let zs = ysIndexes.map(({ y, i }) => y - cumulativeHeights[i]);
+    // run isotonic regression function to overwrite yLabelPositions
+    let adj = labelPlacer(zs);
+    console.log({ adj });
+    // add offsets back on to the regressed values
+    yLabelPositions = Array(_selected.length).fill(0);
+    ysIndexes.forEach(({ i }, j) => {
+      yLabelPositions[i] = adj[j] + cumulativeHeights[i];
+    });
+  }
 
   let maxValueLatestDate = $derived(
     _data
@@ -87,8 +121,10 @@
         )
       : 0
   );
+
   $inspect({ maxValueLatestDate });
   // $inspect(_data.dateDomain[1], Object.values(_data.keyed).flat());
+  $inspect({ yLabelPositions });
 </script>
 
 {#snippet line(arr, width = 1, color = "#b0b0b0", opacity = 1, id = "")}
@@ -157,11 +193,7 @@
         <div class="y-baseline"></div>
         {#each yScale.ticks(5) as yTick, i}
           <div class="line-y-tick" style:top="{yScale(yTick)}px"></div>
-          <div
-            class="line-y-tick-label"
-            style:top="{yScale(yTick)}px"
-            use:updateLeftMargin
-          >
+          <div class="line-y-tick-label" style:top="{yScale(yTick)}px">
             {formatYTick(yTick)}
           </div>
         {/each}
@@ -178,16 +210,6 @@
           </div>
         {/if}
         {#if width >= widthThreshold}
-          {#each _selected as arr, i}
-            <div
-              class="margin-label-selected"
-              style="left: {xScale(_data.dateDomain[1]) + 10}px;top: {yScale(
-                arr[arr.length - 1][yKey]
-              )}px;color:{ONSpalette[i]}"
-            >
-              {arr?.[0]?.areanm}
-            </div>
-          {/each}
           <div
             class="margin-label-geo"
             style="left: {xScale(_data.dateDomain[1]) + 10}px;top: {yScale(
@@ -197,6 +219,21 @@
             {pluralise(geoLevel.label)}
           </div>
         {/if}
+        <div class="margin-labels-selected" use:marginLabels>
+          {#if width >= widthThreshold && !hoveredArea}
+            {#each _selected as arr, i}
+              {@const yPos =
+                yLabelPositions?.[i] ?? yScale(arr[arr.length - 1][yKey])}
+              <div
+                class="margin-label-selected"
+                style="left: {xScale(_data.dateDomain[1]) +
+                  10}px;top: {yPos}px;color:{ONStextPalette[i]}"
+              >
+                {arr?.[0][labelKey]}
+              </div>
+            {/each}
+          {/if}
+        </div>
       </div>
       <svg
         viewBox="0 0 {widthInner} {height}"
@@ -252,17 +289,15 @@
   .line-wrapper {
     display: block;
     position: relative;
-    padding-top: 0;
   }
   .line-inner {
     display: block;
     position: relative;
   }
   .line-chart {
-    display: block;
-    margin-top: 30px;
-    height: 500px;
+    width: 100%;
     overflow: visible;
+    display: block;
   }
   .line-chart polyline,
   .line-chart line {
@@ -362,7 +397,9 @@
     font-size: 16px;
     font-weight: bold;
     color: orange;
-    white-space: nowrap;
+    max-width: 140px;
+    line-height: 1.1;
+    /* right: calc(100% + 10px); */
   }
 
   .margin-label-selected {
@@ -370,7 +407,11 @@
     transform: translateY(-50%);
     font-size: 16px;
     font-weight: bold;
-    white-space: nowrap;
+    max-width: 140px;
+    line-height: 0.95;
+    /* right: calc(100% + 10px); */
+    padding-top: 4px;
+    padding-bottom: 4px;
   }
 
   .margin-label-geo {
@@ -379,6 +420,7 @@
     font-size: 16px;
     font-weight: bold;
     color: grey;
-    white-space: nowrap;
+    max-width: 140px;
+    line-height: 1.1;
   }
 </style>
