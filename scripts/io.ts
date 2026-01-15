@@ -50,8 +50,8 @@ function autoTypeWithoutDates(object: { [key: string]: any }) {
 	for (const key in object) {
 		const value = object[key].trim();
 		if (!value) object[key] = null;
-		else if (value === 'true') object[key] = true;
-		else if (value === 'false') object[key] = false;
+		else if (value.toLowerCase() === 'true') object[key] = true;
+		else if (value.toLowerCase() === 'false') object[key] = false;
 		else if (value === 'NaN') object[key] = NaN;
 		else if (!isNaN(+value)) object[key] = +value;
 	}

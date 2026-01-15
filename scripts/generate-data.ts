@@ -229,6 +229,7 @@ function indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name) {
 function processFile(file, excluded_indicators) {
 
     const data_file = file.replace(`${CSV_PREPROCESS_DIR}`, '')
+    if (!fs.existsSync(`${CSV_PREPROCESS_DIR}${data_file}`)) console.log(`Cannot find data file ${data_file}`);
     let indicator_data = loadCsvWithoutBom(`${CSV_PREPROCESS_DIR}${data_file}`)
     const meta_data = JSON.parse(fs.readFileSync(`${CSV_PREPROCESS_DIR}${data_file.replace('.csv', '.csv-metadata.json')}`))
     const tableSchema = meta_data.tables[0].tableSchema.columns
@@ -305,9 +306,9 @@ const excluded_indicators = manifest_metadata.filter((f) => !f.include).array('c
 var file_paths = [
     ...new Set(
         manifest_metadata.filter((f) => f.include)
-            .array('filePath')
+            .array('dataset')
     )
-];
+].map(code => `${CSV_PREPROCESS_DIR}/${code}/${code}.csv`);
 
 // read in existing periods
 // later use this to check for new indicator time periods that need adding
