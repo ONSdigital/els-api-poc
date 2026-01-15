@@ -8,6 +8,7 @@ const geoArray = Object.values(geoMetadata);
 
 export default function getChildAreas(params = {}) {
   const cdUpper = (params?.code || "").toUpperCase();
+  console.log({ cdUpper })
   if (!isValidAreaCode(cdUpper))
     return { error: 400, message: `${params?.code} is not a valid GSS code.` };
 
@@ -22,7 +23,7 @@ export default function getChildAreas(params = {}) {
     .filter(
       (g) =>
         geoLevel.codes.includes(g.areacd.slice(0, 3)) &&
-        g.parents.includes(cdUpper)
+        g.parents?.includes?.(cdUpper)
     )
     .map((g) => g.areacd);
 
