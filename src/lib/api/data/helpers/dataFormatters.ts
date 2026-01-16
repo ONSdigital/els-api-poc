@@ -252,7 +252,7 @@ export function toRows(
   return [cube.extension.slug, rows];
 }
 
-function getDimColumns(datasets) {
+function getDimColumns(datasets: jsonStatDataset[]) {
   const cols = {};
   for (const ds of datasets) {
     const keys = ds.id.slice(0, -1);
@@ -267,7 +267,7 @@ function getDimColumns(datasets) {
   return Object.values(cols);
 }
 
-function getMeasureColumns(datasets, measure) {
+function getMeasureColumns(datasets: jsonStatDataset[], measure: parsedParam) {
   const filter = [measure].flat();
   const cols = {};
   for (const ds of datasets) {
@@ -281,11 +281,11 @@ function getMeasureColumns(datasets, measure) {
 }
 
 function makeCSVWColumns(
-  datasets,
-  measure,
-  singleIndicator,
-  includeNames,
-  includeStatus
+  datasets: jsonStatDataset[],
+  measure: parsedParam,
+  singleIndicator: boolean,
+  includeNames: boolean,
+  includeStatus: boolean
 ) {
   const cols = [
     {
@@ -313,12 +313,12 @@ function makeCSVWColumns(
 }
 
 export function toCSVW(
-  datasets,
-  measure,
-  href,
-  singleIndicator,
-  includeNames = false,
-  includeStatus = false
+  datasets: jsonStatDataset[],
+  measure: parsedParam,
+  href: string,
+  singleIndicator: boolean,
+  includeNames: boolean,
+  includeStatus: boolean
 ) {
   const dateString = new Date().toISOString().slice(0, 10);
   let metadata = {
@@ -339,7 +339,7 @@ export function toCSVW(
       "dc:issued": ds.updated,
     };
   }
-  metadata.tatableSchema = {
+  metadata.tableSchema = {
     columns: makeCSVWColumns(
       datasets,
       measure,

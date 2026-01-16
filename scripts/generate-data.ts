@@ -52,6 +52,14 @@ function getIndex(row, id, size, dimension, reverseLookup) {
     }
     return index;
 }
+function getDimRole(datasets, key: string) {
+    const dims = new Set();
+    for (const ds of datasets) {
+        const vals = ds?.role?.[key] || [];
+        for (const val of vals) dims.add(val);
+    }
+    return Array.from(dims);
+}
 function processColumns(k, metaLookup, columnValues, id, size, role, dimension) {
     const row = metaLookup.filter(aq.escape(d => d.name === k)).objects()[0]
     const values = columnValues[k]
@@ -368,7 +376,9 @@ const summaryData = {
             Object.keys(ds.dimension.period.category.index).map(val => +val.slice(0, 4))
         ).flat())).sort((a, b) => a - b),
     geoYears: Array.from(new Set(cube.link.item.map(ds => ds.extension.geography.year)))
-        .sort((a, b) => a - b)
+        .sort((a, b) => a - b),
+    geoDims: getDimRole(cube.link.item, "geo"),
+    timeDims: getDimRole(cube.link.item, "time")
 };
 
 const summaryOutput = "./src/lib/data/json-stat-summary.json";

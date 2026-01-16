@@ -7,14 +7,15 @@ import {
 import { getSpreadsheetMetadata } from "./helpers/generateXLSX";
 import { toCSVW } from "./helpers/dataFormatters";
 import { isValidDate } from "$lib/util/validationHelpers";
+import summaryData from "$lib/data/json-stat-summary.json";
 
 // Filter and format a single JSON-Stat dataset based on selected filters/parameters
 export function filterJSONStat(
-  cube,
-  filters,
-  params,
-  format,
-  singleIndicator
+  cube: jsonStatDataset,
+  filters: dimensionFilters,
+  params: parsedParams,
+  format: dataFormat,
+  singleIndicator: boolean
 ) {
   const dims = [];
 
@@ -28,7 +29,7 @@ export function filterJSONStat(
       values: Object.entries(dimension.category.index),
     };
     const filter = filters[key];
-    if (filter && dim.key === "period") {
+    if (filter && cube.role.time.includes(dim.key)) {
       if (filters.hasGeo)
         // If "hasGeo" param is applied. Only years with the requested geography are included
         dim.values = filterTimeForGeo(cube, dim.values, filters.hasGeo);
@@ -73,9 +74,8 @@ export function filterJSONStat(
 
 // Filter and format the data within an array of JSON-Stat datasets
 export default function filterDatasets(
-  datasets,
-  params,
-  format,
+  datasets: jsonStatDataset[],
+  params: parsedParams
 ) {
   // Check if request is for a single indicator
   const singleIndicator =
@@ -83,8 +83,10 @@ export default function filterDatasets(
     params.indicator !== "all" &&
     [params.indicator].flat().length === 1;
 
+  const format: dataFormat = params.format || "json";
+
   // Return only CSVW metadata, if requested
-  if (params.format === "csvw") {
+  if (format === "csvw") {
     return toCSVW(
       datasets,
       params.measure,
@@ -96,26 +98,32 @@ export default function filterDatasets(
   }
 
   // Create filters
-  const filters = {};
+  const filters: dimensionFilters = {};
 
-  // Create filters for standard dimensions
-  if (params.geo !== "all" || params.geoCluster !== "all")
-    filters.areacd = makeGeoFilter(params.geo, params.geoExtent, params.geoCluster);
-  if (params.time !== "all") {
-    if (
-      [params.time]
-        .flat()
-        .map((t) => isValidDate(t))
-        .includes(false)
-    )
-      return { error: 400, message: "Invalid time period requested." };
-    filters.period = params.time;
-  }
-  if (params.measure !== "all") filters.measure = makeFilter(params.measure);
-
-  // Add other dimension filters
-  for (const filter of params.dimFilters) {
-    filters[filter.key] = makeFilter(filter.values);
+  // Create filters for each dimensions
+  for (const filter of [
+    { key: "areacd", values: params.geo },
+    { key: "period", values: params.time },
+    { key: "measure", values: params.measure },
+    ...params.dimFilters
+  ]) {
+    if (summaryData.geoDims.includes(filter.key) && (filter.values !== "all" || params.geoCluster !== "all"))
+      // Create geo filter
+      filters[filter.key] = makeGeoFilter(filter.values, params.geoExtent, params.geoCluster);
+    else if (summaryData.timeDims.includes(filter.key) && filter.values !== "all") {
+      // Create time filter
+      if (
+        [filter.values]
+          .flat()
+          .map((t) => isValidDate(t))
+          .includes(false)
+      )
+        return { error: 400, message: "Invalid time period requested." };
+      filters[filter.key] = params.time;
+    } else if (filter.values !== "all") {
+      // Create filter for any standard dimension
+      filters[filter.key] = makeFilter(filter.values);
+    }
   }
 
   const filtered = [];

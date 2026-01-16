@@ -14,8 +14,7 @@ export default async function getFilteredData(params = {}) {
   // Apply filters to the data within the datasets and generate the selected output format
   datasets = filterDatasets(
     datasets,
-    params,
-    params.format
+    params
   );
   if (datasets.error) return datasets;
 
