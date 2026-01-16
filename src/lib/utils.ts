@@ -7,15 +7,12 @@ import { ckmeans } from "simple-statistics";
 import { oldGeoCodesLookup } from "./config/geoLookups";
 import { geoLevelsAllLookup } from "$lib/config/geoLevels";
 
-type jsonDataColumns = { [key: string]: any[] };
-type jsonDataRows = { [key: string]: any }[];
-
-export function parseData(data: jsonDataColumns): jsonDataRows {
+export function parseData(data: jsonDataColumns) {
   const cols = Object.keys(data);
-  const rows = [];
+  const rows: jsonDataRows = [];
 
   for (let i = 0; i < data[cols[0]].length; i++) {
-    const row = {};
+    const row: jsonDataRow = {};
     for (const col of cols) row[col] = data[col][i];
     // row.areanm = areaLookup[row.areacd].areanm;
     rows.push(row);
@@ -23,13 +20,13 @@ export function parseData(data: jsonDataColumns): jsonDataRows {
   return rows;
 }
 
-export function parseDataKeyed(data, zKey, rowTemplate = {}) {
+export function parseDataKeyed(data: jsonDataColumns, zKey: string, rowTemplate: jsonDataRow = {}) {
   if (data.message) return { keyed: {}, array: [] };
-  const keyed = {};
-  const array = [];
+  const keyed: jsonDataRowsKeyed = {};
+  const array: jsonDataRows = [];
   const cols = Object.keys(data);
   for (let i = 0; i < data[cols[0]].length; i++) {
-    const row = { ...rowTemplate };
+    const row: jsonDataRow = { ...rowTemplate };
     for (const col of cols) row[col] = data[col][i];
     row.time = new Date(data.period[i].split("/")[0]);
     if (!keyed[data[zKey][i]]) keyed[data[zKey][i]] = [];
@@ -39,7 +36,7 @@ export function parseDataKeyed(data, zKey, rowTemplate = {}) {
   return { keyed, array };
 }
 
-export async function fetchChartData(indicator, dimensions) {
+export async function fetchChartData(indicator: string, dimensions: keyedDimensions) {
   dimensions = { ...{ geo: "ltla", time: "latest" }, ...dimensions }; // Use default geo + time filters unless explicitly set
   const coreDims = ["geo", "time"];
   const dims = Object.entries(dimensions).map((d) =>
@@ -59,9 +56,9 @@ export function makeValueFormatter(dp) {
   return format(`,.${dp ?? 0}f`);
 }
 
-export function makePeriodFormatter(periodFormat) {
+export function makePeriodFormatter(periodFormat: string) {
   const parsePeriod = (p) => new Date(p.split("/")[0]);
-  const range = +periodFormat.match(/^\d+/)?.[0];
+  const range = +periodFormat?.match?.(/^\d+/)?.[0];
   const formatter =
     periodFormat === "month"
       ? utcFormat("%b %Y")
@@ -103,16 +100,16 @@ export function slugify(text: string) {
 }
 
 export function makeDataUrl(
-  indicator,
-  timeRange,
-  timeNearest = null,
-  geoSelected = [],
-  geoLevel = null,
-  geoExtent = null,
-  geoCluster = null
-) {
+  indicator: string,
+  timeRange: string | string[],
+  timeNearest: string | null = null,
+  geoSelected: string[] = [],
+  geoLevel: string | null = null,
+  geoExtent: string | null = null,
+  geoCluster: string | null = null
+): string {
   const base = "/api/v1/data.cols.json";
-  const chunks = [];
+  const chunks: { key: string, value: string }[] = [];
 
   if (indicator) chunks.push({ key: "indicator", value: indicator });
 
@@ -135,7 +132,7 @@ export function makeDataUrl(
   return resolve(url);
 }
 
-export function makeGeoJSON(topojson, layer) {
+export function makeGeoJSON(topojson, layer: string) {
   return feature(topojson, layer);
 }
 
@@ -154,7 +151,7 @@ export function makeMapFeatures(topo) {
   return features;
 }
 
-export function valuesToBreaks(values, count = 5) {
+export function valuesToBreaks(values: number[], count = 5) {
   const clusters = ckmeans(values, values.length < count ? values.length : count);
   const breaks = [
     ...clusters.map(c => c[0]),
