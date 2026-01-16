@@ -17,7 +17,7 @@ export function filterJSONStat(
   format: dataFormat,
   singleIndicator: boolean
 ) {
-  const dims = [];
+  const dims: filteredDimension[] = [];
 
   // Filter on each dimension in sequence
   for (let i = 0; i < cube.id.length; i++) {
@@ -66,9 +66,9 @@ export function filterJSONStat(
       params.includeStatus
     );
   if (format.slice(0, 4) === "cols")
-    return toCols(cube, dims, params.includeNames, params.includeStatus);
+    return toCols(cube, dims, params.includeNames, params.includeStatus, params.groupByArea);
   if (format.slice(0, 4) === "rows")
-    return toRows(cube, dims, false, params.includeNames, params.includeStatus);
+    return toRows(cube, dims, false, params.includeNames, params.includeStatus, params.groupByArea);
   return toJSONStat(cube, dims, params.includeNames, params.includeStatus);
 }
 

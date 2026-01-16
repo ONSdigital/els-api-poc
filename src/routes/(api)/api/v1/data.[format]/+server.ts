@@ -17,7 +17,7 @@ export const GET: RequestHandler = async ({ url, params }) => {
   const timeNearest = getParam(url, "timeNearest", "none");
   const measure = getParam(url, "measure", "all");
   const includeNames = getParam(url, "includeNames", true);
-  const includeStatus = getParam(url, "includeStatus", format === "xlsx");
+  const includeStatus = getParam(url, "includeStatus", ["json", "xlsx"].includes(format));
   const dimFilters = getDimensionFilters(url);
 
   const datasets = await getFilteredData({

@@ -7,9 +7,9 @@ import { ckmeans } from "simple-statistics";
 import { oldGeoCodesLookup } from "./config/geoLookups";
 import { geoLevelsAllLookup } from "$lib/config/geoLevels";
 
-export function parseData(data: jsonDataColumns) {
+export function parseData(data: jsonDataCols) {
   const cols = Object.keys(data);
-  const rows: jsonDataRows = [];
+  const rows: jsonDataRow[] = [];
 
   for (let i = 0; i < data[cols[0]].length; i++) {
     const row: jsonDataRow = {};
@@ -20,10 +20,10 @@ export function parseData(data: jsonDataColumns) {
   return rows;
 }
 
-export function parseDataKeyed(data: jsonDataColumns, zKey: string, rowTemplate: jsonDataRow = {}) {
+export function parseDataKeyed(data: jsonDataCols, zKey: string, rowTemplate: jsonDataRow = {}) {
   if (data.message) return { keyed: {}, array: [] };
   const keyed: jsonDataRowsKeyed = {};
-  const array: jsonDataRows = [];
+  const array: jsonDataRow[] = [];
   const cols = Object.keys(data);
   for (let i = 0; i < data[cols[0]].length; i++) {
     const row: jsonDataRow = { ...rowTemplate };

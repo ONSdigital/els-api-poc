@@ -14,26 +14,28 @@ declare global {
 
   // Data arrays/objects
   type jsonDataRow = { [key: string]: any };
-  type jsonDataRows = jsonDataRow[];
-  type jsonDataColumns = { [key: string]: any[] };
-  type jsonDataRowsKeyed = { [key: string]: jsonDataRows };
+  type jsonDataRowsByArea = { areacd: string, areanm?: string, values: jsonDataRow[] }[];
+  type jsonDataCols = { [key: string]: any[] };
+  type jsonDataColsByArea = { areacd: string, areanm?: string, values: jsonDataCols }[];
+  type jsonDataRowsKeyed = { [key: string]: jsonDataRow[] };
+  type dataItem = [number, ...string[]];
 
   // JSON-Stat (based on sub-set of full spec)
-  type jsonStatDimension = { label?: string, category: { index: { [key: string]: number }, label?: { [key: string]: string } } };
+  type jsonStatDimension = { label: string, category: { index: { [key: string]: number }, label?: { [key: string]: string } } };
   type jsonStatDataset = {
     version: "2.0",
     class: "dataset",
     label: string,
+    note: string[],
+    source: string,
+    updated: string,
     id: string[],
     size: number[],
     role: { [key: string]: string[] },
     dimension: { [key: string]: jsonStatDimension },
     value: (number | null)[],
-    source?: string,
-    updated?: string,
-    note?: string[],
-    status?: { [key: string]: string },
-    extension?: any
+    status: { [key: string]: string },
+    extension: any
   };
   type jsonStatCollection = { version: "2.0", class: "collection", label: string, link: { item: jsonStatDataset[] } };
 
@@ -43,6 +45,7 @@ declare global {
   type dataFormat = "json" | "csv" | "csvw" | "xlsx" | "cols.json" | "rows.json";
   type keyedDimensions = { [key: string]: string | string[] };
   type dimensionFilters = { [key: string]: any };
+  type filteredDimension = { key: string, count: number, values: [string, number][] };
 
   // Miscellaneous
   type errorObject = { error: number, message: string };
