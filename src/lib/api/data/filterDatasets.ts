@@ -5,7 +5,7 @@ import {
   toCols
 } from "./helpers/dataFormatters";
 import { getSpreadsheetMetadata } from "./helpers/generateXLSX";
-import { toCSVW } from "./helpers/dataFormatters";
+import generateCSVW from "./helpers/generateCSVW";
 import { isValidDate } from "$lib/util/validationHelpers";
 import summaryData from "$lib/data/json-stat-summary.json";
 
@@ -87,7 +87,7 @@ export default function filterDatasets(
 
   // Return only CSVW metadata, if requested
   if (format === "csvw") {
-    return toCSVW(
+    return generateCSVW(
       datasets,
       params.measure,
       params.href,
