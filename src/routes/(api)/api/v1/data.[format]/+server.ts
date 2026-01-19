@@ -4,7 +4,7 @@ import { getParam, getDimensionFilters } from "$lib/api/utils";
 import getFilteredData from "$lib/api/data/getFilteredData";
 
 export const GET: RequestHandler = async ({ url, params }) => {
-  const format = params.format || "json";
+  const format = params.format || null;
   const topic = getParam(url, "topic", "all");
   const indicator = getParam(url, "indicator", "all");
   const excludeMultivariate = getParam(url, "excludeMultivariate", false);

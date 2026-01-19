@@ -1,3 +1,5 @@
+import { dataFormats, geoFormats } from "$lib/api/config";
+
 export function isValidAreaCode(code: string): boolean {
     return !!code.match(/^[EKNSW]\d{8}$/);
 }
@@ -37,4 +39,12 @@ export function isValidDate(str: string): boolean {
         isValidYear(str) ||
         ["earliest", "latest"].includes(str)
     );
+}
+
+export function isValidDataFormat(str: string): boolean {
+    return dataFormats.includes(str);
+}
+
+export function isValidGeoFormat(str: string): boolean {
+    return geoFormats.includes(str);
 }

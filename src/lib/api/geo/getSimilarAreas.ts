@@ -8,7 +8,7 @@ const areasSimilar = await readData("areas-similar");
 export default function getSimilarAreas(params = {}) {
   const cdUpper = (params?.code || "").toUpperCase();
   if (!isValidAreaCode(cdUpper))
-    return { error: 400, message: `${params?.code} is not a valid GSS code.` };
+    return { error: 404, message: `Area not found. "${params?.code}" is not a valid GSS code.` };
 
   const similar = areasSimilar[cdUpper];
   if (!similar) return [];

@@ -9,11 +9,11 @@ const geoArray = Object.values(geoMetadata);
 export default function getChildAreas(params = {}) {
   const cdUpper = (params?.code || "").toUpperCase();
   if (!isValidAreaCode(cdUpper))
-    return { error: 400, message: `${params?.code} is not a valid GSS code.` };
+    return { error: 404, message: `Area not found. "${params?.code}" is not a valid GSS code.` };
 
   const area = geoMetadata[cdUpper];
   if (!area)
-    return { error: 400, message: `Children not found for ${params.code}` };
+    return { error: 404, message: `Children not found for "${params.code}".` };
 
   const geoLevel = geoLevels[params.geoLevel];
   if (!geoLevel) return params.includeNames ? addAreaNames(area.children) : area.children;

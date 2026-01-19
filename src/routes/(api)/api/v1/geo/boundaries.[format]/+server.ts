@@ -4,7 +4,7 @@ import { getParam } from "$lib/api/utils";
 import getBoundaries from "$lib/api/geo/getBoundaries";
 
 export const GET: RequestHandler = ({ url, params }) => {
-  const format = params.format || "geojson";
+  const format = params.format || null;
   const year = getParam(url, "year", "latest");
   const country = getParam(url, "country", "all");
   const geoLevel = getParam(url, "geoLevel", "ltla");

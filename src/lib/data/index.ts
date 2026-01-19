@@ -12,9 +12,9 @@ export const paths = Object.keys(files);
 
 // Read a JSON data file from disk or return cached version
 const cache = {};
-export default async function(key) {
+export default async function (key) {
   const path = paths.find(p => p.endsWith(`/${key}.json`));
-  if (!path) return {error: 404, message: "File not found"};
+  if (!path) return { error: 404, message: "File not found." };
 
   if (cache[key]) return cache[key];
 

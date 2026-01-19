@@ -6,7 +6,7 @@ export function extractAreaCodeFromSlug(slug: string): string | errorObject {
   const code = parts[0];
 
   if (isValidAreaCode(code)) return code;
-  return { error: 400, message: "Invalid GSS code" };
+  return { error: 404, message: "Area not found. Invalid GSS code." };
 }
 
 export const makeCanonicalSlug = (props: areaObject) => {

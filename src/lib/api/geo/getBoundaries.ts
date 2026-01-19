@@ -2,6 +2,8 @@ import { feature } from "topojson-client";
 import { topology } from "topojson-server";
 import { coordEach } from "@turf/meta";
 import { geoYearFilter, makeCountryFilter } from "./helpers/geoFilters";
+import { geoFormats } from "../config";
+import { isValidGeoFormat } from "$lib/util/validationHelpers";
 import readData from "$lib/data";
 
 const topojson = await readData("topo");
@@ -13,10 +15,15 @@ function roundCoords(coords) {
 }
 
 export default function getBoundaries(params = {}) {
+  if (!isValidGeoFormat(params.format))
+    return {
+      error: 404,
+      message: `Requested data format "${params.format}" not found. Only ${geoFormats.join(", ")} available.`
+    };
   if (!topojson.objects[params.geoLevel])
     return {
       error: 400,
-      message: `Geography level ${params.geoLevel} not available`,
+      message: `Geography level "${params.geoLevel}" not available.`,
     };
 
   const geojson = feature(topojson, topojson.objects[params.geoLevel]);
@@ -24,7 +31,7 @@ export default function getBoundaries(params = {}) {
     params.country !== "all" ? makeCountryFilter(params.country) : null;
   const featureFilter = countryFilter
     ? (f) =>
-        countryFilter(f.properties.areacd) && geoYearFilter(f.properties, year)
+      countryFilter(f.properties.areacd) && geoYearFilter(f.properties, year)
     : (f) => geoYearFilter(f.properties, year);
 
   const year = params.year === "latest" ? geoLatestYear : params.year;
