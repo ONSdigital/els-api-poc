@@ -38,6 +38,23 @@ declare global {
     extension: any
   };
   type jsonStatCollection = { version: "2.0", class: "collection", label: string, link: { item: jsonStatDataset[] } };
+  type spreadsheetTableCol = { index: number, key: string, heading: string, format?: string };
+  type spreadsheetTableRow = (string | number | null)[];
+  type spreadsheetTableData = {
+    sheetName: string,
+    tableName: string,
+    sheetIntroText: string[],
+    columns: spreadsheetTableCol[],
+    rows: spreadsheetTableRow[]
+  }
+  type spreadsheetData = {
+    creator: string,
+    created: Date,
+    coverSheetTitle: string,
+    coverSheetContents: string[],
+    notes: { name: string, text: string }[],
+    sheets: spreadsheetTableData[]
+  }
 
   // Data filter/format params
   type parsedParam = string | string[] | number | boolean | null;
