@@ -137,6 +137,17 @@ function indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name) {
     let emptyMeasures = measures.filter(d =>
         indicatorTable.array(d).every(v => v == null || Number.isNaN(v)));
 
+    // Identify non-standard dimension columns
+    let dimensions = tableSchema
+        .filter(d => d.type === 'dimension' && !['areacd', 'period'].includes(d.name))
+        .map(d => d.name);
+
+    // identify dimensions that only have a single value (and can therefore be skipped):
+    let uniDimensions = dimensions.filter(d => indicatorTable.dedupe(d).numRows() === 1);
+    console.log({ uniDimensions });
+
+    indicatorTable = indicatorTable.select(aq.not(uniDimensions));
+
     let indicatorTableLong = indicatorTable
         .select(aq.not(emptyMeasures))
         // pivot longer - measures to single column, values etc. to values - retain status:
@@ -181,7 +192,7 @@ function indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name) {
     let otherDimensions = tableSchema
         .filter(d => d.type === 'dimension')
         .map(d => d.name)
-        .filter(d => !['areacd', 'period'].includes(d))
+        .filter(d => !['areacd', 'period'].includes(d) && indicatorTable.columnNames().includes(d))
 
     // sort by each dimension (including the newly made measure, which is a dimension)
     // age is numbers as strings, so needs sorting properly
