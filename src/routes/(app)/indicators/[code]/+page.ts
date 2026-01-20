@@ -1,5 +1,6 @@
 import type { PageLoad } from './$types';
 import { resolve } from "$app/paths";
+import { error } from '@sveltejs/kit';
 import { geoLevels } from "$lib/config/geoLevels";
 import { countryLetterLookup } from '$lib/config/geoLookups';
 
@@ -20,47 +21,50 @@ export const load: PageLoad = async ({ params, url, fetch }) => {
   const path = resolve(
     `/api/v1/metadata/indicators/${params.code}?fullDims=true`
   );
-  const indicator = await (await fetch(path)).json();
-
   const periodPath = resolve(
     `/api/v1/metadata/indicators/${params.code}/dimensions/period`
   );
-  const periodsRaw = await (await fetch(periodPath)).json();
-  const periods = Object.keys(periodsRaw.category.index);
-
   const areasPath = resolve(
     `/api/v1/geo/list?indicator=${params.code}&year=all`
   );
-  const areas = (await (await fetch(areasPath)).json()).sort((a, b) =>
-    a.areanm.localeCompare(b.areanm)
-  );
-  const gLevels = indicator.geography.levels
-    .filter(id => id !== "uk")
-    .map((id) => ({
-      id,
-      ...geoLevels[id],
-    }));
 
-  const initialAreaCode = url.searchParams.get("initialArea") || null;
-  const initialArea = getInitialArea(indicator, areas, initialAreaCode);
-  console.log({ initialAreaCode, initialArea })
+  try {
+    const indicator = await (await fetch(path)).json();
+    const periodsRaw = await (await fetch(periodPath)).json();
+    const periods = Object.keys(periodsRaw.category.index);
+    const areas = (await (await fetch(areasPath)).json()).sort((a, b) =>
+      a.areanm.localeCompare(b.areanm)
+    );
+    const gLevels = indicator.geography.levels
+      .filter(id => id !== "uk")
+      .map((id) => ({
+        id,
+        ...geoLevels[id],
+      }));
 
-  return {
-    indicator,
-    areas,
-    initialArea,
-    geoLevels: gLevels,
-    periods,
+    const initialAreaCode = url.searchParams.get("initialArea") || null;
+    const initialArea = getInitialArea(indicator, areas, initialAreaCode);
+    console.log({ initialAreaCode, initialArea })
 
-    // Page metadata
-    title: `${indicator.label} - ONS`,
-    description: indicator.subtitle,
-    pageType: `indicator data page`,
-    breadcrumbLinks: [
-      { label: "Home", href: resolve("/") },
-      { label: "Explore local statistics", href: resolve("/") },
-      { label: "Local indicators", href: resolve("/indicators") },
-    ],
-    breadcrumbBackground: "#eaeaea",
-  };
+    return {
+      indicator,
+      areas,
+      initialArea,
+      geoLevels: gLevels,
+      periods,
+
+      // Page metadata
+      title: `${indicator.label} - ONS`,
+      description: indicator.subtitle,
+      pageType: `indicator data page`,
+      breadcrumbLinks: [
+        { label: "Home", href: resolve("/") },
+        { label: "Explore local statistics", href: resolve("/") },
+        { label: "Local indicators", href: resolve("/indicators") },
+      ],
+      breadcrumbBackground: "#eaeaea",
+    };
+  } catch {
+    error(404, "Selected data indicator not found.")
+  }
 };

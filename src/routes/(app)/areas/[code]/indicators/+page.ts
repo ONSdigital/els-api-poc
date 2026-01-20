@@ -77,7 +77,6 @@ export const load: PageLoad = async ({ parent, fetch }) => {
       breadcrumbBackground: "var(--ons-color-banner-bg)"
     };
   } catch (err) {
-    console.log(err);
-    error(404, { message: "Could not retrieve metadata" });
+    error(404, { message: "Area data not found." });
   }
 };
