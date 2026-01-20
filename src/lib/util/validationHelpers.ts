@@ -1,4 +1,4 @@
-import { dataFormats, geoFormats } from "$lib/api/config";
+import { dataFormats, geoFormats, chartTypes } from "$lib/api/config";
 
 export function isValidAreaCode(code: string): boolean {
     return !!code.match(/^[EKNSW]\d{8}$/);
@@ -47,4 +47,8 @@ export function isValidDataFormat(str: string): boolean {
 
 export function isValidGeoFormat(str: string): boolean {
     return geoFormats.includes(str);
+}
+
+export function isValidChartType(str: string): boolean {
+    return chartTypes.includes(str);
 }

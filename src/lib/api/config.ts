@@ -7,3 +7,4 @@ export const postcodeLookupBase =
 
 export const dataFormats = ["json", "xlsx", "csv", "csvw", "cols.json", "rows.json"];
 export const geoFormats = ["geojson", "topojson"];
+export const chartTypes = ["line", "bar", "map", "table"];

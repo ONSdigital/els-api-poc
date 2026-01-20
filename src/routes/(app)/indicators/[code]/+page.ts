@@ -44,7 +44,6 @@ export const load: PageLoad = async ({ params, url, fetch }) => {
 
     const initialAreaCode = url.searchParams.get("initialArea") || null;
     const initialArea = getInitialArea(indicator, areas, initialAreaCode);
-    console.log({ initialAreaCode, initialArea })
 
     return {
       indicator,
