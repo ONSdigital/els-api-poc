@@ -2,7 +2,7 @@
   import { scaleLinear, scaleBand } from "d3-scale";
   import { format } from "d3-format";
   import { parseChartData, contrastColor, labelPlacer } from "./chartHelpers";
-  import { ONSpalette, ONStextPalette } from "$lib/config";
+  import { ONSpalette, ONStextPalette, ONScolours } from "$lib/config";
   import { pluralise } from "@onsvisual/robo-utils";
   import { tick } from "svelte";
 
@@ -162,6 +162,16 @@
   />
 {/snippet}
 
+{#snippet line(d, i, color)}
+  {@const offsetX = labels?.[i]?.x ?? d.x}
+  <polyline
+    points="{d.x},{100 - d.y} {d.x},{(100 - d.y) / 3} {offsetX},{(100 - d.y) /
+      3} {offsetX},0"
+    stroke={color}
+    stroke-width="2"
+  />
+{/snippet}
+
 {#if width < widthThreshold}
   <ul class="top-labels">
     {#if !hoveredArea}
@@ -241,11 +251,13 @@
           {#each _selected as a, i (a[0][idKey])}
             {@const yPos = yLabelPositions?.[i] || yScale?.(a[0][idKey])?.y}
             {@const height = yScale?.(a[0][idKey])?.height}
+            {@const isLabelDodged =
+              yLabelPositions?.[i] !== yScale?.(a[0][idKey])?.y}
             <div
               class="margin-label-selected"
-              style="top: {yPos
-                ? yPos + height / 2
-                : 0}px;color:{ONStextPalette[i]}"
+              style="top: {yPos ? yPos + height / 2 : 0}px;right:{isLabelDodged
+                ? 'calc(100% + 16px)'
+                : 'calc(100% + 8px)'};color:{ONStextPalette[i]}"
             >
               {a[0][labelKey]}
             </div>
@@ -271,6 +283,37 @@
           {/if}
         </g>
       {/if}
+      {#if yLabelPositions?.[0] && !hovered}
+        <g>
+          {#each _selected as a, i (a[0][idKey])}
+            {@const yPosAdj = yLabelPositions[i]}
+            {@const yPosOrig = yScale(a[0][idKey]).y}
+            {@const height = yScale(a[0][idKey]).height}
+            {#if Math.abs(yPosAdj - yPosOrig) > 0.7}
+              <polyline
+                stroke={ONScolours.grey60}
+                fill="none"
+                points="-14,{yPosAdj + height / 2}
+                -6.5,{yPosAdj + height / 2}
+                -6.5,{yPosOrig + height / 2} 
+                -2,{yPosOrig + height / 2}"
+              >
+              </polyline>
+            {:else if Math.abs(yPosAdj - yPosOrig) > 0}
+              <polyline
+                stroke={ONScolours.grey60}
+                fill="none"
+                points="-14,{yPosAdj + height / 2}
+                -2,{yPosOrig + height / 2}"
+              >
+              </polyline>
+            {:else}{/if}
+          {/each}
+        </g>
+      {/if}
+      <!-- {#if width >= widthThreshold && !hoveredArea && selected.length >=2}
+        {@render line()}
+      {/if} -->
     </svg>
   </div>
 </div>
@@ -367,7 +410,7 @@
     max-width: 140px;
     text-align: right;
     line-height: 1.1;
-    right: calc(100% + 10px);
+    right: calc(100% + 8px);
   }
 
   .margin-label-selected {
@@ -378,7 +421,6 @@
     max-width: 140px;
     text-align: right;
     line-height: 0.95;
-    right: calc(100% + 10px);
     padding-top: 4px;
     padding-bottom: 4px;
   }
@@ -393,6 +435,6 @@
     max-width: 140px;
     text-align: right;
     line-height: 1.1;
-    right: calc(100% + 10px);
+    right: calc(100% + 8px);
   }
 </style>
