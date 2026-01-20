@@ -52,7 +52,7 @@
 
   <Card title="Local indicators" mode="featured">
     <p style:margin-bottom="28px">
-      Explore {data.summaryStats.indicatorCount} indicators, including
+      Explore {data.summaryStats.univariateCount} indicators, including
       <a
         href={resolve(`/indicators/gross-disposable-household-income-per-head`)}
         class="no-wrap">household income</a

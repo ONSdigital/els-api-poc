@@ -252,9 +252,10 @@
   </NavSection>
   <NavSection title="Other indicators">
     <p>
-      {data.indicator.label} is one of {data.summaryStats.indicatorCount} local indicators
-      on the <a href={resolve("/")}>Explore local statistics</a> service. See
-      the <a href={resolve("/indicators")}>full list of local indicators</a>.
+      {data.indicator.label} is one of {data.summaryStats.univariateCount} local
+      indicators on the <a href={resolve("/")}>Explore local statistics</a>
+      service. See the
+      <a href={resolve("/indicators")}>full list of local indicators</a>.
     </p>
   </NavSection>
 </NavSections>

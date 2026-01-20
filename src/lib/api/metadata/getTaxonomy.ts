@@ -49,7 +49,7 @@ function nestTaxonomy(taxonomy) {
 
 export default function getTaxonomy(params = {}) {
   const taxonomy = getIndicators({ ...params, minimalMetadata: true });
-  const meta = { count: taxonomy.length, total: summaryData.count };
+  const meta = { count: taxonomy.length, total: summaryData.datasetCount };
   const data = params.flat ? taxonomy : nestTaxonomy(taxonomy);
   return { meta, data };
 }

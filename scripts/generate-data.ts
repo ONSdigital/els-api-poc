@@ -379,7 +379,7 @@ console.log(`Wrote ${areasInDataOutput}.`)
 const summaryData = {
     lastUpdate: cube.updated,
     datasetCount: cube.link.item.length,
-    indicatorCount: cube.link.item.filter(ds => !ds.extension.isMultivariate).length,
+    univariateCount: cube.link.item.filter(ds => !ds.extension.isMultivariate).length,
     topics: Array.from(new Set(cube.link.item.map(ds => ds.extension.topic)))
         .map(t => ({ slug: t.replaceAll(" ", "-"), label: t[0].toUpperCase() + t.slice(1) })),
     years: Array.from(
