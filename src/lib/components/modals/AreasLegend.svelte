@@ -35,6 +35,9 @@
 </div>
 
 <style>
+    .areas-legend {
+        flex-grow: 1;
+    }
     .areas-legend > ul {
         list-style-type: none;
         padding: 0;

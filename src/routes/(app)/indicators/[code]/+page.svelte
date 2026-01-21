@@ -90,7 +90,7 @@
         selectedAreas={pageState.selectedAreas}
         selectedGeoGroup={pageState.selectedGeoLevel}
       />
-      <div>
+      <div class="legend-modals">
         <AreasModal mode="indicator" {data} bind:pageState />
         <OptionsModal {data} bind:pageState />
       </div>

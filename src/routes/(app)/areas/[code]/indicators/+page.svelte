@@ -143,7 +143,7 @@
         selectedAreas={[areaProps, ...pageState.selectedAreas]}
         selectedGeoGroup={pageState.selectedGeoGroup}
       />
-      <div>
+      <div class="legend-modals">
         <AreasModal mode="area" {data} bind:pageState />
         <OptionsModal {data} bind:pageState />
       </div>

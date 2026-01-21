@@ -11,7 +11,7 @@
 			const rect = el.getBoundingClientRect();
 			const isInDialog =
 				rect.top < event.clientY &&
-				event.clientY < rect.top + rect.height &&
+				// event.clientY < rect.top + rect.height &&
 				rect.left < event.clientX &&
 				event.clientX < rect.left + rect.width;
 			if (!isInDialog) {
@@ -44,7 +44,7 @@
     on:click={() => {
       dialog.close();
       onCancel();
-    }}>Cancel</Button
+    }}>Cancel your selection</Button
   >
 </dialog>
 

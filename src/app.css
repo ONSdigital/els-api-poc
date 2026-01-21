@@ -7,11 +7,36 @@
 	z-index: 5;
 	display: flex;
 	flex-direction: row;
+	flex-wrap: nowrap;
 	justify-content: space-between;
 	position: sticky;
 	top: 0;
 	background: var(--ons-color-page-light);
 	padding: 0.5em 0;
+}
+
+.legend-modals {
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	align-content: flex-start;
+	gap: .5rem;
+	flex-shrink: 1;
+	flex-grow: 0;
+	max-width: 50%;
+}
+
+.ons-btn+.ons-btn {
+	margin: 0;
+}
+
+.ons-btn {
+	margin: 0 .5rem .5rem 0;
+}
+
+.legend-modals>.ons-btn {
+	margin: 0;
 }
 
 @media (min-width: 740px) {
@@ -23,6 +48,10 @@
 	.wider-nav-sections .ons-col-8\@m {
 		width: 72%;
 		max-width: 72%;
+	}
+
+	.legend-modals {
+		flex-direction: row;
 	}
 }
 
