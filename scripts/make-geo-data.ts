@@ -6,7 +6,6 @@ const topoUrl =
   "https://raw.githubusercontent.com/ONSdigital/uk-topojson/refs/heads/main/output/topo.json";
 const metaUrl =
   "https://raw.githubusercontent.com/ONSdigital/geo-scripts/refs/heads/main/input/lookups/lookup.csv";
-const dataAreasPath = "./src/lib/data/areas-in-data.json";
 const outputDir = "./src/lib";
 
 const geoCodes = new Set(
@@ -54,12 +53,6 @@ for (const row of rows) {
   lookup[row.areacd] = obj;
 }
 
-// Add additional non-standard areas in data to lookup
-const dataAreas = JSON.parse(readFileSync(dataAreasPath));
-for (const row of dataAreas) {
-  if (!lookup[row.areacd]) lookup[row.areacd] = row;
-}
-
 const geoPath = `${outputDir}/data/geo-metadata.json`;
 writeFileSync(geoPath, JSON.stringify(lookup));
 console.log(`Wrote ${geoPath}`);
@@ -98,8 +91,3 @@ for (let i = 0; i < listRaw.length; i++) {
 const listPath = `${outputDir}/data/areas-list.json`;
 writeFileSync(listPath, JSON.stringify(list));
 console.log(`Wrote ${listPath}`);
-
-const latestYear = Math.max(...rows.map((row) => row.start));
-const latestYearPath = `${outputDir}/data/geo-latest-year.json`;
-writeFileSync(latestYearPath, JSON.stringify(latestYear));
-console.log(`Wrote ${latestYearPath}`);

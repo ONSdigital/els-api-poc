@@ -5,9 +5,10 @@ import { geoYearFilter, makeCountryFilter } from "./helpers/geoFilters";
 import { geoFormats } from "../config";
 import { isValidGeoFormat } from "$lib/util/validationHelpers";
 import readData from "$lib/data";
+import summaryData from "$lib/data/json-stat-summary.json";
 
 const topojson = await readData("topo");
-const geoLatestYear = await readData("geo-latest-year");
+const geoLatestYear = summaryData.geoYears[summaryData.geoYears.length - 1];
 
 function roundCoords(coords) {
   coords[0] = Math.round(coords[0] * 1e4) / 1e4;

@@ -2,10 +2,11 @@ import { makeGeoLevelFilter, geoYearFilter } from "./helpers/geoFilters";
 import groupAreasByLevel from "./helpers/groupAreasByLevel";
 import { geoLevelsAllLookup } from "$lib/config/geoLevels";
 import readData from "$lib/data";
+import summaryData from "$lib/data/json-stat-summary.json";
 
 const areasList = await readData("areas-list");
-const geoLatestYear = await readData("geo-latest-year");
 const geoMetadata = await readData("geo-metadata");
+const geoLatestYear = summaryData.geoYears[summaryData.geoYears.length - 1];
 
 function makeAreaRow(json, i) {
   const row = { areacd: json.areacd[i], areanm: json.areanm[i] };

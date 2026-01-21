@@ -1,10 +1,10 @@
 import readData from "$lib/data";
 
-const geoLookup = await readData("geo-metadata");
+const areaNameLookup = await readData("areas-in-data");
 
 // Makes a code => name lookup from an array of GSS codes
 function makeAreaLookup(codes: string[]) {
-  return Object.fromEntries(codes.map((cd) => [cd, geoLookup[cd]?.areanm]));
+  return Object.fromEntries(codes.map((cd) => [cd, areaNameLookup[cd] || null]));
 }
 
 // Map an array of dimension values to their corresponding labels
@@ -147,7 +147,7 @@ function makeColFill(
     pushMeasures(data, item, cube);
   };
   const pushName = (data: jsonDataCols, item: dataItem) =>
-    data.areanm.push(geoLookup[item[1]]?.areanm || null);
+    data.areanm.push(areaNameLookup[item[1]] || null);
   const pushStatus = (data: jsonDataCols, item: dataItem, cube: jsonStatDataset) =>
     data.status.push(cube.status[item[0] * measuresCount] || null);
 
@@ -200,7 +200,7 @@ export function itemsToCols(
       if (item[1] !== currentArea?.areacd) {
         const newArea = {
           areacd: item[1],
-          ...(includeNames && { areanm: geoLookup[item[1]]?.areanm }),
+          ...(includeNames && { areanm: areaNameLookup[item[1]] || null }),
           values: {}
         };
         for (const col of cols) {

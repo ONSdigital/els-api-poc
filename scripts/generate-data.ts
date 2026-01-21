@@ -1,5 +1,5 @@
 import * as aq from 'arquero';
-import fs, { writeFileSync } from 'fs';
+import fs, { readFileSync, writeFileSync } from 'fs';
 import { descending } from 'd3-array';
 import { loadCsvWithoutBom, readJsonSync, readCsvAutoType } from './io.ts';
 import {
@@ -367,10 +367,17 @@ cube.link.item = cube.link.item.map(item => {
 writeFileSync(metadataOutput, JSON.stringify(cube));
 console.log(`Wrote ${metadataOutput}.`)
 
+// Create name lookup for areas that exist in the data
 const areasInData = areas[0].concat(areas.slice(1))
     .dedupe("areacd")
     .orderby("areacd")
     .objects();
+// Import primary area metadata lookup as source of truth for areas that exist in both places
+const geoMetadataInput = "./src/lib/data/geo-metadata.json";
+const geoMetadata = JSON.parse(readFileSync(geoMetadataInput));
+// Create the code -> name lookup and write it to disk
+const areasInDataLookup = {};
+for (const area of areasInData) areasInDataLookup[area.areacd] = geoMetadata?.[area.areacd]?.areanm || area.areanm;
 const areasInDataOutput = "./src/lib/data/areas-in-data.json";
 writeFileSync(areasInDataOutput, JSON.stringify(areasInData));
 console.log(`Wrote ${areasInDataOutput}.`)
