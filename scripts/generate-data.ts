@@ -379,7 +379,7 @@ const geoMetadata = JSON.parse(readFileSync(geoMetadataInput));
 const areasInDataLookup = {};
 for (const area of areasInData) areasInDataLookup[area.areacd] = geoMetadata?.[area.areacd]?.areanm || area.areanm;
 const areasInDataOutput = "./src/lib/data/areas-in-data.json";
-writeFileSync(areasInDataOutput, JSON.stringify(areasInData));
+writeFileSync(areasInDataOutput, JSON.stringify(areasInDataLookup));
 console.log(`Wrote ${areasInDataOutput}.`)
 
 // Generate JSON file with summary stats/data
