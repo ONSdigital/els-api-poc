@@ -5,13 +5,28 @@
 
   let id = $derived(title.toLowerCase().replaceAll(" ", "-"));
   let dialog = $state();
+  
+  function clickOutsideToCancel(el) {
+    el.addEventListener('click', function (event) {
+			const rect = el.getBoundingClientRect();
+			const isInDialog =
+				rect.top < event.clientY &&
+				event.clientY < rect.top + rect.height &&
+				rect.left < event.clientX &&
+				event.clientX < rect.left + rect.width;
+			if (!isInDialog) {
+				el.close();
+        onCancel();
+			}
+		});
+  }
 </script>
 
 <Button variant="secondary" {icon} small on:click={() => dialog.showModal()}
   >{label}</Button
 >
 
-<dialog aria-labelledby={id} bind:this={dialog}>
+<dialog aria-labelledby={id} bind:this={dialog} use:clickOutsideToCancel>
   <h1 {id} tabindex="-1">{title}</h1>
   <div class="modal-contents">
     {@render children()}
