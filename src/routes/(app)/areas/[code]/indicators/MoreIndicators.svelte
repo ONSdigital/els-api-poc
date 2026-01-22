@@ -4,11 +4,11 @@
 	let { id, hidden = $bindable(true), buttonText = "Expand", onToggle = () => null, children } = $props();
 	
 	function makeObserver(node, callback) {
-		function observerFn(entries) {
-	    for (const entry of entries) callback(entry);
-	  }
-	  const observer = new MutationObserver(observerFn);
-	  observer.observe(node, { attributes: true });
+	    function observerFn(entries) {
+            for (const entry of entries) callback(entry);
+        }
+        const observer = new MutationObserver(observerFn);
+        observer.observe(node, { attributes: true });
 	}
 </script>
 
