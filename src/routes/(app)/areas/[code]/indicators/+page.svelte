@@ -19,6 +19,7 @@
   import AreasLegend from "$lib/components/modals/AreasLegend.svelte";
   import BigNumber from "./BigNumber.svelte";
   import IndicatorRow from "./IndicatorRow.svelte";
+  import MoreIndicators from "./MoreIndicators.svelte";
   import SimilarAreas from "./SimilarAreas.svelte";
 
   const maxIndicators = 3;
@@ -42,8 +43,8 @@
     showConfidenceIntervals: false,
   });
 
-  let expandedTopics = $state(
-    Object.fromEntries(data.taxonomy.map((t) => [t?.slug, false])),
+  let hiddenTopics = $state(
+    Object.fromEntries(data.taxonomy.map((t) => [t?.slug, true])),
   );
 
   let hovered = $state();
@@ -51,6 +52,17 @@
   function handleSelect(area) {
     const url = `/areas/${makeCanonicalSlug(area)}/indicators`;
     goto(resolve(url));
+  }
+
+  function flattenTopic(topic) {
+    const flat = {label: topic.label, slug: topic.slug, count: topic.count, items: []};
+    for (const child of topic.children) {
+      if (child.children) {
+        flat.items.push({heading: child.label, headingSlug: child.slug, ...child.children[0]});
+        for (const grandchild of child.children.slice(1)) flat.items.push(grandchild);
+      } else flat.items.push(child);
+    }
+    return flat;
   }
 </script>
 
@@ -107,33 +119,22 @@
 </Grid>
 
 {#snippet indicator(item, topic)}
-  {#if item.children}
-    {@const hidden = !(
-      expandedTopics[topic.slug] || item.children[0].index < maxIndicators
-    )}
-    <h4 {hidden}>
-      {item.label}
-    </h4>
-    {#each item.children as child}
-      {@render indicator(child, topic)}
-    {/each}
-  {:else}
-    {@const hidden = !(
-      expandedTopics[topic.slug] || item.index < maxIndicators
-    )}
-    <IndicatorRow
-      indicator={item.slug}
-      metadata={data.metadata[item.slug]}
-      timeRange={pageState.selectedPeriodRange}
-      selected={[
-        areaProps.areacd,
-        ...pageState.selectedAreas.map((a) => a.areacd),
-      ]}
-      geoGroup={pageState.selectedGeoGroup}
-      {hidden}
-      bind:hovered
-    />
-  {/if}
+  {@const hidden = 
+    hiddenTopics[topic.slug] && item.index >= maxIndicators
+  }
+  {#if item.heading}<h4 id={item.headingSlug}>{item.heading}</h4>{/if}
+  <IndicatorRow
+    indicator={item.slug}
+    metadata={data.metadata[item.slug]}
+    timeRange={pageState.selectedPeriodRange}
+    selected={[
+      areaProps.areacd,
+      ...pageState.selectedAreas.map((a) => a.areacd),
+    ]}
+    geoGroup={pageState.selectedGeoGroup}
+    {hidden}
+    bind:hovered
+  />
 {/snippet}
 
 <NavSections cls="wider-nav-sections">
@@ -149,26 +150,24 @@
       </div>
     </div>
     <NavSection title="Topics" />
-    {#each data.taxonomy as topic}
-      <NavSection title={topic.label} subsection>
-        {#each topic.children as child}
-          {@render indicator(child, topic)}
+    {#each data.taxonomy.map(t => flattenTopic(t)) as topic}
+      <NavSection title={topic.label} id={topic.id} subsection>
+        {#each topic.items.slice(0, maxIndicators) as item}
+          {@render indicator(item, topic)}
         {/each}
+        {#if topic.count > maxIndicators}
+          <MoreIndicators
+            id="{topic.id}-more"
+            bind:hidden={hiddenTopics[topic.slug]}
+            buttonText="Show {hiddenTopics[topic.slug]
+                ? `${topic.count - maxIndicators} more`
+                : "fewer"} {topic?.label.toLowerCase()} indicators">
+            {#each topic.items.slice(maxIndicators) as item}
+              {@render indicator(item, topic)}
+            {/each}
+          </MoreIndicators>
+        {/if}
       </NavSection>
-      {#if topic.count > maxIndicators}
-        <Button
-          variant="secondary"
-          icon="carret"
-          iconRotation={expandedTopics[topic.slug] ? 180 : 0}
-          small
-          on:click={() =>
-            (expandedTopics[topic.slug] = !expandedTopics[topic.slug])}
-          >Show {expandedTopics[topic.slug]
-            ? "fewer"
-            : `${topic.count - maxIndicators} more`}
-          {topic?.label.toLowerCase()} indicators</Button
-        >
-      {/if}
       <div style:margin-bottom="2rem"></div>
     {/each}
   </div>

@@ -74,7 +74,7 @@
 {/snippet}
 
 <Observe bind:visible rootMargin={200}>
-  <div id={indicator} class="indicator-row" {hidden}>
+  <div id={indicator} class="indicator-row">
     <details class="indicator-header">
       <summary class="indicator-title"
         ><strong>{metadata.label}</strong>{metadata.subText
