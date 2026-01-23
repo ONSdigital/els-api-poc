@@ -106,6 +106,40 @@ export function parseBeeswarmData(
   return { array, keyed, median: med, mad, domain };
 }
 
+export function parsePyramidData(data: jsonDataCols, idKey: string, groupKey: string = "sex", categoryKey: string = "age") {
+  if (!data || data?.message) return null;
+
+  const keyed: { [key: string]: jsonDataRow[] } = {};
+  const array: jsonDataRow[] = [];
+  const cols = Object.keys(data);
+  const valueCols = cols.slice(3).filter(col => ![groupKey, categoryKey].includes(col));
+
+  const groupDomain = new Set();
+  const categoryDomain = new Set();
+  let maxValue = 0;
+
+  for (let i = 0; i < data[cols[0]].length; i++) {
+    const key = data[idKey][i];
+    if (!keyed[key]) keyed[key] = [];
+    const row = {};
+    for (const col of cols) row[col] = data[col][i];
+    for (const col of valueCols) {
+      if (data[col][i] > maxValue) maxValue = data[col][i];
+    }
+    keyed[key].push(row);
+    array.push(row);
+    groupDomain.add(data[groupKey][i]);
+    categoryDomain.add(data[categoryKey][i]);
+  }
+  return {
+    array,
+    keyed,
+    valueDomain: [0, maxValue],
+    groupDomain: Array.from(groupDomain).sort((a, b) => a.localeCompare(b, "en-GB")),
+    categoryDomain: Array.from(categoryDomain)
+  };
+}
+
 export const contrastColor = (color) => {
   if (!color || typeof color !== "string") return "black";
   const rgb = parse(color).rgb;

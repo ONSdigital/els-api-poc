@@ -17,10 +17,10 @@ export const load: PageLoad = async ({ parent, fetch }) => {
   );
 
   const taxonomyPath = resolve(
-    `/api/v1/metadata/taxonomy?hasGeo=${code}&excludeMultivariate=true`
+    `/api/v1/metadata/taxonomy?hasGeo=${code}`
   );
   const metadataPath = resolve(
-    `/api/v1/metadata/indicators?hasGeo=${code}&excludeMultivariate=true&asLookup=true`
+    `/api/v1/metadata/indicators?hasGeo=${code}&asLookup=true`
   );
   const areasPath = resolve(`/api/v1/geo/list?year=latest`);
   const relatedPath = resolve(`/api/v1/geo/related/${code}`);
