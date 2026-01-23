@@ -2,8 +2,14 @@
   import { scaleLinear, scaleTime } from "d3-scale";
   import { nice } from "d3-array";
   import { format } from "d3-format";
-  import { parseChartData, contrastColor, labelPlacer } from "./chartHelpers";
-  import { markerPaths, ONSpalette, ONStextPalette } from "$lib/config";
+  import { parseChartData, contrastColor } from "./chartHelpers";
+  import { labelPlacer, marginLabels } from "./labelHelpers";
+  import {
+    markerPaths,
+    ONSpalette,
+    ONStextPalette,
+    ONScolours,
+  } from "$lib/config";
   import { pluralise } from "@onsvisual/robo-utils";
   import { tick } from "svelte";
 
@@ -22,6 +28,8 @@
 
   const height = 500;
   const widthThreshold = 550;
+  const pointRadius = 5;
+  const dodgedLabelGap = 16;
 
   let width = $state(680);
   let leftMargin = 30;
@@ -79,39 +87,10 @@
   }
   let xTicks = $derived(makeXTicks(xScale, _data));
 
-  let yLabelPositions = $state();
-  async function marginLabels(el) {
-    await tick();
-    const divs = el.getElementsByTagName("div");
-    if (divs.length < 2) {
-      yLabelPositions = null;
-      console.log("fewer than 2 areas selected");
-      return;
-    }
-    let ys = _selected.map((s) => yScale(s[s.length - 1][yKey]));
-    let ysIndexes = ys.map((y, i) => ({ y, i })).sort((a, b) => a.y - b.y);
-    console.log({ ys });
-    console.log({ ysIndexes });
+  let labelLookup = $state();
 
-    const cumulativeHeights = Array(_selected.length).fill(0);
-    for (let j = 1; j < _selected.length; j++) {
-      const current = ysIndexes[j].i;
-      const previous = ysIndexes[j - 1].i;
-      cumulativeHeights[current] =
-        cumulativeHeights[previous] +
-        (divs[previous].clientHeight + divs[current].clientHeight) / 2;
-    }
-    console.log({ cumulativeHeights });
-    // subtract offsets
-    let zs = ysIndexes.map(({ y, i }) => y - cumulativeHeights[i]);
-    // run isotonic regression function to overwrite yLabelPositions
-    let adj = labelPlacer(zs);
-    console.log({ adj });
-    // add offsets back on to the regressed values
-    yLabelPositions = Array(_selected.length).fill(0);
-    ysIndexes.forEach(({ i }, j) => {
-      yLabelPositions[i] = adj[j] + cumulativeHeights[i];
-    });
+  async function runMarginLabels(el, selected) {
+    labelLookup = await marginLabels(el, _selected, yScale, yKey, 1, 6);
   }
 
   let maxValueLatestDate = $derived(
@@ -123,8 +102,7 @@
   );
 
   $inspect({ maxValueLatestDate });
-  // $inspect(_data.dateDomain[1], Object.values(_data.keyed).flat());
-  $inspect({ yLabelPositions });
+  $inspect({ labelLookup });
 </script>
 
 {#snippet line(arr, width = 1, color = "#b0b0b0", opacity = 1, id = "")}
@@ -219,15 +197,21 @@
             {pluralise(geoLevel.label)}
           </div>
         {/if}
-        <div class="margin-labels-selected" use:marginLabels>
+        <div class="margin-labels-selected" use:runMarginLabels>
           {#if width >= widthThreshold && !hoveredArea}
             {#each _selected as arr, i}
               {@const yPos =
-                yLabelPositions?.[i] ?? yScale(arr[arr.length - 1][yKey])}
+                labelLookup?.[i].y ?? yScale(arr[arr.length - 1][yKey])}
+              {@const isLabelDodged =
+                labelLookup?.[i].y !== yScale(arr[arr.length - 1][yKey])}
               <div
                 class="margin-label-selected"
-                style="left: {xScale(_data.dateDomain[1]) +
-                  10}px;top: {yPos}px;color:{ONStextPalette[i]}"
+                style="left: {isLabelDodged
+                  ? xScale(_data.dateDomain[1]) + dodgedLabelGap
+                  : xScale(_data.dateDomain[1]) +
+                    dodgedLabelGap / 2}px;top: {yPos}px;color:{ONStextPalette[
+                  i
+                ]}"
               >
                 {arr?.[0][labelKey]}
               </div>
@@ -259,7 +243,7 @@
               <circle
                 cx={xScale(c.date)}
                 cy={yScale(c[yKey])}
-                r="5"
+                r={pointRadius}
                 fill={ONSpalette[sIndex]}
                 stroke="white"
               ></circle>
@@ -280,6 +264,40 @@
             {/each}
           {/if}
         </g>
+        {#if labelLookup?.[0] && !hovered}
+          <g>
+            {#each _selected as arr, i}
+              {@const yPosAdj = labelLookup?.[i].y}
+              {@const yPosOrig = yScale(arr[arr.length - 1][yKey])}
+              {@const elbowX =
+                xScale(_data.dateDomain[1]) +
+                pointRadius +
+                6 +
+                labelLookup[i].elbow}
+              <!-- {@const labelHeight = labelHeights?.[i]} -->
+              {#if Math.abs(yPosAdj - yPosOrig) > 0.7}
+                <polyline
+                  stroke={ONScolours.grey60}
+                  fill="none"
+                  points="
+                {xScale(_data.dateDomain[1]) + 2 + 14 + pointRadius},{yPosAdj}
+                {elbowX},{yPosAdj}
+                {elbowX},{yPosOrig} 
+                {xScale(_data.dateDomain[1]) + 2 + pointRadius},{yPosOrig}"
+                >
+                </polyline>
+              {:else if Math.abs(yPosAdj - yPosOrig) > 0}
+                <polyline
+                  stroke={ONScolours.grey60}
+                  fill="none"
+                  points="-14,{yPosAdj}
+                -2,{yPosOrig}"
+                >
+                </polyline>
+              {:else}{/if}
+            {/each}
+          </g>
+        {/if}
       </svg>
     {/if}
   </div>
@@ -399,7 +417,6 @@
     color: orange;
     max-width: 140px;
     line-height: 1.1;
-    /* right: calc(100% + 10px); */
   }
 
   .margin-label-selected {
@@ -409,7 +426,6 @@
     font-weight: bold;
     max-width: 140px;
     line-height: 0.95;
-    /* right: calc(100% + 10px); */
     padding-top: 4px;
     padding-bottom: 4px;
   }

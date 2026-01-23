@@ -1,7 +1,8 @@
 <script lang="ts">
   import { scaleLinear, scaleBand } from "d3-scale";
   import { format } from "d3-format";
-  import { parseChartData, contrastColor, labelPlacer } from "./chartHelpers";
+  import { parseChartData, contrastColor } from "./chartHelpers";
+  import { labelPlacer } from "./labelHelpers";
   import { ONSpalette, ONStextPalette, ONScolours } from "$lib/config";
   import { pluralise } from "@onsvisual/robo-utils";
   import { tick } from "svelte";
@@ -95,7 +96,8 @@
   }
 
   let yScale = $derived(sorted ? makeYScale(sorted, selected) : null);
-
+  let ys = _selected.map((s) => yScale(s[0][idKey]).y);
+  let ysIndexes = ys.map((y, i) => ({ y, i })).sort((a, b) => a.y - b.y);
   let yLabelPositions = $state();
   async function marginLabels(el) {
     await tick();
@@ -128,6 +130,55 @@
     });
   }
 
+  // Group together proximate selected labels (after dodging)
+  // to allow for elbow offsetting
+
+  let elbowOffset = $derived.by(() => {
+    if (!_selected.length || !yLabelPositions) return [];
+
+    const labelProximityThreshold = 2;
+    const leaderLineGroups = [];
+
+    ysIndexes.forEach((arr, i) => {
+      const y = yLabelPositions[i];
+      let group = leaderLineGroups.find(
+        (g) => Math.abs(g.y - y) < labelProximityThreshold
+      );
+      if (!group) {
+        group = { y, items: [] };
+        leaderLineGroups.push(group);
+      }
+      group.items.push(i);
+    });
+
+    console.log({ leaderLineGroups });
+
+    const elbowRoom = 6;
+
+    const elbowOffsets = Array(_selected.length).fill(0);
+
+    leaderLineGroups.forEach((group) => {
+      const indices = group.items;
+
+      const middleElbowOffset = indices.length > 2 ? elbowRoom : elbowRoom / 2;
+
+      const elbowGap =
+        indices.length > 2
+          ? middleElbowOffset / Math.floor((indices.length - 1) / 2)
+          : 0;
+
+      indices.forEach((labelIndex, groupIndex) => {
+        const offset =
+          middleElbowOffset -
+          Math.floor(Math.abs(groupIndex - (indices.length - 1) / 2)) *
+            elbowGap;
+
+        elbowOffsets[labelIndex] = offset;
+      });
+    });
+    return elbowOffsets;
+  });
+
   let xScale = $derived(
     _data
       ? scaleLinear()
@@ -141,6 +192,7 @@
   );
 
   $inspect({ yLabelPositions });
+  $inspect({ elbowOffset });
 </script>
 
 {#snippet bar(b, fill = "#b0b0b0", opacity = 1, id = "", i)}
@@ -289,13 +341,14 @@
             {@const yPosAdj = yLabelPositions[i]}
             {@const yPosOrig = yScale(a[0][idKey]).y}
             {@const height = yScale(a[0][idKey]).height}
-            {#if Math.abs(yPosAdj - yPosOrig) > 0.7}
+            {@const elbowX = xScale(0) - 6 - elbowOffset[i]}
+            {#if Math.abs(yPosAdj - yPosOrig) > 0.75}
               <polyline
                 stroke={ONScolours.grey60}
                 fill="none"
                 points="-14,{yPosAdj + height / 2}
-                -6.5,{yPosAdj + height / 2}
-                -6.5,{yPosOrig + height / 2} 
+                {elbowX},{yPosAdj + height / 2}
+                {elbowX},{yPosOrig + height / 2} 
                 -2,{yPosOrig + height / 2}"
               >
               </polyline>
@@ -303,7 +356,7 @@
               <polyline
                 stroke={ONScolours.grey60}
                 fill="none"
-                points="-14,{yPosAdj + height / 2}
+                points="-14,{yPosOrig + height / 2}
                 -2,{yPosOrig + height / 2}"
               >
               </polyline>
@@ -311,9 +364,6 @@
           {/each}
         </g>
       {/if}
-      <!-- {#if width >= widthThreshold && !hoveredArea && selected.length >=2}
-        {@render line()}
-      {/if} -->
     </svg>
   </div>
 </div>

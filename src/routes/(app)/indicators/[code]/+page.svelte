@@ -41,7 +41,7 @@
   let pageState = $state({
     selectedAreas: data.initialArea ? [data.initialArea] : [],
     selectedGeoLevel: data.geoLevels.find(
-      (g) => g.id === data.indicator.geography.initialLevel,
+      (g) => g.id === data.indicator.geography.initialLevel
     ),
     selectedPeriodRange: [
       data.periods[0],
@@ -60,8 +60,8 @@
       key: data.indicator.source.length === 1 ? "Data source" : "Data sources",
       value: arrayJoin(
         data.indicator.source.map(
-          (s) => `<a href="${s.href}" target="_blank">${s.name}</a>`,
-        ),
+          (s) => `<a href="${s.href}" target="_blank">${s.name}</a>`
+        )
       ),
     },
     {
@@ -104,7 +104,7 @@
           <p class="subtitle">
             {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(
               0,
-              4,
+              4
             )}
             to {pageState.selectedPeriodRange[1].slice(0, 4)}
           </p>
@@ -140,7 +140,7 @@
             <p class="subtitle">
               {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(
                 0,
-                4,
+                4
               )}
               to {pageState.selectedPeriodRange[1].slice(0, 4)}
             </p>
@@ -164,7 +164,7 @@
         <p class="subtitle">
           {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(
             0,
-            4,
+            4
           )}
           to {pageState.selectedPeriodRange[1].slice(0, 4)}
         </p>
@@ -185,7 +185,7 @@
         <p class="subtitle">
           {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(
             0,
-            4,
+            4
           )}
           to {pageState.selectedPeriodRange[1].slice(0, 4)}
         </p>
@@ -212,26 +212,26 @@
     <p>
       You can download this dataset in an <a
         href={resolve(
-          `/api/v1/data.xlsx?indicator=${data.indicator.slug}&time=all`,
+          `/api/v1/data.xlsx?indicator=${data.indicator.slug}&time=all`
         )}
         download={`${data.indicator.slug}.xlsx`}>XLSX</a
       >,
       <a
         href={resolve(
-          `/api/v1/data.csv?indicator=${data.indicator.slug}&time=all`,
+          `/api/v1/data.csv?indicator=${data.indicator.slug}&time=all`
         )}
         download={`${data.indicator.slug}.csv`}>CSV</a
       >,
       <a
         href={resolve(
-          `/api/v1/data.csvw?indicator=${data.indicator.slug}&time=all`,
+          `/api/v1/data.csvw?indicator=${data.indicator.slug}&time=all`
         )}
         download={`${data.indicator.slug}.csv-metadata.json`}>CSVW</a
       >
       or
       <a
         href={resolve(
-          `/api/v1/data.json?indicator=${data.indicator.slug}&time=all`,
+          `/api/v1/data.json?indicator=${data.indicator.slug}&time=all`
         )}
         download={`${data.indicator.slug}.json`}>JSON-Stat</a
       >
