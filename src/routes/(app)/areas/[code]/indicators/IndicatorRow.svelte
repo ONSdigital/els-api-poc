@@ -20,8 +20,8 @@
 	let formatValue = $derived(makeValueFormatter(metadata.decimalPlaces));
 	let formatPeriod = $derived(makePeriodFormatter(metadata.periodFormat));
 
+	let chartData = {}; // cached chart data
 	let loadedDataUrl = $state({});
-	let chartData = $state({});
 	let chartMode = $state("simple");
 
 	async function fetchData(
@@ -117,6 +117,15 @@
 			</div>
 		</details>
 		{#if indicator === "population-by-age-and-sex"}
+			{@const dataArgs = [
+				visible && !hidden,
+				indicator,
+				timeRange,
+				selected,
+				geoGroup.geoLevel,
+				geoGroup.geoExtent,
+				geoGroup.geoCluster
+			].slice(0, chartMode === "simple" ? 4 : undefined)}
 			<div class="indicator-pyramid">
 				<ButtonGroup
 					legend="Select areas to show on chart"
@@ -126,16 +135,16 @@
 					<ButtonGroupItem value="simple" label="Show selected areas" />
 					<ButtonGroupItem value="advanced" label="Show all areas" />
 				</ButtonGroup>
-				{#await fetchData("pyramid", visible && !hidden, indicator, timeRange, selected, geoGroup.geoLevel, geoGroup.geoExtent, geoGroup.geoCluster) then chartData}
-					<Pyramid data={chartData} mode={chartMode} {selected} bind:hovered />
+				{#await fetchData("pyramid", ...dataArgs) then data}
+					<Pyramid {data} {selected} bind:hovered />
 				{/await}
 			</div>
 		{:else}
 			<div class="indicator-charts">
 				<div class="indicator-beeswarm">
-					{#await fetchData("beeswarm", visible && !hidden, indicator, timeRange, selected, geoGroup.geoLevel, geoGroup.geoExtent, geoGroup.geoCluster) then chartData}
+					{#await fetchData("beeswarm", visible && !hidden, indicator, timeRange, selected, geoGroup.geoLevel, geoGroup.geoExtent, geoGroup.geoCluster) then data}
 						<Beeswarm
-							data={chartData}
+							{data}
 							{formatPeriod}
 							{formatValue}
 							valuePrefix={metadata.prefix}
@@ -146,9 +155,9 @@
 					{/await}
 				</div>
 				<div class="indicator-sparkline">
-					{#await fetchData("sparkline", visible && !hidden, indicator, timeRange, selected) then chartData}
+					{#await fetchData("sparkline", visible && !hidden, indicator, timeRange, selected) then data}
 						<Sparkline
-							data={chartData}
+							{data}
 							{formatPeriod}
 							{formatValue}
 							valuePrefix={metadata.prefix}
@@ -171,7 +180,7 @@
 		height: 150px;
 	}
 	.indicator-pyramid {
-		min-height: 300px;
+		min-height: 412px;
 	}
 	.indicator-beeswarm {
 		flex-grow: 1;

@@ -134,6 +134,7 @@ export function parsePyramidData(data: jsonDataCols, idKey: string, groupKey: st
   return {
     array,
     keyed,
+    keysLength: Object.keys(keyed).length,
     valueDomain: [0, maxValue],
     groupDomain: Array.from(groupDomain).sort((a, b) => a.localeCompare(b, "en-GB")),
     categoryDomain: Array.from(categoryDomain)

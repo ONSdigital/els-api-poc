@@ -11,8 +11,7 @@
 		idKey = "areacd",
 		xKey = "value",
 		yKey = "age",
-		zKey = "sex",
-		mode = "simple"
+		zKey = "sex"
 	} = $props();
 
 	const barHeight = 18;
@@ -20,20 +19,25 @@
 	const gutter = 70;
 	const bottomMargin = 20;
 
-	const _data = parsePyramidData(data, idKey);
+	let _data = $derived(parsePyramidData(data, idKey));
+	let mode = $derived(_data?.keysLength === selected.length ? "simple" : "advanced");
 
 	let w = $state(400);
 	let hoveredPos = $state();
 
 	let xRange = $derived([0, (w - gutter) / 2]);
-	let xScale = $derived(scaleLinear().domain(_data.valueDomain).range(xRange));
-	let yRange = $derived([barHeight * _data.categoryDomain.length, 0]);
+	let xDomain = $derived(
+		!_data?.valueDomain || _data?.valueDomain?.[1] < 5 ? [0, 5] : _data?.valueDomain
+	);
+	let xScale = $derived(scaleLinear().domain(xDomain).range(xRange));
+	let yRange = $derived([barHeight * (_data?.categoryDomain?.length || 18), 0]);
 	let yScale = $derived(
 		scaleBand()
-			.domain(_data.categoryDomain)
+			.domain(_data?.categoryDomain || ["Female", "Male"])
 			.range(yRange)
 			.paddingInner(barGap / barHeight)
 	);
+	$inspect({ xDomain: _data?.valueDomain, dataLength: _data?.array?.length });
 
 	function sumBySex(area, sex) {
 		const areaData = _data.keyed[area] || [];
@@ -75,6 +79,13 @@
 			? xRange[1] - xScale(d[xKey])
 			: xScale(d[xKey]) + xRange[1] + gutter}
 	<line
+		class="chart-mark-hoverable"
+		x1={xPos}
+		y1={yScale(d[yKey])}
+		x2={xPos}
+		y2={yScale(d[yKey]) + yScale.bandwidth()}
+	/>
+	<line
 		class="chart-mark"
 		x1={xPos}
 		y1={yScale(d[yKey])}
@@ -84,8 +95,8 @@
 {/snippet}
 
 {#snippet polyline(points, color = "grey", width = 2)}
-	<polyline class="chart-line" stroke="white" stroke-width={width + 2} {points} />
-	<polyline class="chart-line" stroke={color} stroke-width={width} {points} />
+	<polyline class="chart-polyline" stroke="white" stroke-width={width + 2} {points} />
+	<polyline class="chart-polyline" stroke={color} stroke-width={width} {points} />
 {/snippet}
 
 {#snippet tick(t, sex)}
@@ -98,7 +109,7 @@
 
 <div class="chart-container" bind:clientWidth={w}>
 	<svg class="chart" viewBox="0 0 {w} {yRange[0] + bottomMargin}">
-		{#if xRange && xScale}
+		{#if _data}
 			<g class="chart-y-axis">
 				{#each _data.categoryDomain as yTick}
 					<text class="chart-y-tick" x={w / 2} y={yScale(yTick) + yScale.bandwidth() / 2} dy={2}>
@@ -120,6 +131,12 @@
 					y2={yRange[0]}
 				/>
 			</g>
+			<g class="chart-x-axis">
+				{#each xScale.ticks(3) as t}
+					{@render tick(t, "female")}
+					{@render tick(t, "male")}
+				{/each}
+			</g>
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			{#if mode === "simple"}
 				<g class="chart-marks">
@@ -135,13 +152,11 @@
 						hoveredPos = null;
 					}}
 				>
-					{#each Object.entries(_data.keyed) as areaData}
+					{#each Object.entries(_data.keyed) as areaData (areaData[0])}
 						<g
-							class:chart-hovered={areaData[0] === hovered}
 							onmouseenter={(e) => {
 								hovered = areaData[0];
 								hoveredPos = { x: e.offsetX, y: e.offsetY };
-								e.target.parentNode.appendChild(e.target);
 							}}
 						>
 							{#each areaData[1] as d}
@@ -151,12 +166,8 @@
 					{/each}
 				</g>
 			{/if}
-			{#if _data.keyed[hovered]}
-				<g class="chart-hovered">
-					{@render polyline(makeLine(_data.keyed[hovered], xScale, "female"), "orange", 3)}
-					{@render polyline(makeLine(_data.keyed[hovered], xScale, "male"), "orange", 3)}
-				</g>
-			{:else if selected.length}
+
+			{#if selected.length}
 				{@const maxIndex = selected.length - 1}
 				<g class="chart-selected">
 					{#each [...selected].reverse() as area, i}
@@ -173,17 +184,16 @@
 					{/each}
 				</g>
 			{/if}
-
-			<g class="chart-x-axis">
-				{#each xScale.ticks(3) as t}
-					{@render tick(t, "female")}
-					{@render tick(t, "male")}
-				{/each}
-			</g>
+			{#if _data.keyed[hovered]}
+				<g class="chart-hovered">
+					{@render polyline(makeLine(_data.keyed[hovered], xScale, "female"), "orange", 3)}
+					{@render polyline(makeLine(_data.keyed[hovered], xScale, "male"), "orange", 3)}
+				</g>
+			{/if}
 		{/if}
 	</svg>
 	<div class="chart-annotations">
-		{#each _data.groupDomain as group, i}
+		{#each _data?.groupDomain || [] as group, i}
 			<div
 				class="chart-legend"
 				style:text-align={i === 0 ? "left" : "right"}
@@ -209,7 +219,7 @@
 				style:top="{hoveredPos.y}px"
 				style:transform="translate({hoveredPos.x < w / 2 ? -100 : 0}%,-100%)"
 			>
-				{_data.keyed?.[hovered]?.[0]?.areanm}
+				{_data?.keyed?.[hovered]?.[0]?.areanm}
 			</div>
 		{/if}
 	</div>
@@ -261,6 +271,10 @@
 		stroke: lightgrey;
 		stroke-width: 1px;
 	}
+	.chart-mark-hoverable {
+		stroke: rgba(255, 255, 255, 0);
+		stroke-width: 6px;
+	}
 	.chart-y-tick {
 		text-anchor: middle;
 		alignment-baseline: middle;
@@ -268,11 +282,12 @@
 	}
 
 	.chart-hovered,
-	.chart-selected {
+	.chart-selected,
+	.chart-area-label {
 		pointer-events: none;
 	}
 
-	.chart-line {
+	.chart-polyline {
 		fill: none;
 	}
 

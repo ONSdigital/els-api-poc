@@ -125,7 +125,6 @@ export function makeDataUrl(
   if (geoExtent) chunks.push({ key: "geoExtent", value: geoExtent });
   if (geoCluster) chunks.push({ key: "geoCluster", value: geoCluster });
   if (otherDims) chunks.push(...Object.keys(otherDims).map(key => ({ key: `dimension_${key}`, value: [otherDims[key]].flat().join(",") })));
-  console.log({ chunks });
 
   const time = Array.isArray(timeRange) ? timeRange.map(p => String(p).slice(0, 10)).join(",") : String(timeRange).slice(0, 10);
   if (time) chunks.push({ key: "time", value: time });
