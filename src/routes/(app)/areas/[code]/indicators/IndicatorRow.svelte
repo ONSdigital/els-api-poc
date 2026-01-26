@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from "$app/paths";
-	import { Observe, Em } from "@onsvisual/svelte-components";
+	import { Observe, Em, ButtonGroup, ButtonGroupItem } from "@onsvisual/svelte-components";
 	import { makeDataUrl, makeValueFormatter, makePeriodFormatter } from "$lib/utils";
 	import Beeswarm from "$lib/components/charts/Beeswarm.svelte";
 	import Sparkline from "$lib/components/charts/Sparkline.svelte";
@@ -22,6 +22,7 @@
 
 	let loadedDataUrl = $state({});
 	let chartData = $state({});
+	let chartMode = $state("simple");
 
 	async function fetchData(
 		chartType,
@@ -117,8 +118,16 @@
 		</details>
 		{#if indicator === "population-by-age-and-sex"}
 			<div class="indicator-pyramid">
+				<ButtonGroup
+					legend="Select areas to show on chart"
+					visuallyHideLegend
+					bind:value={chartMode}
+				>
+					<ButtonGroupItem value="simple" label="Show selected areas" />
+					<ButtonGroupItem value="advanced" label="Show all areas" />
+				</ButtonGroup>
 				{#await fetchData("pyramid", visible && !hidden, indicator, timeRange, selected, geoGroup.geoLevel, geoGroup.geoExtent, geoGroup.geoCluster) then chartData}
-					<Pyramid data={chartData} {selected} bind:hovered />
+					<Pyramid data={chartData} mode={chartMode} {selected} bind:hovered />
 				{/await}
 			</div>
 		{:else}

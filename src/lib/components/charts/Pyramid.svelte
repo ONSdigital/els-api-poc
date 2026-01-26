@@ -11,7 +11,8 @@
 		idKey = "areacd",
 		xKey = "value",
 		yKey = "age",
-		zKey = "sex"
+		zKey = "sex",
+		mode = "simple"
 	} = $props();
 
 	const barHeight = 18;
@@ -31,7 +32,7 @@
 		scaleBand()
 			.domain(_data.categoryDomain)
 			.range(yRange)
-			.paddingInner(barGap / (barHeight + barGap))
+			.paddingInner(barGap / barHeight)
 	);
 
 	function sumBySex(area, sex) {
@@ -55,24 +56,31 @@
 	}
 </script>
 
+{#snippet bar(d)}
+	{@const xPos =
+		d[zKey] === _data.groupDomain[0] ? xRange[1] - xScale(d[xKey]) : xRange[1] + gutter}
+	<rect
+		class="chart-rect"
+		x={xPos}
+		y={yScale(d[yKey])}
+		width={xScale(d[xKey])}
+		height={yScale.bandwidth()}
+		fill={ONSpalette[0]}
+	/>
+{/snippet}
+
 {#snippet mark(d)}
-	{#if d[zKey] === _data.groupDomain[0]}
-		<line
-			class="chart-mark"
-			x1={xRange[1] - xScale(d[xKey])}
-			y1={yScale(d[yKey])}
-			x2={xRange[1] - xScale(d[xKey])}
-			y2={yScale(d[yKey]) + yScale.bandwidth()}
-		/>
-	{:else}
-		<line
-			class="chart-mark"
-			x1={xScale(d[xKey]) + xRange[1] + gutter}
-			y1={yScale(d[yKey])}
-			x2={xScale(d[xKey]) + xRange[1] + gutter}
-			y2={yScale(d[yKey]) + yScale.bandwidth()}
-		/>
-	{/if}
+	{@const xPos =
+		d[zKey] === _data.groupDomain[0]
+			? xRange[1] - xScale(d[xKey])
+			: xScale(d[xKey]) + xRange[1] + gutter}
+	<line
+		class="chart-mark"
+		x1={xPos}
+		y1={yScale(d[yKey])}
+		x2={xPos}
+		y2={yScale(d[yKey]) + yScale.bandwidth()}
+	/>
 {/snippet}
 
 {#snippet polyline(points, color = "grey", width = 2)}
@@ -113,28 +121,36 @@
 				/>
 			</g>
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<g
-				class="chart-background"
-				onmouseleave={() => {
-					hovered = null;
-					hoveredPos = null;
-				}}
-			>
-				{#each Object.entries(_data.keyed) as areaData}
-					<g
-						class:chart-hovered={areaData[0] === hovered}
-						onmouseenter={(e) => {
-							hovered = areaData[0];
-							hoveredPos = { x: e.offsetX, y: e.offsetY };
-							e.target.parentNode.appendChild(e.target);
-						}}
-					>
-						{#each areaData[1] as d}
-							{@render mark(d)}
-						{/each}
-					</g>
-				{/each}
-			</g>
+			{#if mode === "simple"}
+				<g class="chart-marks">
+					{#each _data.keyed[selected[0]] as d}
+						{@render bar(d)}
+					{/each}
+				</g>
+			{:else}
+				<g
+					class="chart-marks"
+					onmouseleave={() => {
+						hovered = null;
+						hoveredPos = null;
+					}}
+				>
+					{#each Object.entries(_data.keyed) as areaData}
+						<g
+							class:chart-hovered={areaData[0] === hovered}
+							onmouseenter={(e) => {
+								hovered = areaData[0];
+								hoveredPos = { x: e.offsetX, y: e.offsetY };
+								e.target.parentNode.appendChild(e.target);
+							}}
+						>
+							{#each areaData[1] as d}
+								{@render mark(d)}
+							{/each}
+						</g>
+					{/each}
+				</g>
+			{/if}
 			{#if _data.keyed[hovered]}
 				<g class="chart-hovered">
 					{@render polyline(makeLine(_data.keyed[hovered], xScale, "female"), "orange", 3)}
@@ -174,7 +190,7 @@
 				style:left={i === 0 ? 0 : null}
 				style:right={i === 1 ? 0 : null}
 			>
-				{group}
+				<span>{group}</span>
 				{#if hovered || selected.length}
 					{@const color = hovered ? "orange" : ONSpalette[0]}
 					<br /><span
@@ -219,6 +235,7 @@
 	.chart-legend {
 		position: absolute;
 		top: 0;
+		margin-top: -8px;
 	}
 	.chart-label {
 		display: block;
@@ -235,6 +252,10 @@
 	.chart-baseline {
 		stroke: #b3b3b3;
 		stroke-width: 1.5px;
+	}
+	.chart-rect {
+		stroke: none;
+		opacity: 0.3;
 	}
 	.chart-mark {
 		stroke: lightgrey;
