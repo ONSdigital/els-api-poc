@@ -136,7 +136,7 @@
 					<ButtonGroupItem value="advanced" label="Show all areas" />
 				</ButtonGroup>
 				{#await fetchData("pyramid", ...dataArgs) then data}
-					<Pyramid {data} {selected} bind:hovered />
+					<Pyramid {data} {formatValue} {selected} bind:hovered />
 				{/await}
 			</div>
 		{:else}

@@ -8,6 +8,7 @@
 		data,
 		selected = [],
 		hovered = $bindable(),
+		formatValue = (d) => d,
 		idKey = "areacd",
 		xKey = "value",
 		yKey = "age",
@@ -204,12 +205,14 @@
 				<span>{group}</span>
 				{#if hovered || selected.length}
 					{@const color = hovered ? "orange" : ONSpalette[0]}
-					<br /><span
-						class="chart-label"
-						style:background={color}
-						style:color={contrastColor(color)}
-						>{Math.round(sumBySex(hovered || selected[0], group) * 10) / 10}%</span
-					>
+					{@const sum = sumBySex(hovered || selected[0], group)}
+					{#if sum}
+						<br /><span
+							class="chart-label"
+							style:background={color}
+							style:color={contrastColor(color)}>{formatValue(sum)}%</span
+						>
+					{/if}
 				{/if}
 			</div>
 		{/each}
