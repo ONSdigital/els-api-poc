@@ -20,7 +20,7 @@
 	const bottomMargin = 20;
 
 	let _data = $derived(parsePyramidData(data, idKey));
-	let mode = $derived(_data?.keysLength === selected.length ? "simple" : "advanced");
+	let mode = $derived(_data?.keysLength <= selected.length ? "simple" : "advanced");
 
 	let w = $state(400);
 	let hoveredPos = $state();
@@ -171,20 +171,22 @@
 				{@const maxIndex = selected.length - 1}
 				<g class="chart-selected">
 					{#each [...selected].reverse() as area, i}
-						{@render polyline(
-							makeLine(_data.keyed[area], xScale, "female"),
-							ONSpalette[maxIndex - i],
-							i === maxIndex ? 3 : 2
-						)}
-						{@render polyline(
-							makeLine(_data.keyed[area], xScale, "male"),
-							ONSpalette[maxIndex - i],
-							i === maxIndex ? 3 : 2
-						)}
+						{#if _data?.keyed?.[area]}
+							{@render polyline(
+								makeLine(_data.keyed[area], xScale, "female"),
+								ONSpalette[maxIndex - i],
+								i === maxIndex ? 3 : 2
+							)}
+							{@render polyline(
+								makeLine(_data.keyed[area], xScale, "male"),
+								ONSpalette[maxIndex - i],
+								i === maxIndex ? 3 : 2
+							)}
+						{/if}
 					{/each}
 				</g>
 			{/if}
-			{#if _data.keyed[hovered]}
+			{#if _data?.keyed?.[hovered]}
 				<g class="chart-hovered">
 					{@render polyline(makeLine(_data.keyed[hovered], xScale, "female"), "orange", 3)}
 					{@render polyline(makeLine(_data.keyed[hovered], xScale, "male"), "orange", 3)}
