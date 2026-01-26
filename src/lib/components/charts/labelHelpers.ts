@@ -19,7 +19,13 @@ export function labelPlacer(zs) {
   return xs;
 }
 
-export async function marginLabels(el, _selected, yScale, yKey, labelProximityThreshold = 1, elbowRoom = 6) {
+export async function marginLabels(el, params={}) {
+    const selected = params.selected || []
+    const yScaleVar = params.yScaleVar || null
+    const yKey = params.yKey || "value"
+    const labelProximityThreshold = params.labelProximityThreshold || 50 
+    const elbowRoom = params.elbowRoom || 6
+
     await tick();
 
     const divs = el.getElementsByTagName("div");
@@ -34,34 +40,33 @@ export async function marginLabels(el, _selected, yScale, yKey, labelProximityTh
     }
 
     //////////////// Calculate dodged y positions for labels ///////////////
-    let ys = _selected.map((s) => yScale(s[s.length - 1][yKey]));
-    let ysIndexes = ys.map((y, i) => ({ y, i })).sort((a, b) => a.y - b.y);
+    let sortedYs = selected
+        .map((s) => yScaleVar(s[s.length - 1][yKey]))
+        .map((y, i) => ({ y, i })) //retain index of original selection order prior to sorting
+        .sort((a, b) => a.y - b.y);
 
-    const cumulativeHeights = Array(_selected.length).fill(0);
-    for (let j = 1; j < _selected.length; j++) {
-      const current = ysIndexes[j].i;
-      const previous = ysIndexes[j - 1].i;
+    const cumulativeHeights = Array(selected.length).fill(0);
+    for (let j = 1; j < selected.length; j++) {
+      const current = sortedYs[j].i;
+      const previous = sortedYs[j - 1].i;
       cumulativeHeights[current] =
         cumulativeHeights[previous] +
         (divs[previous].clientHeight + divs[current].clientHeight) / 2;
     }
     // subtract offsets
-    let zs = ysIndexes.map(({ y, i }) => y - cumulativeHeights[i]);
+    let baselinedYs = sortedYs.map(({ y, i }) => y - cumulativeHeights[i]);
     // run isotonic regression function to overwrite yLabelPositions
-    let adj = labelPlacer(zs);
+    let regressedYs = labelPlacer(baselinedYs);
     // add offsets back on to the regressed values
-    const yLabelPositions = Array(_selected.length).fill(0);
-    ysIndexes.forEach(({ i }, j) => {
-      yLabelPositions[i] = adj[j] + cumulativeHeights[i];
-    });
+    const yLabelPositions = sortedYs.map(({ i }, j) => regressedYs[j] + cumulativeHeights[i] );
 
     //////////////// Calculate elbow position for leader lines ///////////////
     
     // Group together proximate selected labels (after dodging)
     // to allow for elbow offsetting
     const leaderLineGroups = [];
-
-    ysIndexes.forEach((arr, i) => {
+    console.log({sortedYs})
+    sortedYs.forEach((arr, i) => {
       const y = yLabelPositions[i];
       let group = leaderLineGroups.find(
         (g) => Math.abs(g.y - y) < labelProximityThreshold
@@ -71,9 +76,10 @@ export async function marginLabels(el, _selected, yScale, yKey, labelProximityTh
         leaderLineGroups.push(group);
       }
       group.items.push(i);
+      group.y = y;
     });
 
-    const elbowOffsets = Array(_selected.length).fill(0);
+    const elbowOffsets = Array(selected.length).fill(0);
     console.log({leaderLineGroups})
 
     leaderLineGroups.forEach((group) => {
@@ -96,6 +102,8 @@ export async function marginLabels(el, _selected, yScale, yKey, labelProximityTh
       });
     });
 
-    const lookup = _selected.map((_, i) => ({ y: yLabelPositions[i], elbow: elbowOffsets[i] })); 
+    // const lookup = selected.map((_, i) => ({ y: yLabelPositions[i], elbow: elbowOffsets[i] })); 
+    const lookup = Array(selected.length).fill(null)
+    sortedYs.forEach((d, i) => lookup[d.i] = { y: yLabelPositions[i], elbow: elbowOffsets[i] })
     return lookup;
   }

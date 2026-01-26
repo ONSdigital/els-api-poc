@@ -2,7 +2,7 @@
   import { scaleLinear, scaleBand } from "d3-scale";
   import { format } from "d3-format";
   import { parseChartData, contrastColor } from "./chartHelpers";
-  import { labelPlacer } from "./labelHelpers";
+  import { labelPlacer, marginLabels } from "./labelHelpers";
   import { ONSpalette, ONStextPalette, ONScolours } from "$lib/config";
   import { pluralise } from "@onsvisual/robo-utils";
   import { tick } from "svelte";
@@ -96,88 +96,13 @@
   }
 
   let yScale = $derived(sorted ? makeYScale(sorted, selected) : null);
-  let ys = _selected.map((s) => yScale(s[0][idKey]).y);
-  let ysIndexes = ys.map((y, i) => ({ y, i })).sort((a, b) => a.y - b.y);
-  let yLabelPositions = $state();
-  async function marginLabels(el) {
-    await tick();
-    const divs = el.getElementsByTagName("div");
-    if (divs.length < 2) {
-      yLabelPositions = null;
-      return;
-    }
-    let ys = _selected.map((s) => yScale(s[0][idKey]).y);
-    let ysIndexes = ys.map((y, i) => ({ y, i })).sort((a, b) => a.y - b.y);
-    console.log({ ysIndexes });
 
-    const cumulativeHeights = Array(_selected.length).fill(0);
-    for (let j = 1; j < _selected.length; j++) {
-      const current = ysIndexes[j].i;
-      const previous = ysIndexes[j - 1].i;
-      cumulativeHeights[current] =
-        cumulativeHeights[previous] +
-        (divs[previous].clientHeight + divs[current].clientHeight) / 2;
-    }
-    console.log({ cumulativeHeights });
-    // subtract offsets
-    let zs = ysIndexes.map(({ y, i }) => y - cumulativeHeights[i]);
-    // run isotonic regression function to overwrite yLabelPositions
-    let adj = labelPlacer(zs);
-    // add offsets back on to the regressed values
-    yLabelPositions = Array(_selected.length).fill(0);
-    ysIndexes.forEach(({ i }, j) => {
-      yLabelPositions[i] = adj[j] + cumulativeHeights[i];
-    });
+  let labelLookup = $state();
+  async function makeLabelLookup(el, params) {
+    labelLookup = await marginLabels(el, params);
   }
 
-  // Group together proximate selected labels (after dodging)
-  // to allow for elbow offsetting
-
-  let elbowOffset = $derived.by(() => {
-    if (!_selected.length || !yLabelPositions) return [];
-
-    const labelProximityThreshold = 2;
-    const leaderLineGroups = [];
-
-    ysIndexes.forEach((arr, i) => {
-      const y = yLabelPositions[i];
-      let group = leaderLineGroups.find(
-        (g) => Math.abs(g.y - y) < labelProximityThreshold
-      );
-      if (!group) {
-        group = { y, items: [] };
-        leaderLineGroups.push(group);
-      }
-      group.items.push(i);
-    });
-
-    console.log({ leaderLineGroups });
-
-    const elbowRoom = 6;
-
-    const elbowOffsets = Array(_selected.length).fill(0);
-
-    leaderLineGroups.forEach((group) => {
-      const indices = group.items;
-
-      const middleElbowOffset = indices.length > 2 ? elbowRoom : elbowRoom / 2;
-
-      const elbowGap =
-        indices.length > 2
-          ? middleElbowOffset / Math.floor((indices.length - 1) / 2)
-          : 0;
-
-      indices.forEach((labelIndex, groupIndex) => {
-        const offset =
-          middleElbowOffset -
-          Math.floor(Math.abs(groupIndex - (indices.length - 1) / 2)) *
-            elbowGap;
-
-        elbowOffsets[labelIndex] = offset;
-      });
-    });
-    return elbowOffsets;
-  });
+  const yScaleVar = (d) => yScale(d).y;
 
   let xScale = $derived(
     _data
@@ -190,9 +115,6 @@
   let hoveredIndex = $derived(
     hoveredArea ? sorted.findIndex((d) => d[idKey] === hoveredArea) : -1
   );
-
-  $inspect({ yLabelPositions });
-  $inspect({ elbowOffset });
 </script>
 
 {#snippet bar(b, fill = "#b0b0b0", opacity = 1, id = "", i)}
@@ -298,13 +220,16 @@
           </div>
         {/each}
       {/if}
-      <div class="margin-labels-selected" use:marginLabels>
+      <div
+        class="margin-labels-selected"
+        use:makeLabelLookup={{ selected: _selected, yScaleVar, yKey: idKey }}
+      >
         {#if width >= widthThreshold && !hoveredArea}
           {#each _selected as a, i (a[0][idKey])}
-            {@const yPos = yLabelPositions?.[i] || yScale?.(a[0][idKey])?.y}
+            {@const yPos = labelLookup?.[i]?.y || yScale?.(a[0][idKey])?.y}
             {@const height = yScale?.(a[0][idKey])?.height}
             {@const isLabelDodged =
-              yLabelPositions?.[i] !== yScale?.(a[0][idKey])?.y}
+              labelLookup?.[i]?.y !== yScale?.(a[0][idKey])?.y}
             <div
               class="margin-label-selected"
               style="top: {yPos ? yPos + height / 2 : 0}px;right:{isLabelDodged
@@ -335,13 +260,13 @@
           {/if}
         </g>
       {/if}
-      {#if yLabelPositions?.[0] && !hovered}
+      {#if labelLookup?.[0] && !hovered}
         <g>
           {#each _selected as a, i (a[0][idKey])}
-            {@const yPosAdj = yLabelPositions[i]}
+            {@const yPosAdj = labelLookup?.[i]?.y}
             {@const yPosOrig = yScale(a[0][idKey]).y}
             {@const height = yScale(a[0][idKey]).height}
-            {@const elbowX = xScale(0) - 6 - elbowOffset[i]}
+            {@const elbowX = xScale(0) - 6 - labelLookup?.[i]?.elbow}
             {#if Math.abs(yPosAdj - yPosOrig) > 0.75}
               <polyline
                 stroke={ONScolours.grey60}

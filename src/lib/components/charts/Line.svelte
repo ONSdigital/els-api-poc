@@ -88,10 +88,10 @@
   let xTicks = $derived(makeXTicks(xScale, _data));
 
   let labelLookup = $state();
-
-  async function runMarginLabels(el, selected) {
-    labelLookup = await marginLabels(el, _selected, yScale, yKey, 1, 6);
+  async function makeLabelLookup(el, params) {
+    labelLookup = await marginLabels(el, params);
   }
+  const yScaleVar = (d) => yScale(d);
 
   let maxValueLatestDate = $derived(
     _data
@@ -100,9 +100,6 @@
         )
       : 0
   );
-
-  $inspect({ maxValueLatestDate });
-  $inspect({ labelLookup });
 </script>
 
 {#snippet line(arr, width = 1, color = "#b0b0b0", opacity = 1, id = "")}
@@ -197,13 +194,16 @@
             {pluralise(geoLevel.label)}
           </div>
         {/if}
-        <div class="margin-labels-selected" use:runMarginLabels>
+        <div
+          class="margin-labels-selected"
+          use:makeLabelLookup={{ selected: _selected, yScaleVar, yKey }}
+        >
           {#if width >= widthThreshold && !hoveredArea}
             {#each _selected as arr, i}
               {@const yPos =
-                labelLookup?.[i].y ?? yScale(arr[arr.length - 1][yKey])}
+                labelLookup?.[i]?.y ?? yScale(arr[arr.length - 1][yKey])}
               {@const isLabelDodged =
-                labelLookup?.[i].y !== yScale(arr[arr.length - 1][yKey])}
+                labelLookup?.[i]?.y !== yScale(arr[arr.length - 1][yKey])}
               <div
                 class="margin-label-selected"
                 style="left: {isLabelDodged
