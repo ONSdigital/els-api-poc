@@ -9,7 +9,7 @@ const execAsync = promisify(exec);
 const PROJECT_ROOT = process.cwd();
 
 // Define paths relative to project root
-const TARGET_DIR = path.join(PROJECT_ROOT, 'scripts/insights/raw/family-ess-main');
+const TARGET_DIR = path.join(PROJECT_ROOT, 'scripts/raw-data');
 const REPO_URL = 'https://github.com/ONSdigital/explore-local-statistics-data.git';
 const TEMP_DIR = path.join(PROJECT_ROOT, 'temp-clone');
 
@@ -66,7 +66,7 @@ async function main(): Promise<void> {
     try {
         console.log(`Project root: ${PROJECT_ROOT}`);
         console.log(`Target directory: ${TARGET_DIR}`);
-        
+
         // Remove existing contents
         await removeDirectory(TARGET_DIR);
 

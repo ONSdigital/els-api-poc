@@ -13,13 +13,9 @@ import { table } from 'console';
 import { parse } from 'path';
 
 // config.ts
-const RAW_DIR = 'scripts/insights/raw';
-const CONFIG_DIR = `${RAW_DIR}/config-data`;
+const RAW_DATA_DIR = 'scripts/raw-data';
+const CONFIG_DIR = `scripts/config`;
 const MANIFEST = `${CONFIG_DIR}/manifest_metadata.csv` // equivalent to FILE_NAMES_LOG
-// const EXCLUDED_INDICATORS_PATH = `${CONFIG_DIR}/excluded-indicators.json`;
-const CSV_PREPROCESS_DIR = `${RAW_DIR}/family-ess-main`
-const EXISTING_PERIODS_FILENAME = `${CONFIG_DIR}/periods/unique-periods-lookup.csv`;
-
 
 export default async function main() {
     // ensure correct version of node
@@ -33,13 +29,6 @@ export default async function main() {
 
 }
 
-function parsePeriod(str, isQuarterly = false) {
-    str = str.replace("T00:00:00", "");
-    if (str.match(/\d{4}-\d{4}/)) str = str.replace("-", "/");
-    const parts = str.split("/").map(p => p.slice(0, 10));
-    if (isQuarterly && parts.length === 1) parts.push("P3M");
-    return parts.join("/");
-}
 function getIndex(row, id, size, dimension, reverseLookup) {
     const coords = [];
     for (const key of id) {
@@ -162,35 +151,6 @@ function indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name) {
             { 'value-temp': 'value' }
         )
 
-    // join unqiue periods lookup to indicator data (ensure indicator period is a string)
-    let indicatorTableLong_periods = indicatorTableLong
-        .derive({ period: aq.escape(d => String(d.period)) })
-        .join_left(periods, ['period'])
-
-    // check for annoying quarterly data decimal years...
-    const isQuarterly = indicatorTableLong_periods
-        .array('xDomainNumb')
-        .some(n => n % 1 !== 0)
-    console.log('Indicator contains quarterly data represented by decimals:', isQuarterly)
-
-    ///////////// if needed later?? ///////////////////
-    // // create table of all period labels for the indicator
-    // const unique_periods_for_each_indicator = indicatorTableLong_periods
-    //     .derive({
-    //         indicator: aq.escape(() => indicator),
-    //         xDomainNumb: d => parsePeriod(d.period, isQuarterly)
-    //     })
-    //     .dedupe('period', 'xDomainNumb', 'label', 'labelShort', 'labelVeryShort')
-    //     .select('indicator','period', 'xDomainNumb', 'label', 'labelShort', 'labelVeryShort')
-
-    // replace the period values with period run through the parsePeriod() function, remove xDomainNumb etc.
-    indicatorTableLong_periods = indicatorTableLong_periods
-        .derive({
-            period: aq.escape(d => parsePeriod(d.period, isQuarterly))
-        })
-        .select(aq.not('xDomainNumb', 'label', 'labelShort', 'labelVeryShort'))
-    // indicatorTableLong_periods.print()
-
     // identify columns of type dimension using tableschema metadata
     // and exclude areacd and period as we want to ensure those are specified first
     let otherDimensions = tableSchema
@@ -201,17 +161,17 @@ function indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name) {
     // sort by each dimension (including the newly made measure, which is a dimension)
     // age is numbers as strings, so needs sorting properly
 
-    indicatorTableLong_periods = indicatorTableLong_periods
+    indicatorTableLong = indicatorTableLong
         .orderby(...['areacd', 'period',
             ...otherDimensions,
             'measure'].map(col => aq.collate(col, 'en-GB', { numeric: true })))
 
     // get unique values of all columns in order they appear
     const columnValues = Object.fromEntries(
-        indicatorTableLong_periods.columnNames()
+        indicatorTableLong.columnNames()
             .map(c => [
                 c,
-                [...new Set(indicatorTableLong_periods.array(c))]
+                [...new Set(indicatorTableLong.array(c))]
             ])
     )
 
@@ -241,7 +201,7 @@ function indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name) {
     const value = new Array(valuesLength).fill(null);
     const status = {}
 
-    for (const row of indicatorTableLong_periods) {
+    for (const row of indicatorTableLong) {
         const i = getIndex(row, id, size, dimension, dimensionReverseLookups);
         value[i] = row.value;
         if (row.status) { status[i] = row.status };
@@ -249,12 +209,12 @@ function indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name) {
 
     return { ...dataset, id, size, role, dimension, value, status };
 }
-function processFile(file, excluded_indicators) {
+function processFile(file) {
 
-    const data_file = file.replace(`${CSV_PREPROCESS_DIR}`, '')
-    if (!fs.existsSync(`${CSV_PREPROCESS_DIR}${data_file}`)) console.log(`Cannot find data file ${data_file}`);
-    let indicator_data = loadCsvWithoutBom(`${CSV_PREPROCESS_DIR}${data_file}`)
-    const meta_data = JSON.parse(fs.readFileSync(`${CSV_PREPROCESS_DIR}${data_file.replace('.csv', '.csv-metadata.json')}`))
+    const data_file = file.replace(`${RAW_DATA_DIR}`, '')
+    if (!fs.existsSync(`${RAW_DATA_DIR}${data_file}`)) console.log(`Cannot find data file ${data_file}`);
+    let indicator_data = loadCsvWithoutBom(`${RAW_DATA_DIR}${data_file}`)
+    const meta_data = JSON.parse(fs.readFileSync(`${RAW_DATA_DIR}${data_file.replace('.csv', '.csv-metadata.json')}`))
     const tableSchema = meta_data.tables[0].tableSchema.columns
     const dataset_name = data_file.split("/")[1]
 
@@ -286,29 +246,28 @@ function processFile(file, excluded_indicators) {
         .select(aq.not(suppressedCols))
         .rename(varNames)
 
-    //  filter out unwanted indicators - checks whether the excluded indicator matches the full indicator name
-    //  entire files are excluded at an earlier point when creating file_paths
-    if (excluded_indicators.length) {
-        indicator_data = indicator_data.filter(aq.escape(
-            row =>
-                !excluded_indicators.includes(row.indicator))
-        );
+    // split table into one table per indicator
+    let indicatorTables = [...new Set(indicator_data.array('indicator'))]
+        .map(ind => ({
+            key: ind, data: indicator_data.filter(aq.escape(
+                d => d.indicator === ind))
+        }));
+    const indicatorsList = indicatorTables.map(ind => ind.key);
+    console.log('There are ', indicatorsList.length, 'indicator(s) present in data file: ', indicatorsList)
+
+    // Filter out indicators that are not present in the manifest
+    const includedIndicators = manifest_metadata.filter(aq.escape(d => d.dataset === dataset_name)).array("code");
+    if (indicatorsList.length !== includedIndicators.length) {
+        const skippedIndicators = indicatorsList.filter(key => !includedIndicators.includes(key));
+        console.log('Skipping ', skippedIndicators.length, 'indicator(s) not present in manifest: ', skippedIndicators);
+        indicatorTables = indicatorTables.filter(table => includedIndicators.includes(table.key));
     }
 
-    // split table into one table per indicator
-    const indicatorTables =
-        Object.fromEntries(
-            [...new Set(indicator_data.array('indicator'))]
-                .map(ind => [ind, indicator_data.filter(aq.escape(
-                    d => d.indicator === ind))])
-        );
-
-    console.log('There are ', Object.keys(indicatorTables).length, 'indicator(s) present in data file: ', Object.keys(indicatorTables))
-    // define new array
+    // define new array for formatted datasets
     const indicatorDatasets = []
     // loop through each indicator (when more than one)
-    for (const [indicator, t] of Object.entries(indicatorTables)) {
-        const cube = indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name);
+    for (const table of indicatorTables) {
+        const cube = indicatorToCube(table.key, table.data, meta_data, tableSchema, dataset_name);
         if (cube) indicatorDatasets.push(cube);
     }
 
@@ -320,10 +279,6 @@ const manifest_metadata = loadCsvWithoutBom(MANIFEST);
 const indicator_slugs = manifest_metadata
     // .filter((f) => f.include)
     .array('slug');
-const excluded_indicators = [];
-// const excluded_indicators = manifest_metadata
-//     .filter((f) => !f.include)
-//     .array('code');
 
 // Throw error if new indicator files have been downloaded and need to be added to the manifest
 // await abortIfNewFilesExist(manifest_metadata, CSV_PREPROCESS_DIR)
@@ -336,13 +291,7 @@ var file_paths = [
             // .filter((f) => f.include)
             .array('dataset')
     )
-].map(code => `${CSV_PREPROCESS_DIR}/${code}/${code}.csv`);
-
-// read in existing periods
-// later use this to check for new indicator time periods that need adding
-const periods = aq.from(loadCsvWithoutBom(EXISTING_PERIODS_FILENAME, {
-    stringColumns: ['period', 'label', 'labelShort']
-}).objects());
+].map(code => `${RAW_DATA_DIR}/${code}/${code}.csv`);
 
 const cube = {
     version: "2.0",
@@ -354,7 +303,7 @@ const cube = {
 const indicators = [];
 const areas = [];
 for (const file of file_paths) {
-    const { indicatorDatasets, uniqueAreas } = processFile(file, excluded_indicators);
+    const { indicatorDatasets, uniqueAreas } = processFile(file);
     indicators.push(...indicatorDatasets);
     areas.push(uniqueAreas);
 }
