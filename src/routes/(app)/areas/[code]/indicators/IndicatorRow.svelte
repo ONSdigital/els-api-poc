@@ -182,6 +182,9 @@
 	.indicator-pyramid {
 		min-height: 412px;
 	}
+	.indicator-pyramid :global(.button-group) {
+		margin-top: 0.25rem;
+	}
 	.indicator-beeswarm {
 		flex-grow: 1;
 		max-width: 470px;

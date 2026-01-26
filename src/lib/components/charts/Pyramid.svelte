@@ -37,7 +37,6 @@
 			.range(yRange)
 			.paddingInner(barGap / barHeight)
 	);
-	$inspect({ xDomain: _data?.valueDomain, dataLength: _data?.array?.length });
 
 	function sumBySex(area, sex) {
 		const areaData = _data.keyed[area] || [];
@@ -232,7 +231,7 @@
 		display: block;
 		position: relative;
 		width: 100%;
-		margin: 1rem 0;
+		margin: 0.75rem 0;
 	}
 	.chart {
 		overflow: visible;
