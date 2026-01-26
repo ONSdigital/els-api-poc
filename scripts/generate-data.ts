@@ -102,6 +102,11 @@ function indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name) {
     // filter file-level metadata to be indicator level
     const meta_indicator = meta_data.metadata.indicators.find(d => d.code === indicator)
     const manifest_metadata_indicator = manifest_metadata.filter(aq.escape(d => d.dataset === dataset_name && d.code === indicator)).objects()
+    if (!manifest_metadata_indicator[0]) {
+        console.log(`Skipping indicator ${indicator} in dataset ${dataset_name}. No metadata in manifest.`);
+        return null;
+    }
+
     // deconstruct meta_indicator (and remove slug as using slug from csv):
     const { label, caveats, longDescription, slug, ...restOfMetadata } = meta_indicator
 
@@ -144,7 +149,6 @@ function indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name) {
 
     // identify dimensions that only have a single value (and can therefore be skipped):
     let uniDimensions = dimensions.filter(d => indicatorTable.dedupe(d).numRows() === 1);
-    console.log({ uniDimensions });
 
     indicatorTable = indicatorTable.select(aq.not(uniDimensions));
 
@@ -304,7 +308,8 @@ function processFile(file, excluded_indicators) {
     const indicatorDatasets = []
     // loop through each indicator (when more than one)
     for (const [indicator, t] of Object.entries(indicatorTables)) {
-        indicatorDatasets.push(indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name))
+        const cube = indicatorToCube(indicator, t, meta_data, tableSchema, dataset_name);
+        if (cube) indicatorDatasets.push(cube);
     }
 
     return { indicatorDatasets, uniqueAreas }
@@ -312,10 +317,13 @@ function processFile(file, excluded_indicators) {
 }
 
 const manifest_metadata = loadCsvWithoutBom(MANIFEST);
-const indicator_slugs = manifest_metadata.filter((f) => f.include).array('slug');
-const excluded_indicators = manifest_metadata.filter((f) => !f.include).array('code');
-// const areas_geog_level = loadCsvWithoutBom(AREAS_GEOG_LEVEL_FILENAME);
-// const excludedIndicators = readJsonSync(EXCLUDED_INDICATORS_PATH);
+const indicator_slugs = manifest_metadata
+    // .filter((f) => f.include)
+    .array('slug');
+const excluded_indicators = [];
+// const excluded_indicators = manifest_metadata
+//     .filter((f) => !f.include)
+//     .array('code');
 
 // Throw error if new indicator files have been downloaded and need to be added to the manifest
 // await abortIfNewFilesExist(manifest_metadata, CSV_PREPROCESS_DIR)
@@ -324,7 +332,8 @@ const excluded_indicators = manifest_metadata.filter((f) => !f.include).array('c
 // extract distinct filepaths
 var file_paths = [
     ...new Set(
-        manifest_metadata.filter((f) => f.include)
+        manifest_metadata
+            // .filter((f) => f.include)
             .array('dataset')
     )
 ].map(code => `${CSV_PREPROCESS_DIR}/${code}/${code}.csv`);
