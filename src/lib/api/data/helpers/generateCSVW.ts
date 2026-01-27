@@ -67,32 +67,34 @@ export default function generateCSVW(
     includeStatus: boolean
 ) {
     const dateString = new Date().toISOString().slice(0, 10);
-    let metadata = {
-        "@context": ["http://www.w3.org/ns/csvw", { "@language": "en" }],
-        url: href.replace(".csvw", ".csv"),
-        "rdfs:label": `Combined datasets retrieved from Explore Local Statistics on ${dateString}`,
-    };
-    if (datasets.length === 1) {
-        const ds = datasets[0];
-        metadata = {
-            ...metadata,
-            "rdfs:label": `Dataset retrieved from Explore Local Statistics on ${dateString}`,
-            "dc:title": ds.label,
-            "dc:description": ds.extension.description,
-            "dc:creator": ds.source,
-            "dc:source": ds.extension.source[0].url,
-            "dc:publisher": "Office for National Statistics",
-            "dc:issued": ds.updated,
-        };
-    }
-    metadata.tableSchema = {
+
+    const singleDataset = datasets.length === 1 ? datasets[0] : null;
+    const singleDatasetMetadata = singleDataset ? {
+        "rdfs:label": `Dataset retrieved from Explore Local Statistics on ${dateString}`,
+        "dc:title": singleDataset.label,
+        "dc:description": singleDataset.extension.description,
+        "dc:creator": singleDataset.source,
+        "dc:source": singleDataset.extension.source[0].url,
+        "dc:publisher": "Office for National Statistics",
+        "dc:issued": singleDataset.updated,
+    } : {};
+
+    const tableSchema: csvwTableSchema = {
         columns: makeCSVWColumns(
             datasets,
             measure,
             singleIndicator,
             includeNames,
             includeStatus
-        ),
+        )
+    };
+
+    const metadata: csvwMetadata = {
+        "@context": ["http://www.w3.org/ns/csvw", { "@language": "en" }],
+        url: href.replace(".csvw", ".csv"),
+        "rdfs:label": `Combined datasets retrieved from Explore Local Statistics on ${dateString}`,
+        ...singleDatasetMetadata,
+        tableSchema
     };
     return metadata;
 }

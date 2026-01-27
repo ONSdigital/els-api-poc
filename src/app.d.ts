@@ -38,6 +38,8 @@ declare global {
     extension: any
   };
   type jsonStatCollection = { version: "2.0", class: "collection", label: string, link: { item: jsonStatDataset[] } };
+
+  // Config for XLSX spreadsheet generation
   type spreadsheetTableCol = { index: number, key: string, heading: string, format?: string };
   type spreadsheetTableRow = (string | number | null)[];
   type spreadsheetTableData = {
@@ -55,6 +57,16 @@ declare global {
     notes: { name: string, text: string }[],
     sheets: spreadsheetTableData[]
   }
+
+  // CSVW metadata schema (simplified)
+  type csvwTableSchema = { columns: { name: string, titles: string, datatype: string }[] };
+  type csvwMetadata = {
+    "@context": ["http://www.w3.org/ns/csvw", { "@language": "en" }],
+    url: string,
+    "rdfs:label": string,
+    tableSchema: csvwTableSchema,
+    [key: string]: any
+  };
 
   // Data filter/format params
   type parsedParam = string | string[] | number | boolean | null;
