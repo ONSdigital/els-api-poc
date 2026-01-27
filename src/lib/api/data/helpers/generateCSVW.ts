@@ -70,7 +70,6 @@ export default function generateCSVW(
 
     const singleDataset = datasets.length === 1 ? datasets[0] : null;
     const singleDatasetMetadata = singleDataset ? {
-        "rdfs:label": `Dataset retrieved from Explore Local Statistics on ${dateString}`,
         "dc:title": singleDataset.label,
         "dc:description": singleDataset.extension.description,
         "dc:creator": singleDataset.source,
@@ -92,7 +91,7 @@ export default function generateCSVW(
     const metadata: csvwMetadata = {
         "@context": ["http://www.w3.org/ns/csvw", { "@language": "en" }],
         url: href.replace(".csvw", ".csv"),
-        "rdfs:label": `Combined datasets retrieved from Explore Local Statistics on ${dateString}`,
+        "rdfs:label": `Metadata generated on ${dateString} by the Explore Local Statistics service.`,
         ...singleDatasetMetadata,
         tableSchema
     };
