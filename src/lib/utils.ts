@@ -36,22 +36,6 @@ export function parseDataKeyed(data: jsonDataCols, zKey: string, rowTemplate: js
   return { keyed, array };
 }
 
-export async function fetchChartData(indicator: string, dimensions: keyedDimensions) {
-  dimensions = { ...{ geo: "ltla", time: "latest" }, ...dimensions }; // Use default geo + time filters unless explicitly set
-  const coreDims = ["geo", "time"];
-  const dims = Object.entries(dimensions).map((d) =>
-    coreDims.includes(d[0])
-      ? `${d[0]}=${[d[1]].join(",")}`
-      : `dimension_${d[0]}=${[d[1]].flat().join(",")}`
-  );
-  const url = resolve(
-    `/api/v1/data.cols.json?indicator=${indicator}${dims.length > 0 ? `&${dims.join("&")}` : ""}&includeNames=true`
-  );
-  const data = await (await fetch(url)).json();
-  console.log({ data });
-  return parseData(data);
-}
-
 export function makeValueFormatter(dp) {
   return format(`,.${dp ?? 0}f`);
 }
