@@ -1,5 +1,5 @@
 function getDimColumns(datasets: jsonStatDataset[]) {
-    const cols = {};
+    const cols: { [key: string]: csvwColumn } = {};
     for (const ds of datasets) {
         const keys = ds.id.slice(0, -1);
         for (const key of keys) {
@@ -15,12 +15,12 @@ function getDimColumns(datasets: jsonStatDataset[]) {
 
 function getMeasureColumns(datasets: jsonStatDataset[], measure: parsedParam) {
     const filter = [measure].flat();
-    const cols = {};
+    const cols: { [key: string]: csvwColumn } = {};
     for (const ds of datasets) {
         const cat = ds.dimension.measure.category;
         for (const key in cat.index) {
             if (filter[0] === "all" || filter.includes(key))
-                cols[key] = { name: key, titles: cat.label[key], datatype: "number" };
+                cols[key] = { name: key, titles: cat?.label?.[key] || key, datatype: "number" };
         }
     }
     return Object.values(cols);
