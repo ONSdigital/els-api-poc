@@ -215,7 +215,7 @@ function processFile(file) {
     if (!fs.existsSync(`${RAW_DATA_DIR}${data_file}`)) console.log(`Cannot find data file ${data_file}`);
     let indicator_data = loadCsvWithoutBom(`${RAW_DATA_DIR}${data_file}`)
     const meta_data = JSON.parse(fs.readFileSync(`${RAW_DATA_DIR}${data_file.replace('.csv', '.csv-metadata.json')}`))
-    const tableSchema = meta_data.tables[0].tableSchema.columns
+    const tableSchema = meta_data.tableSchema.columns
     const dataset_name = data_file.split("/")[1]
 
     // get unique areas and their names
