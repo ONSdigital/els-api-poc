@@ -5,7 +5,13 @@ yarn.lock
 
 # ignore ONSdigital `ci` fir
 ci/
+
+# ignore build folder
+build
+
 # ignore raw data
 scripts/insights/raw
-#ignore any json files
+
+# ignore any data files
 **/*.json
+**/*.csv
