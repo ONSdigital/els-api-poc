@@ -36,7 +36,7 @@ inward-foreign-direct-investment-fdi-new,inward-foreign-direct-investment,FALSE
 outward-foreign-direct-investment-fdi,outward-foreign-direct-investment,FALSE
 public-funded-gross-regional-capital-and-non-capital-expenditure-on-research-and-development,expenditure-research-and-development-public,FALSE
 business-expenditure-on-research-and-development,expenditure-research-and-development-business,FALSE
-active-businessesactive-businesses,TRUE
+active-businessesactive-businesses,active-businessesactive-businesses,TRUE
 births-of-new-enterprises,business-births,FALSE
 deaths-of-enterprises,business-deaths,FALSE
 high-growth-enterprises,high-growth-businesses,FALSE

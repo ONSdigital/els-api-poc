@@ -1,8 +1,9 @@
 import type { PageLoad } from './$types';
 import { resolve } from "$app/paths";
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { geoLevels } from "$lib/config/geoLevels";
 import { countryLetterLookup } from '$lib/config/geoLookups';
+import indicatorRedirects from "$lib/data/indicator_redirects.json";
 
 function getInitialArea(indicator, areas, areacd) {
   let area = areas.find((d) => d.areacd === areacd) ||
@@ -64,6 +65,7 @@ export const load: PageLoad = async ({ params, url, fetch }) => {
       breadcrumbBackground: "#eaeaea",
     };
   } catch {
-    error(404, "Selected data indicator not found.")
+    if (indicatorRedirects[params.code]) redirect(301, resolve(`/indicators/${indicatorRedirects[params.code]}`));
+    else error(404, "Selected data indicator not found.");
   }
 };
