@@ -1,4 +1,8 @@
 /* Global CSS styles for ELS */
+:root {
+	--ons-color-highlight-orange-dark: #f56927;
+}
+
 .titleblock-transparent .ons-hero__details {
 	padding: 1.5rem 0 0.5rem;
 }
