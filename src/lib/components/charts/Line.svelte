@@ -100,6 +100,8 @@
         )
       : 0
   );
+
+  $inspect({ labelLookup });
 </script>
 
 {#snippet line(arr, width = 1, color = "#b0b0b0", opacity = 1, id = "")}

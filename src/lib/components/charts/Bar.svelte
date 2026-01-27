@@ -115,6 +115,8 @@
   let hoveredIndex = $derived(
     hoveredArea ? sorted.findIndex((d) => d[idKey] === hoveredArea) : -1
   );
+
+  $inspect({ labelLookup });
 </script>
 
 {#snippet bar(b, fill = "#b0b0b0", opacity = 1, id = "", i)}

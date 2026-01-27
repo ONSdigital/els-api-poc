@@ -23,7 +23,7 @@ export async function marginLabels(el, params={}) {
     const selected = params.selected || []
     const yScaleVar = params.yScaleVar || null
     const yKey = params.yKey || "value"
-    const labelProximityThreshold = params.labelProximityThreshold || 50 
+    const labelProximityThreshold = params.labelProximityThreshold || 20 
     const elbowRoom = params.elbowRoom || 6
 
     await tick();
