@@ -1,8 +1,13 @@
 <script lang="ts">
   import { scaleLinear, scaleTime } from "d3-scale";
   import { nice } from "d3-array";
+  import { area, curveLinear } from "d3-shape";
   import { format } from "d3-format";
-  import { parseChartData, contrastColor } from "./chartHelpers";
+  import {
+    parseChartData,
+    contrastColor,
+    makeCurlyBrace,
+  } from "./chartHelpers";
   import { labelPlacer, marginLabels } from "./labelHelpers";
   import {
     markerPaths,
@@ -24,6 +29,7 @@
     selected = [],
     hoveredArea = null,
     geoLevel,
+    confidenceIntervals,
   } = $props();
 
   const height = 500;
@@ -45,7 +51,21 @@
     _data ? scaleTime().domain(_data.dateDomain).range([0, widthInner]) : null
   );
 
-  let yDomain = $derived(_data ? nice(..._data.valueDomain, 2) : null);
+  let yDomain = $derived(
+    _data
+      ? confidenceIntervals
+        ? nice(
+            Math.min(
+              ...data.lci.filter((el) => el !== null && el !== undefined)
+            ),
+            Math.max(
+              ...data.uci.filter((el) => el !== null && el !== undefined)
+            ),
+            2
+          )
+        : nice(..._data.valueDomain, 2)
+      : null
+  );
   let yScale = $derived(
     yDomain ? scaleLinear().domain(yDomain).range([height, 0]) : null
   );
@@ -101,7 +121,14 @@
       : 0
   );
 
+  const getCIArea = area()
+    .x((d) => xScale(d.date))
+    .y0((d) => yScale(d.lci))
+    .y1((d) => yScale(d.uci))
+    .curve(curveLinear);
+
   $inspect({ labelLookup });
+  console.log(data);
 </script>
 
 {#snippet line(arr, width = 1, color = "#b0b0b0", opacity = 1, id = "")}
@@ -111,6 +138,22 @@
       .join(" ")}
     stroke={color}
     stroke-width={width}
+    {opacity}
+    onpointerenter={() => {
+      hoveredArea = id;
+    }}
+    onpointerleave={() => {
+      hoveredArea = null;
+    }}
+    style:pointer-events={color === "#b0b0b0" ? null : "none"}
+  />
+{/snippet}
+
+{#snippet ribbon(arr, color = "#b0b0b0", opacity = 0.3, id = "")}
+  <path
+    d={getCIArea(arr)}
+    fill={color}
+    stroke="none"
     {opacity}
     onpointerenter={() => {
       hoveredArea = id;
@@ -153,6 +196,48 @@
   style:padding-bottom="25px"
   style:padding-right="{rightMargin}px"
 >
+  {#if confidenceIntervals}
+    <svg aria-hidden="true" {width} height="50" class="line-chart-legend">
+      <path
+        d="M10 15  L50 15 L50 45  L10 35"
+        stroke="none"
+        fill="#222"
+        opacity="0.2"
+      ></path>
+      <path d="M10 25  L50 30" stroke="#222" fill="none" stroke-width="2px"
+      ></path>
+      <circle
+        cx="10"
+        cy="25"
+        r="4"
+        stroke="white"
+        fill="#222"
+        stroke-width="1px"
+      ></circle>
+      <circle
+        cx="50"
+        cy="30"
+        r="4"
+        stroke="white"
+        fill="#222"
+        stroke-width="1px"
+      ></circle>
+      <text
+        x="70"
+        y="35"
+        font-size="18px"
+        stroke="#222"
+        fill="#222"
+        stroke-width="0px">95% confidence interval range</text
+      >
+      <path
+        d={makeCurlyBrace(55, 15, 55, 45, -10, 0.5)}
+        stroke="#222"
+        fill="none"
+        stroke-width="1px"
+      ></path>
+    </svg>
+  {/if}
   <div class="line-inner">
     {#if _data && xScale && yScale}
       <div class="line-x-axis">
@@ -236,8 +321,13 @@
               arr[0][idKey]
             )}
           {/each}
-
+          {#if confidenceIntervals}
+            {#each _selected as arr, i}
+              {@render ribbon(arr, ONSpalette[i], 0.3, arr[0][idKey])}
+            {/each}
+          {/if}
           {#each _selected as arr, i}
+            {@render line(arr, 4.5, "white", 1, arr[0][idKey])}
             {@render line(arr, 3, ONSpalette[i], 1, arr[0][idKey])}
           {/each}
           {#each _selected as s, sIndex}
@@ -254,7 +344,11 @@
         </g>
         <g>
           {#if hoveredArea}
-            {@render line(hovered, "4px", "orange", 1, hoveredArea)}
+            {#if confidenceIntervals}
+              {@render ribbon(hovered, "orange", 0.3, hoveredArea)}
+            {/if}
+            {@render line(hovered, 4.5, "white", 1, hoveredArea)}
+            {@render line(hovered, 3, "orange", 1, hoveredArea)}
             {#each hovered as c}
               <circle
                 cx={xScale(c.date)}

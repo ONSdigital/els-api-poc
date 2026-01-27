@@ -47,7 +47,7 @@
       data.periods[0],
       data.periods[data.periods.length - 1],
     ],
-    showConfidenceIntervals: false,
+    showConfidenceIntervals: data.indicator.confidenceIntervals,
     formatPeriod: () => formatPeriod,
   });
 </script>
@@ -150,6 +150,7 @@
               timeRange={pageState.selectedPeriodRange}
               selected={pageState.selectedAreas.map((a) => a.areacd)}
               geoLevel={pageState.selectedGeoLevel}
+              confidenceIntervals={pageState.showConfidenceIntervals}
               {formatValue}
               {formatPeriod}
               chartType="line"
@@ -174,6 +175,7 @@
           timeRange={pageState.selectedPeriodRange}
           selected={pageState.selectedAreas.map((a) => a.areacd)}
           geoLevel={pageState.selectedGeoLevel}
+          confidenceIntervals={pageState.showConfidenceIntervals}
           {formatValue}
           {formatPeriod}
           chartType="bar"

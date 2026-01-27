@@ -20,6 +20,7 @@
     formatValue,
     formatPeriod,
     chartType,
+    confidenceIntervals,
   } = $props();
 
   let visible = $state();
@@ -33,7 +34,7 @@
     selected,
     geoLevel,
     chartType,
-    visible,
+    visible
   ) {
     if (!visible && chartData) return chartData;
     else if (!visible) return null;
@@ -42,7 +43,7 @@
       ["line", "table"].includes(chartType) ? timeRange : timeRange[1],
       "latest",
       selected,
-      geoLevel,
+      geoLevel
     );
     if (chartDataUrl !== loadedChartDataUrl) {
       console.log(`Loading ${indicator} ${chartType} data`);
@@ -79,6 +80,7 @@
           bind:hovered
           {formatPeriod}
           {geoLevel}
+          {confidenceIntervals}
         />
       {/if}
     {/await}
