@@ -68,7 +68,7 @@ export function writeJson(filename, data, { minify = false } = {}) {
 	//console.log(`Wrote ${filename}.`);
 }
 
-function stripBom(string: string): string {
+export function stripBom(string: string): string {
 	// Based on:
 	// https://github.com/sindresorhus/strip-bom/blob/main/index.js
 	// (MIT Licence)

@@ -14,7 +14,7 @@
     "data:download": "tsx ./scripts/download-data.ts",
     "data:generate": "tsx ./scripts/generate-data.ts",
     "data:geo": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 tsx ./scripts/make-geo-data.ts",
-    "data:clusters": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 tsx ./scripts/make-clusters.ts",
+    "data:clusters": "tsx ./scripts/make-clusters.ts",
     "data:redirects": "tsx ./scripts/make-redirects.ts"
   },
   "author": "Office for National Statistics",

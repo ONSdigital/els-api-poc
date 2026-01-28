@@ -10,7 +10,8 @@ ci/
 build
 
 # ignore raw data
-scripts/insights/raw
+scripts/raw-data
+scripts/config
 
 # ignore any data files
 **/*.json
