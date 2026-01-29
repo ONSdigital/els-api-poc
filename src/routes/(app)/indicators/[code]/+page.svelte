@@ -96,6 +96,7 @@
 					timeRange={pageState.selectedPeriodRange}
 					selected={pageState.selectedAreas.map((a) => a.areacd)}
 					geoLevel={pageState.selectedGeoLevel}
+					showIntervals={pageState.showConfidenceIntervals}
 				/>
 			</NavSection>
 		{/each}

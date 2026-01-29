@@ -15,13 +15,14 @@
 	};
 
 	let {
+		chartType,
 		indicator,
 		metadata,
 		timeRange,
 		selected = [],
-		geoLevel,
+		geoLevel = null,
+		showIntervals = false,
 		hovered = $bindable(),
-		chartType,
 		mode = "default"
 	} = $props();
 
@@ -138,7 +139,17 @@
 	{/if}
 </div>
 {#if mode === "default"}
-	<ChartActions {chartType} chartDiv={el} {dataUrl} />
+	<ChartActions
+		{indicator}
+		{metadata}
+		{timeRange}
+		{selected}
+		{geoLevel}
+		{showIntervals}
+		{chartType}
+		chartDiv={el}
+		{dataUrl}
+	/>
 {/if}
 
 <style>
