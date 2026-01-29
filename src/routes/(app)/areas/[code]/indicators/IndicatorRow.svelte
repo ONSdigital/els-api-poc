@@ -72,7 +72,7 @@
 {#snippet downloadLinks(chartType)}
 	{@render downloadUrl(loadedDataUrl[chartType], "csv")},
 	{@render downloadUrl(loadedDataUrl[chartType], "csvw")},
-	{@render downloadUrl(loadedDataUrl[chartType], "xlsx")}, or
+	{@render downloadUrl(loadedDataUrl[chartType], "xlsx")} or
 	{@render downloadUrl(loadedDataUrl[chartType], "json", "JSON-Stat")}
 {/snippet}
 

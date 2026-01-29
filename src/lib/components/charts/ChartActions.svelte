@@ -77,7 +77,7 @@
 {#snippet downloadLinks(url: string)}
 	{@render downloadUrl(url, "csv")},
 	{@render downloadUrl(url, "csvw")},
-	{@render downloadUrl(url, "xlsx")}, or
+	{@render downloadUrl(url, "xlsx")} or
 	{@render downloadUrl(url, "json", "JSON-Stat")}
 {/snippet}
 
