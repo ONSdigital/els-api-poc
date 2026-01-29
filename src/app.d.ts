@@ -78,7 +78,7 @@ declare global {
   type filteredDimension = { key: string, count: number, values: [string, number][] };
 
   // Miscellaneous
-  type errorObject = { error: number, message: string };
+  type errorObject = { error?: number, message: string };
 }
 
 export { };

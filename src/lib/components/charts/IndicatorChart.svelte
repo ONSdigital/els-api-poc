@@ -36,38 +36,37 @@
 		["line", "table"].includes(chartType) && timeRange[0] !== timeRange[1]
 	);
 
-	let loadedChartDataUrl;
-	let loadedChartData;
+	let loadedDataUrl: string | null = null;
+	let loadedData: jsonDataCols | errorObject | null = null;
 
-	async function fetchData(indicator, timeRange, selected, geoLevel, chartType, visible) {
-		if (!visible && loadedChartData)
-			return { chartData: loadedChartData, dataUrl: loadedChartDataUrl };
-		else if (!visible) return { chartData: null, dataUrl: null };
-		const chartDataUrl = makeDataUrl(
+	let dataUrl = $derived(
+		makeDataUrl(
 			indicator,
 			hasTimeRange ? timeRange : timeRange[timeRange.length - 1],
 			"latest",
 			selected,
-			geoLevel
-		);
-		if (chartDataUrl !== loadedChartDataUrl) {
+			geoLevel?.id
+		)
+	);
+
+	async function fetchData(dataUrl: string, visible: boolean) {
+		if (!visible && loadedData) return loadedData;
+		else if (!visible) return { message: "Loading chart data" };
+		if (dataUrl !== loadedDataUrl) {
 			console.log(`Loading ${indicator} ${chartType} data`);
-			loadedChartDataUrl = chartDataUrl;
+			loadedDataUrl = dataUrl;
 			try {
-				loadedChartData = await (await fetch(chartDataUrl)).json();
+				loadedData = await (await fetch(dataUrl)).json();
 				console.log(`Loaded ${indicator} ${chartType} data`);
-				return { chartData: loadedChartData, dataUrl: loadedChartDataUrl };
+				return loadedData;
 			} catch {
 				console.log(`Failed to load ${indicator} ${chartType} data`);
-				return { chartData: null, dataUrl: null };
+				return { message: "Could not load chart data" };
 			}
-		} else return { chartData: loadedChartData, dataUrl: loadedChartDataUrl };
+		} else return loadedData;
 	}
-
 	// svelte-ignore await_waterfall
-	let { chartData, dataUrl } = $derived(
-		await fetchData(indicator, timeRange, selected, geoLevel.id, chartType, visible)
-	);
+	let data = $derived(await fetchData(dataUrl, visible));
 
 	function toggleFullScreen() {
 		if (!fullScreenMode) {
@@ -112,10 +111,12 @@
 		{/if}
 		<Observe bind:visible>
 			<div class="indicator-chart">
-				{#if chartData}
+				{#if data?.message}
+					{data.message}
+				{:else if data}
 					{@const Component = chartComponents[chartType]}
 					<Component
-						data={chartData}
+						{data}
 						{metadata}
 						{formatValue}
 						{selected}
