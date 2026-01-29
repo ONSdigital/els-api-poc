@@ -58,7 +58,7 @@
 		on:click={() => {
 			dialog.close();
 			onCancel();
-		}}>Cancel your selection</Button
+		}}>Cancel</Button
 	>
 </dialog>
 
