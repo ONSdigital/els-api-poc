@@ -32,7 +32,9 @@
 
 	let formatPeriod = $derived(makePeriodFormatter(metadata.periodFormat));
 	let formatValue = $derived(makeValueFormatter(metadata.decimalPlaces));
-	let hasTimeRange = $derived(["line", "table"].includes(chartType));
+	let hasTimeRange = $derived(
+		["line", "table"].includes(chartType) && timeRange[0] !== timeRange[1]
+	);
 
 	let loadedChartDataUrl;
 	let loadedChartData;
@@ -43,7 +45,7 @@
 		else if (!visible) return { chartData: null, dataUrl: null };
 		const chartDataUrl = makeDataUrl(
 			indicator,
-			["line", "table"].includes(chartType) ? timeRange : timeRange[1],
+			hasTimeRange ? timeRange : timeRange[timeRange.length - 1],
 			"latest",
 			selected,
 			geoLevel
@@ -96,7 +98,7 @@
 		<p class="content-subtitle">
 			{metadata.subtitle},
 			{#if hasTimeRange}{formatPeriod(timeRange[0])} to{/if}
-			{formatPeriod(timeRange[1])}
+			{formatPeriod(timeRange[timeRange.length - 1])}
 		</p>
 		{#if mode === "default"}
 			<button
@@ -155,11 +157,11 @@
 <style>
 	.content-block {
 		position: relative;
-		padding: 12px;
 		background: var(--ons-color-page-light);
 	}
 	.content-border {
 		border: 1px solid #909090;
+		padding: 12px;
 	}
 	.fullscreen-toggle {
 		position: absolute;

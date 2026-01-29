@@ -30,12 +30,13 @@ export const load: PageLoad = async ({ params, url, fetch }) => {
   );
 
   try {
-    const indicator = await (await fetch(path)).json();
-    const periodsRaw = await (await fetch(periodPath)).json();
+    const [indicator, periodsRaw, areas] = await Promise.all([
+      (await fetch(path)).json(),
+      (await fetch(periodPath)).json(),
+      (await fetch(areasPath)).json()
+    ]);
+    areas.sort((a, b) => a.areanm.localeCompare(b.areanm));
     const periods = Object.keys(periodsRaw.category.index);
-    const areas = (await (await fetch(areasPath)).json()).sort((a, b) =>
-      a.areanm.localeCompare(b.areanm)
-    );
     const gLevels = indicator.geography.levels
       .filter(id => id !== "uk")
       .map((id) => ({

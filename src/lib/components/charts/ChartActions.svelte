@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from "$app/paths";
 	import snapdom from "@zumer/snapdom";
 	import { Icon, Textarea, Button } from "@onsvisual/svelte-components";
 
@@ -42,7 +43,7 @@
 				.join(",")
 		});
 		if (showIntervals) chunks.push({ key: "intervals", value: "true" });
-		const url = `https://www.ons.gov.uk/indicators/${indicator}/embed?chart=${chartType}&${chunks.map((c) => `${c.key}=${c.value}`).join("&")}`;
+		const url = `https://www.ons.gov.uk/explore-local-statistics/indicators/${indicator}/embed?type=${chartType}&${chunks.map((c) => `${c.key}=${c.value}`).join("&")}`;
 		const id = `${chartType}-${indicator}`;
 		return (
 			`<div id="${id}"></div>
