@@ -5,6 +5,7 @@
 	import Map from "$lib/components/charts/Map.svelte";
 	import Bar from "$lib/components/charts/Bar.svelte";
 	import Table from "$lib/components/charts/Table.svelte";
+	import ChartActions from "./ChartActions.svelte";
 
 	const chartComponents = {
 		map: Map,
@@ -33,11 +34,12 @@
 	let hasTimeRange = $derived(["line", "table"].includes(chartType));
 
 	let loadedChartDataUrl;
-	let chartData;
+	let loadedChartData;
 
 	async function fetchData(indicator, timeRange, selected, geoLevel, chartType, visible) {
-		if (!visible && chartData) return chartData;
-		else if (!visible) return null;
+		if (!visible && loadedChartData)
+			return { chartData: loadedChartData, dataUrl: loadedChartDataUrl };
+		else if (!visible) return { chartData: null, dataUrl: null };
 		const chartDataUrl = makeDataUrl(
 			indicator,
 			["line", "table"].includes(chartType) ? timeRange : timeRange[1],
@@ -49,15 +51,20 @@
 			console.log(`Loading ${indicator} ${chartType} data`);
 			loadedChartDataUrl = chartDataUrl;
 			try {
-				chartData = await (await fetch(chartDataUrl)).json();
+				loadedChartData = await (await fetch(chartDataUrl)).json();
 				console.log(`Loaded ${indicator} ${chartType} data`);
-				return chartData;
+				return { chartData: loadedChartData, dataUrl: loadedChartDataUrl };
 			} catch {
 				console.log(`Failed to load ${indicator} ${chartType} data`);
-				return null;
+				return { chartData: null, dataUrl: null };
 			}
-		} else return chartData;
+		} else return { chartData: loadedChartData, dataUrl: loadedChartDataUrl };
 	}
+
+	// svelte-ignore await_waterfall
+	let { chartData, dataUrl } = $derived(
+		await fetchData(indicator, timeRange, selected, geoLevel.id, chartType, visible)
+	);
 
 	function toggleFullScreen() {
 		if (!fullScreenMode) {
@@ -102,20 +109,18 @@
 		{/if}
 		<Observe bind:visible>
 			<div class="indicator-chart">
-				{#await fetchData(indicator, timeRange, selected, geoLevel.id, chartType, visible) then chartData}
+				{#if chartData}
 					{@const Component = chartComponents[chartType]}
-					{#if chartData}
-						<Component
-							data={chartData}
-							{metadata}
-							{formatValue}
-							{selected}
-							bind:hovered
-							{formatPeriod}
-							{geoLevel}
-						/>
-					{/if}
-				{/await}
+					<Component
+						data={chartData}
+						{metadata}
+						{formatValue}
+						{selected}
+						bind:hovered
+						{formatPeriod}
+						{geoLevel}
+					/>
+				{/if}
 			</div>
 		</Observe>
 		{#if metadata.source.length > 0}
@@ -132,6 +137,9 @@
 		{/if}
 	{/if}
 </div>
+{#if mode === "default"}
+	<ChartActions {chartType} chartDiv={el} {dataUrl} />
+{/if}
 
 <style>
 	.content-block {
@@ -141,7 +149,6 @@
 	}
 	.content-border {
 		border: 1px solid #909090;
-		margin-bottom: 1rem;
 	}
 	.fullscreen-toggle {
 		position: absolute;

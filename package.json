@@ -22,7 +22,7 @@
   "devDependencies": {
     "@mapbox/tilebelt": "^2.0.2",
     "@onsvisual/robo-utils": "^0.3.9",
-    "@onsvisual/svelte-components": "^1.0.52",
+    "@onsvisual/svelte-components": "^1.0.53",
     "@onsvisual/svelte-maps": "^1.2.28",
     "@sveltejs/adapter-netlify": "^5.2.4",
     "@sveltejs/adapter-node": "^5.3.3",
@@ -33,6 +33,7 @@
     "@turf/bbox-polygon": "^7.3.1",
     "@turf/boolean-point-in-polygon": "^7.3.1",
     "@turf/meta": "^7.2.0",
+    "@zumer/snapdom": "^2.0.2",
     "accurate-beeswarm-plot": "^1.0.12",
     "arquero": "^8.0.3",
     "cross-env": "^7.0.3",
