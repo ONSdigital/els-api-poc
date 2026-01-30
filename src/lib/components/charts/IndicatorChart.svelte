@@ -51,7 +51,7 @@
 
 	async function fetchData(dataUrl: string, visible: boolean) {
 		if (!visible && loadedData) return loadedData;
-		else if (!visible) return { message: "Loading chart data" };
+		else if (!visible) return null;
 		if (dataUrl !== loadedDataUrl) {
 			console.log(`Loading ${indicator} ${chartType} data`);
 			loadedDataUrl = dataUrl;
@@ -61,7 +61,7 @@
 				return loadedData;
 			} catch {
 				console.log(`Failed to load ${indicator} ${chartType} data`);
-				return { message: "Could not load chart data" };
+				return { message: "Failed to load chart data" };
 			}
 		} else return loadedData;
 	}
@@ -124,6 +124,8 @@
 						{formatPeriod}
 						{geoLevel}
 					/>
+				{:else}
+					Loading chart data
 				{/if}
 			</div>
 		</Observe>
