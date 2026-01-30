@@ -1,12 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import {
-    Hero,
-    NavSections,
-    NavSection,
-    List,
-    Li,
-  } from "@onsvisual/svelte-components";
+  import { Hero, NavSections, NavSection, List, Li } from "@onsvisual/svelte-components";
   import { capitalise } from "@onsvisual/robo-utils";
   import { makePeriodFormatter, makeValueFormatter } from "$lib/utils";
   import AreasLegend from "$lib/components/modals/AreasLegend.svelte";
@@ -14,6 +8,7 @@
   import OptionsModal from "$lib/components/modals/OptionsModal.svelte";
   import ContentBlock from "$lib/components/charts/ContentBlock.svelte";
   import IndicatorChart from "./IndicatorChart.svelte";
+  import { pluralise } from "@onsvisual/robo-utils";
 
   let { data } = $props();
   $inspect(data);
@@ -40,13 +35,8 @@
 
   let pageState = $state({
     selectedAreas: data.initialArea ? [data.initialArea] : [],
-    selectedGeoLevel: data.geoLevels.find(
-      (g) => g.id === data.indicator.geography.initialLevel
-    ),
-    selectedPeriodRange: [
-      data.periods[0],
-      data.periods[data.periods.length - 1],
-    ],
+    selectedGeoLevel: data.geoLevels.find((g) => g.id === data.indicator.geography.initialLevel),
+    selectedPeriodRange: [data.periods[0], data.periods[data.periods.length - 1]],
     showConfidenceIntervals: data.indicator.confidenceIntervals,
     formatPeriod: () => formatPeriod,
   });
@@ -58,11 +48,7 @@
   meta={[
     {
       key: data.indicator.source.length === 1 ? "Data source" : "Data sources",
-      value: arrayJoin(
-        data.indicator.source.map(
-          (s) => `<a href="${s.href}" target="_blank">${s.name}</a>`
-        )
-      ),
+      value: arrayJoin(data.indicator.source.map((s) => `<a href="${s.href}" target="_blank">${s.name}</a>`)),
     },
     {
       key: "Published on",
@@ -71,9 +57,7 @@
   ]}
   background="#eaeaea"
   titleBadge={{
-    label: data.indicator.experimentalStatistic
-      ? "Official statistics in development"
-      : capitalise(data.indicator.topic),
+    label: data.indicator.experimentalStatistic ? "Official statistics in development" : capitalise(data.indicator.topic),
     ariaLabel: `Topic: ${capitalise(data.indicator.topic)}`,
     color: "#003c57",
   }}
@@ -86,10 +70,7 @@
 <NavSections cls="wider-nav-sections" marginTop>
   <div class="indicators-nav-sections">
     <div class="legend-sticky">
-      <AreasLegend
-        selectedAreas={pageState.selectedAreas}
-        selectedGeoGroup={pageState.selectedGeoLevel}
-      />
+      <AreasLegend selectedAreas={pageState.selectedAreas} selectedGeoGroup={pageState.selectedGeoLevel} />
       <div>
         <AreasModal mode="indicator" {data} bind:pageState />
         <OptionsModal {data} bind:pageState />
@@ -97,15 +78,9 @@
     </div>
     {#if data.indicator.standardised}
       <NavSection title="Map">
-        <ContentBlock
-          title={data.indicator.label}
-          source={data.indicator.source}
-        >
+        <ContentBlock title={data.indicator.label} source={data.indicator.source}>
           <p class="subtitle">
-            {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(
-              0,
-              4
-            )}
+            {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(0, 4)}
             to {pageState.selectedPeriodRange[1].slice(0, 4)}
           </p>
           <IndicatorChart
@@ -124,25 +99,21 @@
 
     {#if data.periods.length > 1}
       <NavSection title="Line chart">
-        <ContentBlock
-          title={data.indicator.label}
-          source={data.indicator.source}
-        >
+        <ContentBlock title={data.indicator.label} source={data.indicator.source}>
           {#if pageState.selectedPeriodRange[0] === pageState.selectedPeriodRange[1]}
             <div class="no-chart-container">
               <p>
-                Time series not displayed as selected date range includes only
-                one time period with
+                Time series not displayed as selected date range includes only one time period with
                 <span style="font-weight: bold;">{data.indicator.label}</span> data.
               </p>
             </div>
           {:else}
             <p class="subtitle">
-              {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(
-                0,
-                4
-              )}
+              {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(0, 4)}
               to {pageState.selectedPeriodRange[1].slice(0, 4)}
+            </p>
+            <p class="subtitle-geolevel">
+              {pluralise(pageState.selectedGeoLevel.label)}
             </p>
             <IndicatorChart
               indicator={data.indicator.slug}
@@ -163,11 +134,11 @@
     <NavSection title="Bar chart">
       <ContentBlock title={data.indicator.label} source={data.indicator.source}>
         <p class="subtitle">
-          {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(
-            0,
-            4
-          )}
+          {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(0, 4)}
           to {pageState.selectedPeriodRange[1].slice(0, 4)}
+        </p>
+        <p class="subtitle-geolevel">
+          {pluralise(pageState.selectedGeoLevel.label)}
         </p>
         <IndicatorChart
           indicator={data.indicator.slug}
@@ -185,10 +156,7 @@
     <NavSection title="Table">
       <ContentBlock title={data.indicator.label} source={data.indicator.source}>
         <p class="subtitle">
-          {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(
-            0,
-            4
-          )}
+          {data.indicator.subtitle}, {pageState.selectedPeriodRange[0].slice(0, 4)}
           to {pageState.selectedPeriodRange[1].slice(0, 4)}
         </p>
         <IndicatorChart
@@ -213,39 +181,18 @@
     </List>
     <p>
       You can download this dataset in an <a
-        href={resolve(
-          `/api/v1/data.xlsx?indicator=${data.indicator.slug}&time=all`
-        )}
+        href={resolve(`/api/v1/data.xlsx?indicator=${data.indicator.slug}&time=all`)}
         download={`${data.indicator.slug}.xlsx`}>XLSX</a
       >,
-      <a
-        href={resolve(
-          `/api/v1/data.csv?indicator=${data.indicator.slug}&time=all`
-        )}
-        download={`${data.indicator.slug}.csv`}>CSV</a
-      >,
-      <a
-        href={resolve(
-          `/api/v1/data.csvw?indicator=${data.indicator.slug}&time=all`
-        )}
-        download={`${data.indicator.slug}.csv-metadata.json`}>CSVW</a
-      >
+      <a href={resolve(`/api/v1/data.csv?indicator=${data.indicator.slug}&time=all`)} download={`${data.indicator.slug}.csv`}>CSV</a>,
+      <a href={resolve(`/api/v1/data.csvw?indicator=${data.indicator.slug}&time=all`)} download={`${data.indicator.slug}.csv-metadata.json`}>CSVW</a>
       or
-      <a
-        href={resolve(
-          `/api/v1/data.json?indicator=${data.indicator.slug}&time=all`
-        )}
-        download={`${data.indicator.slug}.json`}>JSON-Stat</a
-      >
+      <a href={resolve(`/api/v1/data.json?indicator=${data.indicator.slug}&time=all`)} download={`${data.indicator.slug}.json`}>JSON-Stat</a>
       format, or download
-      <a
-        href={resolve(`/api/v1/data.xlsx?excludeMultivariate=true&time=all`)}
-        download="datasets.xlsx">all available datasets (XLSX, ~10MB)</a
-      >.
+      <a href={resolve(`/api/v1/data.xlsx?excludeMultivariate=true&time=all`)} download="datasets.xlsx">all available datasets (XLSX, ~10MB)</a>.
     </p>
     <p>
-      Information on the strengths and limitations of the Explore Local
-      Statistics service and methods used is available in the
+      Information on the strengths and limitations of the Explore Local Statistics service and methods used is available in the
       <a
         href="https://www.ons.gov.uk/peoplepopulationandcommunity/healthandsocialcare/healthandwellbeing/methodologies/explorelocalstatisticsserviceqmi"
         >quality and methodology information (QMI) report</a
@@ -254,14 +201,20 @@
   </NavSection>
   <NavSection title="Other indicators">
     <p>
-      {data.indicator.label} is one of {data.summaryStats.indicatorCount} local indicators
-      on the <a href={resolve("/")}>Explore local statistics</a> service. See
-      the <a href={resolve("/indicators")}>full list of local indicators</a>.
+      {data.indicator.label} is one of {data.summaryStats.indicatorCount} local indicators on the <a href={resolve("/")}>Explore local statistics</a>
+      service. See the <a href={resolve("/indicators")}>full list of local indicators</a>.
     </p>
   </NavSection>
 </NavSections>
 
 <style>
+  .subtitle-geolevel {
+    font-size: 16px;
+    font-weight: bold;
+  }
+  .subtitle {
+    margin: 0;
+  }
   .chart-container {
     display: block;
     width: 100%;
