@@ -6,6 +6,7 @@
 	import Bar from "$lib/components/charts/Bar.svelte";
 	import Table from "$lib/components/charts/Table.svelte";
 	import ChartActions from "./ChartActions.svelte";
+	import Spinner from "../visuals/Spinner.svelte";
 
 	const chartComponents = {
 		map: Map,
@@ -125,7 +126,7 @@
 						{geoLevel}
 					/>
 				{:else}
-					Loading chart data
+					<Spinner message="Loading chart data" />
 				{/if}
 			</div>
 		</Observe>
@@ -206,6 +207,8 @@
 		align-items: baseline;
 	}
 	.indicator-chart {
+		display: block;
+		position: relative;
 		min-height: 400px;
 	}
 	.content-fullscreen .indicator-chart {
