@@ -1,0 +1,18 @@
+# Ignore files for PNPM, NPM and YARN
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# ignore ONSdigital `ci` fir
+ci/
+
+# ignore build folder
+build
+
+# ignore raw data
+scripts/raw-data
+scripts/config
+
+# ignore any data files
+**/*.json
+**/*.csv

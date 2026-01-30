@@ -15,7 +15,7 @@ export const load: LayoutLoad = async ({ params, url, fetch }) => {
     if (area.error) error(area.error, area.message);
   } catch (err) {
     console.log(err);
-		error(404, { message: "Area not found" });
+    error(404, { message: "Area not found." });
   }
 
   const canonicalSlug = makeCanonicalSlug(area.properties);

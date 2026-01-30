@@ -21,6 +21,7 @@
   } from "@onsvisual/svelte-components";
   import AreaLede from "./AreaLede.svelte";
   import AreaNavMap from "./AreaNavMap.svelte";
+  import ChildAreas from "./ChildAreas.svelte";
   import AreaSearch from "$lib/components/nav/AreaSearch.svelte";
   import ESSMap from "$lib/components/visuals/ESSMap.svelte";
 
@@ -94,32 +95,7 @@
     </div>
   </div>
   <GridCell colspan={3}>
-    {#if areaProps.children[0]}
-      {#key areaProps}
-        <Tabs bind:selected={selectedChildGroupKey} compact>
-          {#each areaProps.children as childGroup, i}
-            <Tab
-              title={capitalise(childGroup.label)}
-              id={childGroup.key}
-              hideTitle
-            >
-              <ul class="list-columns">
-                {#each childGroup.areas as child}
-                  <li>
-                    <a
-                      href={resolve(`/areas/${makeCanonicalSlug(child)}`)}
-                      data-sveltekit-noscroll>{getName(child)}</a
-                    >
-                  </li>
-                {/each}
-              </ul>
-            </Tab>
-          {/each}
-        </Tabs>
-      {/key}
-    {:else}
-      <p>No smaller areas available within {getName(areaProps, "the")}.</p>
-    {/if}
+    <ChildAreas {areaProps} bind:selected={selectedChildGroupKey}/>
   </GridCell>
 </Grid>
 
@@ -156,19 +132,6 @@
 <style>
   .link-parent {
     display: block;
-  }
-  ul.list-columns {
-    list-style: none;
-    margin: 4px 0 8px;
-    padding: 0;
-    column-width: 220px;
-    overflow-x: none;
-    position: relative;
-  }
-  ul.list-columns > li {
-    font-size: 16px !important;
-    margin: 0;
-    padding: 0;
   }
   /* :global(#related-areas .ons-tab[aria-selected='true']:not(:focus)) {
 		background: #f3f3f3 !important;

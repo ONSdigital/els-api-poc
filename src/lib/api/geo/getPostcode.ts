@@ -4,11 +4,11 @@ import { isValidPostcode } from "$lib/util/validationHelpers";
 export default async function getPostcode(code) {
   const cdUpper = code.toUpperCase();
   if (!isValidPostcode(cdUpper))
-    return { error: 400, message: `${code} is not a valid postcode` };
+    return { error: 404, message: `"Postcode not found. ${code}" is not a valid postcode.` };
 
   const cdBare = cdUpper.match(/[A-Z0-9]/g).join("");
   const url = `${postcodeLookupBase}/${cdBare.slice(0, 4)}.json`;
-  const noCodesError = { error: 400, message: `Postcode ${code} not found` };
+  const noCodesError = { error: 404, message: `Postcode "${code}" not found.` };
 
   try {
     const json = await (await fetch(url)).json();

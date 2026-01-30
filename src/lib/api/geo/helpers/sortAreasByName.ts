@@ -1,5 +1,3 @@
-type areaObject = { areacd: string, areanm?: string, hclnm?: string };
-
 function getName(area: areaObject) {
     return area.hclnm || area.areanm || area.areacd || "";
 }

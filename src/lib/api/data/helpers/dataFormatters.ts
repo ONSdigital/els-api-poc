@@ -1,14 +1,14 @@
 import readData from "$lib/data";
 
-const geoLookup = await readData("geo-metadata");
+const areaNameLookup = await readData("areas-in-data");
 
 // Makes a code => name lookup from an array of GSS codes
-function makeAreaLookup(codes) {
-  return Object.fromEntries(codes.map((cd) => [cd, geoLookup[cd]?.areanm]));
+function makeAreaLookup(codes: string[]) {
+  return Object.fromEntries(codes.map((cd) => [cd, areaNameLookup[cd] || null]));
 }
 
 // Map an array of dimension values to their corresponding labels
-function dimValuesToLabels(dim, cube) {
+function dimValuesToLabels(dim: filteredDimension, cube: jsonStatDataset) {
   if (cube.dimension[dim.key].category.label)
     dim.values = dim.values.map((v) => [
       cube.dimension[dim.key].category.label[v[0]],
@@ -17,11 +17,11 @@ function dimValuesToLabels(dim, cube) {
 }
 
 // Take filtered dims and expand to array of all the values they represent
-export function dimsToItems(dims, cube) {
-  let items = [[0]];
+export function dimsToItems(dims: filteredDimension[], cube: jsonStatDataset) {
+  let items: dataItem[] = [[0]];
   for (const dim of dims) {
     dimValuesToLabels(dim, cube);
-    const newItems = [];
+    const newItems: dataItem[] = [];
     for (const item of items) {
       for (const val of dim.values) {
         newItems.push([item[0] * dim.count + val[1], ...item.slice(1), val[0]]);
@@ -34,14 +34,14 @@ export function dimsToItems(dims, cube) {
 
 // Take filtered dims and use them to return a filtered JSON-Stat dataset
 export function toJSONStat(
-  qb,
-  dims,
+  qb: jsonStatDataset,
+  dims: filteredDimension[],
   includeNames = false,
   includeStatus = false
 ) {
-  const cube = {};
+  const cube: jsonStatDataset = {};
   for (const key of Object.keys(qb).filter(
-    (key) => !["value", "status"].includes(key)
+    (key: string) => !["value", "status"].includes(key)
   ))
     cube[key] = structuredClone(qb[key]);
 
@@ -103,120 +103,165 @@ export function toJSONStat(
 }
 
 // Get the primary key/column for values in the dataset
-function getValueKey(measures) {
-  if (!measures) return "value";
+function getValueDimIndex(measures: filteredDimension) {
   const keys = measures.values.map((val) => val?.[0]);
-  return keys.includes("value") ? "value" : keys?.[0];
+  const valueIndex = keys.indexOf("value");
+  return valueIndex > -1 ? valueIndex : 0;
 }
 
-// This bulky function runs once to generate the most minimal col function based on the selected params
-// This saves a number of condiditional tests for each individual row added
-function makeColFill(includeNames, includeStatus, measures = null) {
-  const measuresCount = measures?.count || 1;
-  const pushMeasures = ((measures) => {
-    return measures
-      ? (data, item, cube) => {
-        for (let j = 0; j < measures.values.length; j++) {
-          data[measures.values[j][0]].push(
-            cube.value[item[0] * measuresCount + measures.values[j][1]]
-          );
-        }
+// This function runs once to generate the most optimal function to fill columns based on the global params
+// Running this saves a number of condiditional tests for each individual row added
+function makeColFill(
+  groupByArea: boolean,
+  includeNames: boolean,
+  includeStatus: boolean,
+  dims: filteredDimension[],
+  measures: filteredDimension,
+  pivotMeasures: boolean
+) {
+  const measuresCount = measures.count;
+
+  const valueDimIndex = getValueDimIndex(measures);
+  const getIndex = pivotMeasures ? (item) => (item[0] * measuresCount) + valueDimIndex : (item) => item[0];
+  const hasVals = includeStatus ?
+    (item: dataItem, cube: jsonStatDataset) => {
+      const index = getIndex(item);
+      return cube.value[index] || cube.status[index];
+    } :
+    (item: dataItem, cube: jsonStatDataset) => cube.value[getIndex(item)];
+
+  const pushMeasures = pivotMeasures
+    ? (data: jsonDataCols, item: dataItem, cube: jsonStatDataset) => {
+      for (let j = 0; j < measures.values.length; j++) {
+        data[measures.values[j][0]].push(
+          cube.value[item[0] * measuresCount + measures.values[j][1]]
+        );
       }
-      : (data, item, cube) => data.value.push(cube.value[item[0]]);
-  })(measures);
-  const pushVals = (data, item, dims, cube) => {
-    for (let i = 0; i < dims.length - 1; i++)
-      data[dims[i].key].push(item[i + 1]);
+    }
+    : (data: jsonDataCols, item: dataItem, cube: jsonStatDataset) => data.value.push(cube.value[item[0]]);
+
+  const dimStart = groupByArea ? 1 : 0;
+  const dimEnd = !pivotMeasures && measuresCount > 1 ? dims.length : dims.length - 1;
+  const pushVals = (data: jsonDataCols, item: dataItem, dims: filteredDimension[], cube: jsonStatDataset) => {
+    for (let i = dimStart; i < dimEnd; i++) data[dims[i].key].push(item[i + 1]);
     pushMeasures(data, item, cube);
   };
-  const pushName = (data, item) =>
-    data.areanm.push(geoLookup[item[1]]?.areanm || null);
-  const pushStatus = (data, item, cube) =>
+  const pushName = (data: jsonDataCols, item: dataItem) =>
+    data.areanm.push(areaNameLookup[item[1]] || null);
+  const pushStatus = (data: jsonDataCols, item: dataItem, cube: jsonStatDataset) =>
     data.status.push(cube.status[item[0] * measuresCount] || null);
 
   return includeNames && includeStatus
-    ? (data, item, dims, cube) => {
-      pushVals(data, item, dims, cube);
-      pushName(data, item);
-      pushStatus(data, item, cube);
-    }
-    : includeNames
-      ? (data, item, dims, cube) => {
+    ? (data: jsonDataCols, item: dataItem, dims: filteredDimension[], cube: jsonStatDataset) => {
+      if (hasVals(item, cube)) {
         pushVals(data, item, dims, cube);
         pushName(data, item);
+        pushStatus(data, item, cube);
+      }
+    }
+    : includeNames
+      ? (data: jsonDataCols, item: dataItem, dims: filteredDimension[], cube: jsonStatDataset) => {
+        if (hasVals(item, cube)) {
+          pushVals(data, item, dims, cube);
+          pushName(data, item);
+        }
       }
       : includeStatus
-        ? (data, item, dims, cube) => {
-          pushVals(data, item, dims, cube);
-          pushStatus(data, item, cube);
+        ? (data: jsonDataCols, item: dataItem, dims: filteredDimension[], cube: jsonStatDataset) => {
+          if (hasVals(item, cube)) {
+            pushVals(data, item, dims, cube);
+            pushStatus(data, item, cube);
+          }
         }
-        : pushVals;
-}
-
-function filterCols(data, valueKey, includeStatus = false) {
-  const filteredData = {};
-  const cols = Object.keys(data);
-
-  for (const key of cols) filteredData[key] = [];
-
-  const hasData = includeStatus
-    ? (i) => data[valueKey][i] || data.status[i]
-    : (i) => data[valueKey][i];
-  const count = data[valueKey].length;
-  for (let i = 0; i < count; i++) {
-    if (hasData(i)) {
-      for (const key of cols) filteredData[key].push(data[key][i]);
-    }
-  }
-  return filteredData;
+        : (data: jsonDataCols, item: dataItem, dims: filteredDimension[], cube: jsonStatDataset) => {
+          if (hasVals(item, cube)) pushVals(data, item, dims, cube);
+        }
 }
 
 export function itemsToCols(
-  cube,
-  dims,
-  items,
-  measures,
-  includeNames = false,
-  includeStatus = false
-) {
-  const data = {};
-  for (const dim of dims.slice(0, -1)) {
-    data[dim.key] = [];
-    if (includeNames && dim.key === "areacd") data.areanm = [];
+  cube: jsonStatDataset,
+  dims: filteredDimension[],
+  items: dataItem[],
+  measures: filteredDimension,
+  pivotMeasures: boolean,
+  includeNames: boolean,
+  includeStatus: boolean,
+  groupByArea: boolean
+): jsonDataCols | jsonDataColsByArea {
+  const colFill = makeColFill(groupByArea, groupByArea ? false : includeNames, includeStatus, dims, measures, pivotMeasures);
+  const measuresLength = measures.values.length;
+  const dimsEnd = !pivotMeasures && measuresLength > 1 ? undefined : -1;
+
+  if (groupByArea) {
+    const data: jsonDataColsByArea = [];
+    const cols = dims.slice(1, dimsEnd);
+    let currentArea = null;
+    for (const item of items) {
+      if (item[1] !== currentArea?.areacd) {
+        const newArea = {
+          areacd: item[1],
+          ...(includeNames && { areanm: areaNameLookup[item[1]] || null }),
+          values: {}
+        };
+        for (const col of cols) {
+          newArea.values[col.key] = [];
+        }
+        for (const val of pivotMeasures ? measures.values : [["value"]]) newArea.values[val[0]] = [];
+        if (includeStatus) newArea.values.status = [];
+        data.push(newArea);
+        currentArea = data[data.length - 1];
+      }
+      colFill(currentArea.values, item, dims, cube);
+    }
+    return data;
+  } else {
+    const data: jsonDataCols = {};
+    for (const dim of dims.slice(0, dimsEnd)) {
+      data[dim.key] = [];
+      if (includeNames && dim.key === "areacd") data.areanm = [];
+    }
+    for (const val of pivotMeasures ? measures.values : [["value"]]) data[val[0]] = [];
+    if (includeStatus) data.status = [];
+    for (const item of items) {
+      colFill(data, item, dims, cube);
+    }
+    return data;
   }
-  for (const val of measures.values) data[val[0]] = [];
-  const colFill = makeColFill(includeNames, includeStatus, measures);
-  if (includeStatus) data.status = [];
-  for (const item of items) {
-    colFill(data, item, dims, cube);
-  }
-  return filterCols(data, getValueKey(measures), includeStatus);
 }
 
-export function toCols(cube, dims, includeNames, includeStatus) {
+export function toCols(
+  cube: jsonStatDataset,
+  dims: filteredDimension[],
+  includeNames: boolean,
+  includeStatus: boolean,
+  groupByArea = false,
+  pivotMeasures = true
+) {
   const measures = dims[dims.length - 1];
 
-  const items = dimsToItems(dims.slice(0, -1), cube);
+  const items = dimsToItems(!pivotMeasures ? dims : dims.slice(0, -1), cube);
   const data = itemsToCols(
     cube,
     dims,
     items,
     measures,
+    pivotMeasures,
     includeNames,
-    includeStatus
+    includeStatus,
+    groupByArea
   );
 
   return [cube.extension.slug, data];
 }
 
-function colsToRows(cols, indicator = null) {
-  indicator = indicator ? { indicator } : null;
+function colsToRows(cols: jsonDataCols, indicator = null) {
+  const ind = indicator ? { indicator } : null;
 
-  const rows = [];
+  const rows: jsonDataRow[] = [];
 
   const colKeys = Object.keys(cols);
-  const makeRow = (i) => {
-    const row = { ...indicator };
+  const makeRow = (i: number) => {
+    const row: jsonDataRow = { ...ind };
     for (const key of colKeys) row[key] = cols[key][i];
     return row;
   };
@@ -229,124 +274,39 @@ function colsToRows(cols, indicator = null) {
 }
 
 export function toRows(
-  cube,
-  dims,
-  includeIndicator,
-  includeNames,
-  includeStatus
-) {
+  cube: jsonStatDataset,
+  dims: filteredDimension[],
+  includeIndicator: boolean,
+  includeNames: boolean,
+  includeStatus: boolean,
+  groupByArea = false,
+  pivotMeasures = true
+): jsonDataRow[] | jsonDataRowsByArea {
   const measures = dims[dims.length - 1];
   if (measures.values.length === 0) return [];
 
-  const items = dimsToItems(dims.slice(0, -1), cube);
+  const items = dimsToItems(!pivotMeasures ? dims : dims.slice(0, -1), cube);
   const cols = itemsToCols(
     cube,
     dims,
     items,
     measures,
+    pivotMeasures,
     includeNames,
-    includeStatus
+    includeStatus,
+    groupByArea
   );
-  const rows = colsToRows(cols, includeIndicator ? cube.label : null);
+
+  const rows = groupByArea ?
+    cols.map(d => {
+      const area = {
+        areacd: d.areacd,
+        ...(includeNames && { areanm: d.areanm }),
+        values: colsToRows(d.values)
+      };
+      return area;
+    }) :
+    colsToRows(cols, includeIndicator ? cube.label : null);
 
   return [cube.extension.slug, rows];
-}
-
-function getDimColumns(datasets) {
-  const cols = {};
-  for (const ds of datasets) {
-    const keys = ds.id.slice(0, -1);
-    for (const key of keys) {
-      cols[key] = {
-        name: key,
-        titles: ds.dimension[key].label || key,
-        datatype: key === "period" ? "date" : "string",
-      };
-    }
-  }
-  return Object.values(cols);
-}
-
-function getMeasureColumns(datasets, measure) {
-  const filter = [measure].flat();
-  const cols = {};
-  for (const ds of datasets) {
-    const cat = ds.dimension.measure.category;
-    for (const key in cat.index) {
-      if (filter[0] === "all" || filter.includes(key))
-        cols[key] = { name: key, titles: cat.label[key], datatype: "number" };
-    }
-  }
-  return Object.values(cols);
-}
-
-function makeCSVWColumns(
-  datasets,
-  measure,
-  singleIndicator,
-  includeNames,
-  includeStatus
-) {
-  const cols = [
-    {
-      name: "indicator",
-      titles: "Indicator",
-      datatype: "string",
-    },
-  ];
-  cols.push(...getDimColumns(datasets));
-  cols.push(...getMeasureColumns(datasets, measure));
-  if (includeNames)
-    cols.splice(2, 0, {
-      name: "areanm",
-      titles: "Area name",
-      datatype: "string",
-    });
-  if (includeStatus)
-    cols.push({
-      name: "status",
-      titles: "Status",
-      datatype: "string",
-    });
-  if (singleIndicator) cols.shift();
-  return cols;
-}
-
-export function toCSVW(
-  datasets,
-  measure,
-  href,
-  singleIndicator,
-  includeNames = false,
-  includeStatus = false
-) {
-  const dateString = new Date().toISOString().slice(0, 10);
-  let metadata = {
-    "@context": ["http://www.w3.org/ns/csvw", { "@language": "en" }],
-    url: href.replace(".csvw", ".csv"),
-    "rdfs:label": `Combined datasets retrieved from Explore Local Statistics on ${dateString}`,
-  };
-  if (datasets.length === 1) {
-    const ds = datasets[0];
-    metadata = {
-      ...metadata,
-      "rdfs:label": `Dataset retrieved from Explore Local Statistics on ${dateString}`,
-      "dc:title": ds.label,
-      "dc:description": ds.extension.description,
-      "dc:creator": ds.source,
-      "dc:source": ds.extension.source[0].url,
-      "dc:publisher": "Office for National Statistics",
-      "dc:issued": ds.updated,
-    };
-  }
-  metadata.tatableSchema = {
-    columns: makeCSVWColumns(
-      datasets,
-      measure,
-      singleIndicator,
-      includeNames,
-      includeStatus
-    ),
-  };
-  return metadata;
 }

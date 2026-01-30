@@ -15,7 +15,7 @@ export function makeIndicatorFilter(indicator, topic) {
 export function makeYearFilter(year) {
   const timeString = String(year);
   if (!isValidYear(timeString))
-    return { error: "Invalid 'hasYear' parameter. Must be YYYY or 'all'." };
+    return { error: 400, message: "Invalid 'hasYear' parameter. Must be YYYY or 'all'." };
   return (ds) =>
     Object.keys(ds.dimension.period.category.index)
       .map((d) => d.slice(0, 4))
@@ -31,7 +31,7 @@ export function makeDatasetGeoFilter(geo) {
     return (ds) => hasGeo(ds, geo);
   if (geo in geoLevels)
     return (ds) => ds.extension.geography.levels.includes(geo);
-  return { error: "Invalid 'hasGeo' parameter. Must be a valid GSS code or geography level." };
+  return { error: 400, message: "Invalid 'hasGeo' parameter. Must be a valid GSS code or geography level." };
 }
 
 export function makeDatasetFilter(indicator, topic, excludeMultivariate, geo, year) {

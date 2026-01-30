@@ -1,5 +1,3 @@
-type parsedParam = string | string[] | number | boolean | null;
-
 function parseParam(param: string): parsedParam {
   return param === "true"
     ? true

@@ -1,42 +1,62 @@
-import { writeFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
+import { csvParse } from "d3-dsv";
+import { stripBom } from "./io";
+import { capitalise } from "@onsvisual/robo-utils";
 
-const config_url = "https://raw.githubusercontent.com/ONSdigital/explore-local-statistics-app/refs/heads/develop/static/insights/config.json";
+// const config_url = "https://raw.githubusercontent.com/ONSdigital/explore-local-statistics-app/refs/heads/develop/static/insights/config.json";
+const input_dir = "./scripts/config/clusters";
 const output_clusters = "./src/lib/data/areas-clusters.json";
 const output_similar = "./src/lib/data/areas-similar.json";
 
-const config = await (await fetch(config_url)).json();
+const descriptions_path = `${input_dir}/cluster-descriptions.json`;
+const descriptions = JSON.parse(stripBom(readFileSync(descriptions_path, 'utf8')));
 
-const similar = config.neighbourLookup;
-writeFileSync(output_similar, JSON.stringify(similar));
-console.log(`Wrote ${output_similar}`);
-
-const rawClusters = config.clustersLookup;
+const types = Object.keys(descriptions);
+const keys = Object.fromEntries(types.map(t => [t, Object.keys(descriptions[t])]));
+const clusters_empty = Object.fromEntries(types.map(t => [t, Object.fromEntries(keys[t].map(key => [key, []]))]));
 const clusters = {
-  types: rawClusters.types,
-  keys: {},
+  types,
+  keys,
   lookup: {},
-  clusters: {},
-  descriptions: {}
+  clusters: clusters_empty,
+  descriptions
 };
+console.log(clusters)
 
-for (const type of clusters.types) {
-  clusters.clusters[type] = {};
-  clusters.descriptions[type] = {};
-  const keys = rawClusters.descriptions.filter(d => d.type === type).map(d => d.letter);
-  clusters.keys[type] = keys;
+const clusters_path = `${input_dir}/cluster-allocation.csv`;
+const clusters_data = csvParse(stripBom(readFileSync(clusters_path, { encoding: "utf8" })));
 
-  for (const key of keys) {
-    clusters.descriptions[type][key] = rawClusters.descriptions
-      .filter(d => d.type === type && d.letter === key)
-      .map(d => d.text)[0];
-    clusters.clusters[type][key] = rawClusters.data.areacd.filter((d, i) => rawClusters.data[type][i] === key);
-
-    for (const cd of clusters.clusters[type][key]) {
-      if (!clusters.lookup[cd]) clusters.lookup[cd] = {};
-      clusters.lookup[cd][type] = key;
+const idKey = clusters_data.columns[0];
+for (const row of [...clusters_data].sort((a, b) => a[idKey].localeCompare(b[idKey], "en-GB"))) {
+  const areacd = row[idKey];
+  const obj = {};
+  for (const type of types) {
+    const letter = row[`${capitalise(type)} model`].slice(-1).toLowerCase();
+    if (letter in clusters.clusters[type]) {
+      obj[type] = letter;
+      clusters.clusters[type][letter].push(areacd);
     }
   }
+  console.log(areacd, obj, row);
+  clusters.lookup[areacd] = obj;
 }
 
 writeFileSync(output_clusters, JSON.stringify(clusters));
 console.log(`Wrote ${output_clusters}`);
+
+const similar = {};
+
+for (const type of types) {
+  const similar_path = `${input_dir}/${type}-neighbours.csv`;
+  const similar_data = csvParse(stripBom(readFileSync(similar_path, { encoding: "utf8" })));
+
+  const idKey = similar_data.columns[0];
+  for (const row of similar_data) {
+    const areacd = row[idKey];
+    if (!similar[areacd]) similar[areacd] = Object.fromEntries(types.map(t => [t, []]));
+    for (const col of similar_data.columns.slice(1)) similar[areacd][type].push(row[col]);
+  }
+}
+
+writeFileSync(output_similar, JSON.stringify(similar));
+console.log(`Wrote ${output_similar}`);

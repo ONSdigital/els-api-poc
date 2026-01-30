@@ -7,10 +7,10 @@ const geoMetadata = await readData("geo-metadata");
 export default function getParentAreas(params = {}) {
   const cdUpper = (params?.code || "").toUpperCase();
   if (!isValidAreaCode(cdUpper))
-    return { error: 400, message: `${params?.code} is not a valid GSS code.` };
+    return { error: 404, message: `Area not found. "${params?.code}" is not a valid GSS code.` };
 
   const area = geoMetadata[cdUpper];
-  if (!area) return { error: 400, message: `Parents not found for ${code}` };
+  if (!area) return { error: 404, message: `Parents not found for "${code}".` };
 
   return params.includeNames ? addAreaNames(area.parents) : area.parents;
 }

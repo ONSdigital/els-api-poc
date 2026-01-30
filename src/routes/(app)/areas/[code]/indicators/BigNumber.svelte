@@ -46,19 +46,23 @@
   <Observe bind:visible rootMargin={200}>
     <div class="big-number-contents ons-u-mb-xs">
       {#await fetchData(period, visible) then data}
-        <p class="ons-card__subtitle ons-u-mb-xs" style:margin-top="-12px">
-          {formatPeriod(data.period[0])}
-        </p>
-        <p class="ons-card__figure ons-u-fs-3xl ons-u-fw-b ons-u-mb-no">
-          {metadata.canBeNegative && data.value[0] > 0
-            ? "+"
-            : ""}{indicator.prefix}{formatValue(data.value[0])}{metadata.suffix}
-        </p>
-        <p class="ons-card__body ons-u-mb-xs">
-          {indicator === "five-year-population-change"
-            ? "Five year change"
-            : capitalise(metadata.subText)}
-        </p>
+        {#if data}
+          <p class="ons-card__subtitle ons-u-mb-xs" style:margin-top="-12px">
+            {formatPeriod(data.period[0])}
+          </p>
+          <p class="ons-card__figure ons-u-fs-3xl ons-u-fw-b ons-u-mb-no">
+            {metadata.canBeNegative && data.value[0] > 0
+              ? "+"
+              : ""}{indicator.prefix}{formatValue(
+              data.value[0],
+            )}{metadata.suffix}
+          </p>
+          <p class="ons-card__body ons-u-mb-xs">
+            {indicator === "five-year-population-change"
+              ? "Five year change"
+              : capitalise(metadata.subText)}
+          </p>
+        {/if}
       {/await}
     </div>
     <p class="ons-u-mb-no">

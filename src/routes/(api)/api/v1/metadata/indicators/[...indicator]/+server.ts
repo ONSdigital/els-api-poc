@@ -23,7 +23,8 @@ export const GET: RequestHandler = ({ url, params }) => {
     singleIndicator: !!params.indicator
   });
 
-  if (metadata.error) error(400, metadata.error);
+  if (!metadata) error(404, `Indicator "${indicator}" not found.`);
+  if (metadata.error) error(metadata.error, metadata.message);
 
   return json(metadata);
 };

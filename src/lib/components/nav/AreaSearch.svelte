@@ -81,4 +81,7 @@
   .search-form :global(.ons-btn__inner) {
     height: 40px;
   }
+  .search-form :global(.ons-btn) {
+    margin: 0;
+  }
 </style>

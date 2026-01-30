@@ -1,3 +1,5 @@
+// Workaround to override default font + size in ExcelJS
+// See issue: https://github.com/exceljs/exceljs/issues/572#issuecomment-631788521
 import StylesXform from "exceljs/lib/xlsx/xform/style/styles-xform.js";
 const origStylesXformInit = StylesXform.prototype.init;
 StylesXform.prototype.init = function () {
@@ -10,12 +12,13 @@ import { PassThrough } from "node:stream";
 import { toWords } from "@onsvisual/robo-utils";
 
 // This function grabs the metadata from the JSON-Stat required to populate the XLSX spreadsheet
-export function getSpreadsheetMetadata(ds) {
+export function getSpreadsheetMetadata(ds, dims) {
     const meta = {
         sheetName: ds.label,
         tableName: ds.extension.slug.replaceAll("-", "_").replace(/\d/g, (str) => toWords(str)),
         note: ds.extension.description,
         measures: new Set(),
+        unit: ds.extension.unit,
         decimalPlaces: ds.extension.decimalPlaces,
         subtitle: ds.extension.subtitle,
         source: ds.extension.source,
@@ -23,13 +26,11 @@ export function getSpreadsheetMetadata(ds) {
             areanm: "Area name",
             status: "Status"
         },
+        uniquePeriods: dims.find(d => d.key === "period").values.map(v => v[0])
     };
     for (const key in ds.dimension) meta.colLookup[key] = ds.dimension[key].label;
     for (const key in ds.dimension.measure.category.label) {
-        meta.colLookup[key] =
-            key === "value"
-                ? `Value${ds.extension.unit ? ` (${ds.extension.unit})` : ''}`
-                : ds.dimension.measure.category.label[key];
+        meta.colLookup[key] = ds.dimension.measure.category.label[key] || null;
         meta.measures.add(key);
     }
     return meta;
@@ -58,17 +59,48 @@ function addTextRow(sheet, text, options = {}) {
     if (options.alignment) row.alignment = options.alignment;
 }
 
-function columnsToRows(columns) {
-    const rows = [];
-    for (let i = 0; i < columns[0].values.length; i++) {
-        const row = columns.map(c => c.values[i]);
-        rows.push(row);
+
+function formatTableData(ds) {
+    const columns: spreadsheetTableCol[] = [];
+    const columnsLookup: { [key: string]: spreadsheetTableCol } = {};
+    const rows: { [key: string]: spreadsheetTableRow } = {};
+
+    const colKeys = Object.keys(ds.data[1]).filter(key => !["period", "value", "status"].includes(key));
+    const hasMeasureCol = colKeys.includes("measure");
+    let i = 0;
+    for (const key of [...colKeys, ...ds.meta.uniquePeriods]) {
+        const isNumeric = ds.meta.uniquePeriods.includes(key);
+        const column = {
+            index: i,
+            key,
+            heading: isNumeric ? `${key}${ds.meta.unit ? ` (${ds.meta.unit})` : ""}` : ds.meta.colLookup[key] || key,
+            ...(isNumeric ? {
+                format: ds.meta.decimalPlaces
+                    ? "#,##0.".padEnd(ds.meta.decimalPlaces + 6, "0")
+                    : "#,###"
+            } : {})
+        }
+        columns.push(column);
+        columnsLookup[key] = column;
+        i++
     }
-    return rows;
+
+    const getRowKey = (data, i, keys) => keys.map(key => data[key][i]).join("_");
+    const data = ds.data[1];
+    for (let i = 0; i < data[colKeys[0]].length; i++) {
+        const rowKey = getRowKey(data, i, colKeys);
+        if (!rows[rowKey]) {
+            rows[rowKey] = Array(columns.length).fill(null);
+            for (let j = 0; j < colKeys.length; j++) rows[rowKey][j] = data[colKeys[j]][i];
+        }
+        rows[rowKey][columnsLookup[data.period[i]].index] = data.value[i];
+    }
+
+    return { columns, rows: Object.values(rows) };
 }
 
 function getColWidth(values = null) {
-    const maxColWidth = 24;
+    const maxColWidth = 28;
     const minColWidth = 12;
 
     if (!values) return minColWidth;
@@ -106,7 +138,7 @@ export async function dataToSpreadsheet(data) {
     ];
     addTextRow(contentsSheet, `# Table of contents`);
     addTextRow(contentsSheet, oneTableMessage, { height: 40, alignment: { vertical: "top" } });
-    const contentsTable = contentsSheet.addTable({
+    contentsSheet.addTable({
         name: 'table_of_contents',
         ref: 'A3',
         headerRow: true,
@@ -170,7 +202,7 @@ export async function dataToSpreadsheet(data) {
                 showRowStripes: false,
             },
             columns: s.columns.map(c => ({ name: c.heading })),
-            rows: columnsToRows(s.columns),
+            rows: s.rows,
         });
         sheet.getRow(tableRowNumber).font = { bold: true };
         sheet.getRow(tableRowNumber).alignment = { wrapText: true };
@@ -178,11 +210,11 @@ export async function dataToSpreadsheet(data) {
         for (let i = 0; i < s.columns.length; i++) {
             const meta = s.columns[i];
             const col = sheet.getColumn(i + 1);
-            if (meta.style) {
-                col.numFmt = meta.style;
+            if (meta.format) {
+                col.numFmt = meta.format;
                 col.width = getColWidth();
             } else {
-                col.width = getColWidth(meta.values);
+                col.width = getColWidth(s.rows.map(d => d[i]));
             }
         }
     }
@@ -196,14 +228,14 @@ export async function dataToSpreadsheet(data) {
 // This function generates an ODS spreadsheet given data and metadata for a series of datasets
 export default async function generateXLSX(datasets) {
     // Note: This cover sheet is currently hard-coded. Possibly better to move somewhere else?
-    const data = {
+    const data: spreadsheetData = {
         creator: "Office for National Statistics",
         created: new Date(),
         coverSheetTitle: "Explore Local Statistics data",
         coverSheetContents: [
             "## Source",
             "Office for National Statistics (ONS) and other producers of official statistics.",
-            `Downloaded on ${(new Date()).toLocaleDateString("en-GB")} from the Explore Local Statistics service.`,
+            `Spreadsheet generated on ${(new Date()).toLocaleDateString("en-GB")} by the Explore Local Statistics service.`,
             "[Visit Explore Local Statistics on the ONS website](https://www.ons.gov.uk)",
             "## Notes",
             "Some cells are blank, indicating unavailable data.",
@@ -225,6 +257,9 @@ export default async function generateXLSX(datasets) {
                 text: ds.meta.note,
             });
         }
+
+        const { columns, rows } = formatTableData(ds);
+
         data.sheets.push({
             sheetName: ds.meta.note
                 ? `${ds.meta.sheetName} [note ${i}]`
@@ -233,18 +268,10 @@ export default async function generateXLSX(datasets) {
             sheetIntroText: [
                 ds.meta.subtitle,
                 ...ds.meta.source
-                    .map((s, j) => `[Source${ds.meta.source.length > 1 ? ` ${j + 1}` : ""}: ${s.name}, ${s.date.split("-").reverse().join("/")}](${s.href})`),
+                    .map((s, j) => `[Source${ds.meta.source.length > 1 ? ` ${j + 1}` : ""}: ${s.name}, published on ${s.date.split("-").reverse().join("/")}](${s.href})`),
             ],
-            columns: Object.keys(ds.data[1]).map((key) => ({
-                style: ds.meta.measures.has(key)
-                    ? (ds.meta.decimalPlaces
-                        ? "#,###.".padEnd(ds.meta.decimalPlaces + 6, "0")
-                        : "#,###")
-                    : null,
-                allowNulls: ds.meta.measures.has(key),
-                heading: ds.meta.colLookup[key],
-                values: ds.data[1][key],
-            })),
+            columns,
+            rows
         });
     }
 

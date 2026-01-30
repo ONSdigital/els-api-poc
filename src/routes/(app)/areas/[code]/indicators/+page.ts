@@ -4,34 +4,39 @@ import { pluralise, getName } from "@onsvisual/robo-utils";
 import summaryData from "$lib/data/json-stat-summary.json";
 import { geoLevels, geoLevelsLookup } from "$lib/config/geoLevels";
 import type { PageLoad } from "./$types";
+import { extractAreaCodeFromSlug } from "$lib/api/geo/helpers/areaSlugUtils";
 
-export const load: PageLoad = async ({ parent, fetch }) => {
-  const { area } = await parent();
-  const code = area.properties.areacd;
-
-  const geoLevel = geoLevelsLookup[code.slice(0, 3)];
-  const parentLevel =
-    geoLevels[["ctry", "rgn"].includes(geoLevel?.key) ? "ctry" : "rgn"];
-  const areaParent = area.properties.parents.find((p) =>
-    parentLevel.codes.includes(p.areacd.slice(0, 3))
-  );
+export const load: PageLoad = async ({ params, parent, fetch }) => {
+  const code = extractAreaCodeFromSlug(params.code || "");
+  if (code.error) error(code.error, code.message);
 
   const taxonomyPath = resolve(
-    `/api/v1/metadata/taxonomy?hasGeo=${code}&excludeMultivariate=true`
+    `/api/v1/metadata/taxonomy?hasGeo=${code}`
   );
   const metadataPath = resolve(
-    `/api/v1/metadata/indicators?hasGeo=${code}&excludeMultivariate=true&asLookup=true`
+    `/api/v1/metadata/indicators?hasGeo=${code}&asLookup=true`
   );
   const areasPath = resolve(`/api/v1/geo/list?year=latest`);
   const relatedPath = resolve(`/api/v1/geo/related/${code}`);
 
   try {
-    const taxonomy = await (await fetch(taxonomyPath)).json();
-    const metadata = await (await fetch(metadataPath)).json();
-    const areas = [...(await (await fetch(areasPath)).json())].sort((a, b) =>
-      a.areanm.localeCompare(b.areanm)
+    const [parentData, taxonomy, metadata, areas, related] = await Promise.all([
+      parent(),
+      (await fetch(taxonomyPath)).json(),
+      (await fetch(metadataPath)).json(),
+      (await fetch(areasPath)).json(),
+      (await fetch(relatedPath)).json()
+    ]);
+    areas.sort((a, b) => a.areanm.localeCompare(b.areanm, "en-GB"));
+
+    const area = parentData.area;
+    const geoLevel = geoLevelsLookup[code.slice(0, 3)];
+    const parentLevel =
+      geoLevels[["ctry", "rgn"].includes(geoLevel?.key) ? "ctry" : "rgn"];
+    const areaParent = area.properties.parents.find((p) =>
+      parentLevel.codes.includes(p.areacd.slice(0, 3))
     );
-    const related = await (await fetch(relatedPath)).json();
+
     const geoGroups = [
       {
         id: "level",
@@ -77,7 +82,6 @@ export const load: PageLoad = async ({ parent, fetch }) => {
       breadcrumbBackground: "var(--ons-color-banner-bg)"
     };
   } catch (err) {
-    console.log(err);
-    error(404, { message: "Could not retrieve metadata" });
+    error(404, { message: "Area data not found." });
   }
 };

@@ -6,9 +6,9 @@ import groupAreasByLevel from "./helpers/groupAreasByLevel";
 import sortAreasByLevel from "./helpers/sortAreasByLevel";
 import { geoYearFilter, makeGeoLevelFilter } from "./helpers/geoFilters";
 import { geoLevelsAllLookup } from "$lib/config/geoLevels";
-import readData from "$lib/data";
+import summaryData from "$lib/data/json-stat-summary.json";
 
-const geoLatestYear = await readData("geo-latest-year");
+const geoLatestYear = summaryData.geoYears[summaryData.geoYears.length - 1];
 
 function makeArea(props) {
   return { areacd: props.areacd, areanm: props.areanm };

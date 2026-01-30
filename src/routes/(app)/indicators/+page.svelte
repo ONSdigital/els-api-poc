@@ -19,7 +19,7 @@
 
 <Hero width="medium" title="Local indicators" cls="titleblock-transparent">
   <p class="ons-hero__text">
-    Explore our {data.summaryStats.indicatorCount} local indicators, including
+    Explore our {data.summaryStats.univariateCount} local indicators, including
     <b>disposable household income</b>,
     <b>participation in further education</b>
     and
