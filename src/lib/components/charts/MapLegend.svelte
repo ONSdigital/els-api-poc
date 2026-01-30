@@ -1,6 +1,6 @@
 <script>
 	//@ts-nocheck
-	import { ONScolours } from "$lib/config";
+	import { ONScolours } from '$lib/config';
 
 	let {
 		data,
@@ -12,15 +12,15 @@
 		labelHeight = 20,
 		breaks,
 		colors = [
-			"rgba(234,236,177,.8)",
-			"rgba(169,216,145,.8)",
-			"rgba(0,167,186,.8)",
-			"rgba(0,78,166,.8)",
-			"rgba(0,13,84,.8)"
+			'rgba(234,236,177,.8)',
+			'rgba(169,216,145,.8)',
+			'rgba(0,167,186,.8)',
+			'rgba(0,78,166,.8)',
+			'rgba(0,13,84,.8)'
 		],
 		format = (d) => d.toFixed(0),
-		prefix = "",
-		suffix = "",
+		prefix = '',
+		suffix = '',
 		snapTicks = true,
 		markerPadding = 6
 	} = $props();
@@ -65,10 +65,10 @@
 	};
 
 	function positionLabels(selectedData, labels, container) {
-		const other = (side) => (side === "left" ? "right" : "left");
+		const other = (side) => (side === 'left' ? 'right' : 'left');
 		const clash = (lab1, lab2) => {
 			const minMax = (l) =>
-				l.align === "right" ? [l.pos, l.pos + l.width] : [l.pos - l.width, l.pos];
+				l.align === 'right' ? [l.pos, l.pos + l.width] : [l.pos - l.width, l.pos];
 			const l1 = minMax(lab1);
 			const l2 = minMax(lab2);
 			const clash = !(l1[1] < l2[0] || l1[0] > l2[1]);
@@ -94,18 +94,18 @@
 				};
 				const labelLeft = lab.pos;
 				const labelRight = lab.pos + lab.width;
-				if (labelRight > containerRight) lab.align = "left";
-				else lab.align = "right";
+				if (labelRight > containerRight) lab.align = 'left';
+				else lab.align = 'right';
 				labs.push(lab);
 			}
 			const sides = {
-				right: labs.filter((l) => l.align === "right").reverse(),
-				left: labs.filter((l) => l.align === "left")
+				right: labs.filter((l) => l.align === 'right').reverse(),
+				left: labs.filter((l) => l.align === 'left')
 			};
 
 			const positionedLabels = [];
 			let offset = 0;
-			let side = sides.left.length > sides.right.length ? "left" : "right";
+			let side = sides.left.length > sides.right.length ? 'left' : 'right';
 			while (sides.right.length + sides.left.length > 0) {
 				if (sides[side].length === 0) side = other(side);
 				const label = sides[side].shift();
@@ -160,7 +160,7 @@
 	</div>
 	{#if Array.isArray(positionedData?.labels)}
 		{#each positionedData.labels as d, i}
-			<div style:opacity={d.areacd === hovered ? null : hovered ? "30%" : null}>
+			<div style:opacity={d.areacd === hovered ? null : hovered ? '30%' : null}>
 				<div
 					class="marker"
 					style:width="{lineWidth}px"
@@ -173,7 +173,7 @@
 					class="value"
 					style:left="{pos(d.value, breaks)}%"
 					style:bottom="{-labelHeight}px"
-					style:transform={d.align === "left"
+					style:transform={d.align === 'left'
 						? `translateX(-100%) translateX(1.5px) translateY(${(d.offset || 0) * labelHeight}px)`
 						: `translateX(-1.5px) translateY(${(d.offset || 0) * labelHeight}px)`}
 					style:color={d.areacd === hovered ? ONScolours.highlightOrangeDark : d.textColor}
@@ -206,7 +206,7 @@
 				style:left="{pos(d.value, breaks)}%"
 				style:bottom="{-labelHeight}px"
 				style:padding="0 {markerPadding}px"
-				style:transform={hoverLeft ? "translateX(-100%) translateX(1.5px)" : "translateX(-1.5px)"}
+				style:transform={hoverLeft ? 'translateX(-100%) translateX(1.5px)' : 'translateX(-1.5px)'}
 				use:hoverLeftCheck
 			>
 				{d.areanm},

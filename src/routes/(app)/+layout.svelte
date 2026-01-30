@@ -1,7 +1,7 @@
 <script lang="ts">
 	// @ts-nocheck
-	import { page } from "$app/state";
-	import { afterNavigate } from "$app/navigation";
+	import { page } from '$app/state';
+	import { afterNavigate } from '$app/navigation';
 	import {
 		AnalyticsBanner,
 		analyticsEvent,
@@ -9,14 +9,14 @@
 		Header,
 		Breadcrumb,
 		Main,
-		Footer,
-	} from "@onsvisual/svelte-components";
+		Footer
+	} from '@onsvisual/svelte-components';
 
-	const analyticsId = "GTM-MBCBVQS";
+	const analyticsId = 'GTM-MBCBVQS';
 	const analyticsProps = {
-		contentTitle: "Explore local statistics",
-		releaseDate: "20240326",
-		contentType: "exploratory",
+		contentTitle: 'Explore local statistics',
+		releaseDate: '20240326',
+		contentType: 'exploratory'
 	};
 
 	// afterNavigate(() => {

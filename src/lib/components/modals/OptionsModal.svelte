@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { Checkbox } from "@onsvisual/svelte-components";
-	import Modal from "./Modal.svelte";
-	import RangeSlider from "./RangeSlider.svelte";
-	import { cloneState } from "./modalHelpers";
+	import { Checkbox } from '@onsvisual/svelte-components';
+	import Modal from './Modal.svelte';
+	import RangeSlider from './RangeSlider.svelte';
+	import { cloneState } from './modalHelpers';
 
 	let { data, pageState = $bindable() } = $props();
 

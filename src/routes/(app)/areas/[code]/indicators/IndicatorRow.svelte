@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { resolve } from "$app/paths";
-	import { Observe, Em, ButtonGroup, ButtonGroupItem } from "@onsvisual/svelte-components";
-	import { makeDataUrl, makeValueFormatter, makePeriodFormatter } from "$lib/utils";
-	import Beeswarm from "$lib/components/charts/Beeswarm.svelte";
-	import Sparkline from "$lib/components/charts/Sparkline.svelte";
-	import Pyramid from "$lib/components/charts/Pyramid.svelte";
+	import { resolve } from '$app/paths';
+	import { Observe, Em, ButtonGroup, ButtonGroupItem } from '@onsvisual/svelte-components';
+	import { makeDataUrl, makeValueFormatter, makePeriodFormatter } from '$lib/utils';
+	import Beeswarm from '$lib/components/charts/Beeswarm.svelte';
+	import Sparkline from '$lib/components/charts/Sparkline.svelte';
+	import Pyramid from '$lib/components/charts/Pyramid.svelte';
 
 	let {
 		indicator,
@@ -22,7 +22,7 @@
 
 	let chartData = {}; // cached chart data
 	let loadedDataUrl = $state({});
-	let chartMode = $state("simple");
+	let chartMode = $state('simple');
 
 	async function fetchData(
 		chartType,
@@ -37,17 +37,17 @@
 		if (!visible && chartData[chartType]) return chartData[chartType];
 		else if (!visible) return null;
 		const args =
-			chartType === "sparkline"
+			chartType === 'sparkline'
 				? [indicator, timeRange, null, selected]
 				: [
 						indicator,
 						timeRange[1],
-						"latest",
+						'latest',
 						selected,
 						geoLevel,
 						geoExtent,
 						geoCluster,
-						chartType === "pyramid" ? { sex: ["female", "male"] } : null
+						chartType === 'pyramid' ? { sex: ['female', 'male'] } : null
 					];
 		const chartDataUrl = makeDataUrl(...args);
 		if (chartDataUrl !== loadedDataUrl[chartType]) {
@@ -66,21 +66,21 @@
 
 {#snippet downloadUrl(url, format, formatLabel = null)}
 	{@const label = formatLabel || format.toUpperCase()}
-	<a href={url?.replace?.(".cols.json", `.${format}`)} download="{indicator}.{format}">{label}</a>
+	<a href={url?.replace?.('.cols.json', `.${format}`)} download="{indicator}.{format}">{label}</a>
 {/snippet}
 
 {#snippet downloadLinks(chartType)}
-	{@render downloadUrl(loadedDataUrl[chartType], "csv")},
-	{@render downloadUrl(loadedDataUrl[chartType], "csvw")},
-	{@render downloadUrl(loadedDataUrl[chartType], "xlsx")} or
-	{@render downloadUrl(loadedDataUrl[chartType], "json", "JSON-Stat")}
+	{@render downloadUrl(loadedDataUrl[chartType], 'csv')},
+	{@render downloadUrl(loadedDataUrl[chartType], 'csvw')},
+	{@render downloadUrl(loadedDataUrl[chartType], 'xlsx')} or
+	{@render downloadUrl(loadedDataUrl[chartType], 'json', 'JSON-Stat')}
 {/snippet}
 
 <Observe bind:visible rootMargin={200}>
 	<div id={indicator} class="indicator-row">
 		<details class="indicator-header">
 			<summary class="indicator-title"
-				><strong>{metadata.label}</strong>{metadata.subText ? `, ${metadata.subText}` : ""}</summary
+				><strong>{metadata.label}</strong>{metadata.subText ? `, ${metadata.subText}` : ''}</summary
 			>
 			<div class="indicator-description">
 				{#if metadata.experimentalStatistic}
@@ -90,22 +90,22 @@
 				{/if}
 				<p><strong>Definition:</strong> {metadata.description}</p>
 				<p>
-					<strong>{metadata.source.length > 1 ? "Data sources" : "Data source"}:</strong>
+					<strong>{metadata.source.length > 1 ? 'Data sources' : 'Data source'}:</strong>
 					{#each metadata.source as s, i}
 						<a href={s.href} target="_blank">{s.name}</a>
-						({s.date.split("-").reverse().join("/")}){i === metadata.source.length - 1 ? "" : ", "}
+						({s.date.split('-').reverse().join('/')}){i === metadata.source.length - 1 ? '' : ', '}
 					{/each}
 				</p>
-				{#if indicator === "population-by-age-and-sex"}
-					<p><strong>Download data:</strong> {@render downloadLinks("pyramid")}.</p>
+				{#if indicator === 'population-by-age-and-sex'}
+					<p><strong>Download data:</strong> {@render downloadLinks('pyramid')}.</p>
 				{:else}
 					<p><strong>Download data:</strong></p>
 					<ul>
 						<li>
-							Beeswarm data as {@render downloadLinks("beeswarm")}.
+							Beeswarm data as {@render downloadLinks('beeswarm')}.
 						</li>
 						<li>
-							Line chart data as {@render downloadLinks("sparkline")}.
+							Line chart data as {@render downloadLinks('sparkline')}.
 						</li>
 					</ul>
 				{/if}
@@ -116,7 +116,7 @@
 				</p>
 			</div>
 		</details>
-		{#if indicator === "population-by-age-and-sex"}
+		{#if indicator === 'population-by-age-and-sex'}
 			{@const dataArgs = [
 				visible && !hidden,
 				indicator,
@@ -125,7 +125,7 @@
 				geoGroup.geoLevel,
 				geoGroup.geoExtent,
 				geoGroup.geoCluster
-			].slice(0, chartMode === "simple" ? 4 : undefined)}
+			].slice(0, chartMode === 'simple' ? 4 : undefined)}
 			<div class="indicator-pyramid">
 				<ButtonGroup
 					legend="Select areas to show on chart"
@@ -135,14 +135,14 @@
 					<ButtonGroupItem value="simple" label="Show selected areas" />
 					<ButtonGroupItem value="advanced" label="Show all areas" />
 				</ButtonGroup>
-				{#await fetchData("pyramid", ...dataArgs) then data}
+				{#await fetchData('pyramid', ...dataArgs) then data}
 					<Pyramid {data} {formatValue} {selected} bind:hovered />
 				{/await}
 			</div>
 		{:else}
 			<div class="indicator-charts">
 				<div class="indicator-beeswarm">
-					{#await fetchData("beeswarm", visible && !hidden, indicator, timeRange, selected, geoGroup.geoLevel, geoGroup.geoExtent, geoGroup.geoCluster) then data}
+					{#await fetchData('beeswarm', visible && !hidden, indicator, timeRange, selected, geoGroup.geoLevel, geoGroup.geoExtent, geoGroup.geoCluster) then data}
 						<Beeswarm
 							{data}
 							{formatPeriod}
@@ -155,7 +155,7 @@
 					{/await}
 				</div>
 				<div class="indicator-sparkline">
-					{#await fetchData("sparkline", visible && !hidden, indicator, timeRange, selected) then data}
+					{#await fetchData('sparkline', visible && !hidden, indicator, timeRange, selected) then data}
 						<Sparkline
 							{data}
 							{formatPeriod}
@@ -204,7 +204,7 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		content: "i";
+		content: 'i';
 		width: 20px;
 		height: 20px;
 		margin-left: 6px;

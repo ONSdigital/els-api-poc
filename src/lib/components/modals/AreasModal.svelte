@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { Button, Dropdown, Select } from "@onsvisual/svelte-components";
-	import Modal from "./Modal.svelte";
-	import { ONSpalette } from "$lib/config";
-	import { cloneState } from "./modalHelpers";
-	import { getAreaType } from "$lib/utils";
+	import { Button, Dropdown, Select } from '@onsvisual/svelte-components';
+	import Modal from './Modal.svelte';
+	import { ONSpalette } from '$lib/config';
+	import { cloneState } from './modalHelpers';
+	import { getAreaType } from '$lib/utils';
 
 	let { data, pageState = $bindable(), mode } = $props();
 
 	let _pageState = $state(cloneState(pageState));
-	let _areas = $derived(data.areas.map((area) => ({ ...area, type: getAreaType(area) || "" })));
+	let _areas = $derived(data.areas.map((area) => ({ ...area, type: getAreaType(area) || '' })));
 
 	function addArea(area) {
 		if (!_pageState.selectedAreas.find((d) => d.areacd === area.areacd))
@@ -28,7 +28,7 @@
 	onConfirm={() => (pageState = cloneState(_pageState))}
 	onCancel={() => (_pageState = cloneState(pageState))}
 >
-	{#if mode === "indicator"}
+	{#if mode === 'indicator'}
 		<Dropdown
 			id="geo-level-select"
 			label="Geography type"
@@ -36,7 +36,7 @@
 			bind:value={_pageState.selectedGeoLevel}
 		/>
 	{/if}
-	{#if mode === "area"}
+	{#if mode === 'area'}
 		<Dropdown
 			id="geo-related-select"
 			label="Geography group"
@@ -47,7 +47,7 @@
 	<div class="select-container">
 		<Select
 			id="area-select"
-			label={mode === "area" ? "Comparison areas" : "Individual areas"}
+			label={mode === 'area' ? 'Comparison areas' : 'Individual areas'}
 			placeholder="Choose one or more"
 			options={_areas}
 			labelKey="areanm"
@@ -59,7 +59,7 @@
 	{#each _pageState.selectedAreas as area, i}
 		<Button
 			icon="cross"
-			color={(mode === "area" ? ONSpalette[i + 1] : ONSpalette[i]) || "darkgrey"}
+			color={(mode === 'area' ? ONSpalette[i + 1] : ONSpalette[i]) || 'darkgrey'}
 			small
 			on:click={() => removeArea(area)}>{area.areanm}</Button
 		>

@@ -1,14 +1,14 @@
 <script lang="ts">
 	//@ts-nocheck
-	import { onMount } from "svelte";
-	import { resolve } from "$app/paths";
-	import bbox from "@turf/bbox";
-	import { parseData, makeMapFeatures, valuesToBreaks } from "$lib/utils";
-	import { ONSpalette, ONStextPalette, ONScolours } from "$lib/config";
-	import { validYear } from "$lib/util/linkHelpers";
-	import topo from "$lib/data/topo.json";
-	import { Map, MapSource, MapLayer, MapTooltip } from "@onsvisual/svelte-maps";
-	import MapLegend from "./MapLegend.svelte";
+	import { onMount } from 'svelte';
+	import { resolve } from '$app/paths';
+	import bbox from '@turf/bbox';
+	import { parseData, makeMapFeatures, valuesToBreaks } from '$lib/utils';
+	import { ONSpalette, ONStextPalette, ONScolours } from '$lib/config';
+	import { validYear } from '$lib/util/linkHelpers';
+	import topo from '$lib/data/topo.json';
+	import { Map, MapSource, MapLayer, MapTooltip } from '@onsvisual/svelte-maps';
+	import MapLegend from './MapLegend.svelte';
 
 	let {
 		data,
@@ -20,18 +20,18 @@
 		formatPeriod = (d) => d,
 		geoLevel = null,
 		colors = [
-			"rgb(234, 236, 177)",
-			"rgb(169, 216, 145)",
-			"rgb(0, 167, 186)",
-			"rgb(0, 78, 166)",
-			"rgb(0, 13, 84)"
+			'rgb(234, 236, 177)',
+			'rgb(169, 216, 145)',
+			'rgb(0, 167, 186)',
+			'rgb(0, 78, 166)',
+			'rgb(0, 13, 84)'
 		]
 	} = $props();
 
-	const topoPath = resolve("/data/topo.json");
+	const topoPath = resolve('/data/topo.json');
 	const ukBounds = [-8.65, 49.867, 1.761, 60.856];
 	const fitBoundsOptions = { padding: 10 };
-	const noHighlight = ["K02", "K03", "K04"]; // Don't highlight UK, GB or England & Wales on map
+	const noHighlight = ['K02', 'K03', 'K04']; // Don't highlight UK, GB or England & Wales on map
 
 	const features = makeMapFeatures(topo);
 
@@ -56,7 +56,7 @@
 		return colors[breaks.length - 2];
 	}
 
-	const featureCollection = (features) => ({ type: "FeatureCollection", features });
+	const featureCollection = (features) => ({ type: 'FeatureCollection', features });
 
 	const makeRenderedFeatures = (features, data, geoLevel, geoYear) => {
 		const renderedFeatures = [];
@@ -114,8 +114,8 @@
 	<div class="map-container">
 		<Map
 			bind:map
-			css={resolve("/css/maplibre-gl.css")}
-			style={resolve("/data/mapstyle.json")}
+			css={resolve('/css/maplibre-gl.css')}
+			style={resolve('/data/mapstyle.json')}
 			location={{ bounds: bounds || ukBounds }}
 			options={{
 				fitBoundsOptions,
@@ -136,8 +136,8 @@
 					id="fills"
 					type="fill"
 					paint={{
-						"fill-color": ["get", "color"],
-						"fill-opacity": 0.7
+						'fill-color': ['get', 'color'],
+						'fill-opacity': 0.7
 					}}
 					order="place_other"
 					hover
@@ -145,14 +145,14 @@
 					let:hovered
 					on:hover={doHover}
 				>
-					<MapTooltip content={features?.[hovered]?.properties?.areanm || ""} />
+					<MapTooltip content={features?.[hovered]?.properties?.areanm || ''} />
 				</MapLayer>
 				<MapLayer
 					id="outline"
 					type="line"
 					paint={{
-						"line-color": "grey",
-						"line-width": ["interpolate", ["linear"], ["zoom"], 6, 0.2, 11, 1]
+						'line-color': 'grey',
+						'line-width': ['interpolate', ['linear'], ['zoom'], 6, 0.2, 11, 1]
 					}}
 					order="place_other"
 				/>
@@ -160,13 +160,13 @@
 					id="hovered"
 					type="line"
 					paint={{
-						"line-color": [
-							"case",
-							["==", ["feature-state", "hovered"], true],
+						'line-color': [
+							'case',
+							['==', ['feature-state', 'hovered'], true],
 							ONScolours.highlightOrangeDark,
-							"rgba(255,255,255,0)"
+							'rgba(255,255,255,0)'
 						],
-						"line-width": 2.5
+						'line-width': 2.5
 					}}
 					order="place_suburb"
 				/>
@@ -183,8 +183,8 @@
 					id="highlighted-outline"
 					type="line"
 					paint={{
-						"line-color": "white",
-						"line-width": 4.5
+						'line-color': 'white',
+						'line-width': 4.5
 					}}
 					order="place_other"
 				/>
@@ -192,8 +192,8 @@
 					id="highlighted"
 					type="line"
 					paint={{
-						"line-color": ["get", "color"],
-						"line-width": 2.5
+						'line-color': ['get', 'color'],
+						'line-width': 2.5
 					}}
 					order="place_other"
 				/>

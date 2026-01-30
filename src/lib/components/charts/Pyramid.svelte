@@ -1,18 +1,18 @@
 <script lang="ts">
-	import { scaleLinear, scaleBand } from "d3-scale";
-	import { parsePyramidData } from "./chartHelpers";
-	import { ONSpalette } from "$lib/config";
-	import { contrastColor } from "./chartHelpers";
+	import { scaleLinear, scaleBand } from 'd3-scale';
+	import { parsePyramidData } from './chartHelpers';
+	import { ONSpalette } from '$lib/config';
+	import { contrastColor } from './chartHelpers';
 
 	let {
 		data,
 		selected = [],
 		hovered = $bindable(),
 		formatValue = (d) => d,
-		idKey = "areacd",
-		xKey = "value",
-		yKey = "age",
-		zKey = "sex"
+		idKey = 'areacd',
+		xKey = 'value',
+		yKey = 'age',
+		zKey = 'sex'
 	} = $props();
 
 	const barHeight = 18;
@@ -21,7 +21,7 @@
 	const bottomMargin = 20;
 
 	let _data = $derived(parsePyramidData(data, idKey));
-	let mode = $derived(_data?.keysLength <= selected.length ? "simple" : "advanced");
+	let mode = $derived(_data?.keysLength <= selected.length ? 'simple' : 'advanced');
 
 	let w = $state(400);
 	let hoveredPos = $state();
@@ -34,7 +34,7 @@
 	let yRange = $derived([barHeight * (_data?.categoryDomain?.length || 18), 0]);
 	let yScale = $derived(
 		scaleBand()
-			.domain(_data?.categoryDomain || ["Female", "Male"])
+			.domain(_data?.categoryDomain || ['Female', 'Male'])
 			.range(yRange)
 			.paddingInner(barGap / barHeight)
 	);
@@ -46,17 +46,17 @@
 
 	function makeLine(dat, xScale, sex) {
 		const scale =
-			sex === "female"
+			sex === 'female'
 				? (d) => xRange[1] - xScale(d[xKey])
 				: (d) => xRange[1] + gutter + xScale(d[xKey]);
 		return dat
-			.filter((d) => d[zKey] === _data.groupDomain[sex === "female" ? 0 : 1])
+			.filter((d) => d[zKey] === _data.groupDomain[sex === 'female' ? 0 : 1])
 			.flatMap((d) => [
 				[scale(d), yScale(d[yKey]) + yScale.bandwidth() + barGap / 2], // bottom left
 				[scale(d), yScale(d[yKey]) - barGap / 2] // top left
 			])
-			.map((p) => p.join(","))
-			.join(" ");
+			.map((p) => p.join(','))
+			.join(' ');
 	}
 </script>
 
@@ -94,13 +94,13 @@
 	/>
 {/snippet}
 
-{#snippet polyline(points, color = "grey", width = 2)}
+{#snippet polyline(points, color = 'grey', width = 2)}
 	<polyline class="chart-polyline" stroke="white" stroke-width={width + 2} {points} />
 	<polyline class="chart-polyline" stroke={color} stroke-width={width} {points} />
 {/snippet}
 
 {#snippet tick(t, sex)}
-	{@const xPos = sex === "female" ? xRange[1] - xScale(t) : xScale(t) + xRange[1] + gutter}
+	{@const xPos = sex === 'female' ? xRange[1] - xScale(t) : xScale(t) + xRange[1] + gutter}
 	<line x1={xPos} y1={yRange[0]} x2={xPos} y2={yRange[0] + 8} />
 	<text x={xPos} y={yRange[0] + 22} text-anchor="middle" font-size="14">
 		{t}%
@@ -133,12 +133,12 @@
 			</g>
 			<g class="chart-x-axis">
 				{#each xScale.ticks(3) as t}
-					{@render tick(t, "female")}
-					{@render tick(t, "male")}
+					{@render tick(t, 'female')}
+					{@render tick(t, 'male')}
 				{/each}
 			</g>
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			{#if mode === "simple"}
+			{#if mode === 'simple'}
 				<g class="chart-marks">
 					{#each _data.keyed[selected[0]] as d}
 						{@render bar(d)}
@@ -173,12 +173,12 @@
 					{#each [...selected].reverse() as area, i}
 						{#if _data?.keyed?.[area]}
 							{@render polyline(
-								makeLine(_data.keyed[area], xScale, "female"),
+								makeLine(_data.keyed[area], xScale, 'female'),
 								ONSpalette[maxIndex - i],
 								i === maxIndex ? 3 : 2
 							)}
 							{@render polyline(
-								makeLine(_data.keyed[area], xScale, "male"),
+								makeLine(_data.keyed[area], xScale, 'male'),
 								ONSpalette[maxIndex - i],
 								i === maxIndex ? 3 : 2
 							)}
@@ -188,8 +188,8 @@
 			{/if}
 			{#if _data?.keyed?.[hovered]}
 				<g class="chart-hovered">
-					{@render polyline(makeLine(_data.keyed[hovered], xScale, "female"), "orange", 3)}
-					{@render polyline(makeLine(_data.keyed[hovered], xScale, "male"), "orange", 3)}
+					{@render polyline(makeLine(_data.keyed[hovered], xScale, 'female'), 'orange', 3)}
+					{@render polyline(makeLine(_data.keyed[hovered], xScale, 'male'), 'orange', 3)}
 				</g>
 			{/if}
 		{/if}
@@ -198,13 +198,13 @@
 		{#each _data?.groupDomain || [] as group, i}
 			<div
 				class="chart-legend"
-				style:text-align={i === 0 ? "left" : "right"}
+				style:text-align={i === 0 ? 'left' : 'right'}
 				style:left={i === 0 ? 0 : null}
 				style:right={i === 1 ? 0 : null}
 			>
 				<span>{group}</span>
 				{#if hovered || selected.length}
-					{@const color = hovered ? "orange" : ONSpalette[0]}
+					{@const color = hovered ? 'orange' : ONSpalette[0]}
 					{@const sum = sumBySex(hovered || selected[0], group)}
 					{#if sum}
 						<br /><span
@@ -297,7 +297,7 @@
 
 	.chart-x-axis text {
 		fill: #333;
-		font-family: "Open Sans";
+		font-family: 'Open Sans';
 	}
 	.chart-x-axis line {
 		stroke: #999;

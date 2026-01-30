@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button } from "@onsvisual/svelte-components";
+	import { Button } from '@onsvisual/svelte-components';
 
 	let {
 		title,
@@ -11,11 +11,11 @@
 		onCancel = () => null
 	} = $props();
 
-	let id = $derived(title.toLowerCase().replaceAll(" ", "-"));
+	let id = $derived(title.toLowerCase().replaceAll(' ', '-'));
 	let dialog = $state();
 
 	function clickOutsideToCancel(el) {
-		el.addEventListener("click", function (event) {
+		el.addEventListener('click', function (event) {
 			const rect = el.getBoundingClientRect();
 			const isInDialog =
 				rect.top < event.clientY &&

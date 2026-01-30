@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { makeDataUrl, makeValueFormatter, makePeriodFormatter } from "$lib/utils";
-	import { Observe, Icon } from "@onsvisual/svelte-components";
-	import Line from "$lib/components/charts/Line.svelte";
-	import Map from "$lib/components/charts/Map.svelte";
-	import Bar from "$lib/components/charts/Bar.svelte";
-	import Table from "$lib/components/charts/Table.svelte";
-	import ChartActions from "./ChartActions.svelte";
-	import Spinner from "../visuals/Spinner.svelte";
+	import { makeDataUrl, makeValueFormatter, makePeriodFormatter } from '$lib/utils';
+	import { Observe, Icon } from '@onsvisual/svelte-components';
+	import Line from '$lib/components/charts/Line.svelte';
+	import Map from '$lib/components/charts/Map.svelte';
+	import Bar from '$lib/components/charts/Bar.svelte';
+	import Table from '$lib/components/charts/Table.svelte';
+	import ChartActions from './ChartActions.svelte';
+	import Spinner from '../visuals/Spinner.svelte';
 
 	const chartComponents = {
 		map: Map,
@@ -24,7 +24,7 @@
 		geoLevel = null,
 		showIntervals = false,
 		hovered = $bindable(),
-		mode = "default"
+		mode = 'default'
 	} = $props();
 
 	let visible = $state(false);
@@ -34,7 +34,7 @@
 	let formatPeriod = $derived(makePeriodFormatter(metadata.periodFormat));
 	let formatValue = $derived(makeValueFormatter(metadata.decimalPlaces));
 	let hasTimeRange = $derived(
-		["line", "table"].includes(chartType) && timeRange[0] !== timeRange[1]
+		['line', 'table'].includes(chartType) && timeRange[0] !== timeRange[1]
 	);
 
 	let loadedDataUrl: string | null = null;
@@ -44,7 +44,7 @@
 		makeDataUrl(
 			indicator,
 			hasTimeRange ? timeRange : timeRange[timeRange.length - 1],
-			"latest",
+			'latest',
 			selected,
 			geoLevel?.id
 		)
@@ -62,7 +62,7 @@
 				return loadedData;
 			} catch {
 				console.log(`Failed to load ${indicator} ${chartType} data`);
-				return { message: "Failed to load chart data" };
+				return { message: 'Failed to load chart data' };
 			}
 		} else return loadedData;
 	}
@@ -83,10 +83,10 @@
 <div
 	class="content-block"
 	class:content-fullscreen={fullScreenMode}
-	class:content-border={mode === "default" && !fullScreenMode}
+	class:content-border={mode === 'default' && !fullScreenMode}
 	bind:this={el}
 >
-	{#if chartType === "line" && timeRange[0] === timeRange[1]}
+	{#if chartType === 'line' && timeRange[0] === timeRange[1]}
 		<div class="no-chart-container">
 			<p>
 				Time series not displayed as selected date range includes only one time period with
@@ -100,14 +100,14 @@
 			{#if hasTimeRange}{formatPeriod(timeRange[0])} to{/if}
 			{formatPeriod(timeRange[timeRange.length - 1])}
 		</p>
-		{#if mode === "default"}
+		{#if mode === 'default'}
 			<button
 				class="fullscreen-toggle"
 				title="{fullScreenMode ? 'Exit' : 'Enter'} full screen mode"
 				onclick={toggleFullScreen}
 			>
-				<Icon type={fullScreenMode ? "shrink" : "expand"} size="l" />
-				<span class="ons-u-vh">{fullScreenMode ? "Exit" : "Enter"} full screen mode</span>
+				<Icon type={fullScreenMode ? 'shrink' : 'expand'} size="l" />
+				<span class="ons-u-vh">{fullScreenMode ? 'Exit' : 'Enter'} full screen mode</span>
 			</button>
 		{/if}
 		<Observe bind:visible>
@@ -136,15 +136,15 @@
 					<span style="font-weight: bold">Source:</span>
 					{#each metadata.source as s, i}
 						<a href={s.href} target="_blank">{s.name}</a>{i < metadata.source.length - 1
-							? " and "
-							: ""}
+							? ' and '
+							: ''}
 					{/each}
 				</p>
 			</div>
 		{/if}
 	{/if}
 </div>
-{#if mode === "default"}
+{#if mode === 'default'}
 	<ChartActions
 		{indicator}
 		{metadata}

@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { resolve } from "$app/paths";
-	import { Hero, NavSections, NavSection, List, Li } from "@onsvisual/svelte-components";
-	import { capitalise } from "@onsvisual/robo-utils";
-	import { makePeriodFormatter, makeValueFormatter } from "$lib/utils";
-	import AreasLegend from "$lib/components/modals/AreasLegend.svelte";
-	import AreasModal from "$lib/components/modals/AreasModal.svelte";
-	import OptionsModal from "$lib/components/modals/OptionsModal.svelte";
-	import IndicatorChart from "$lib/components/charts/IndicatorChart.svelte";
+	import { resolve } from '$app/paths';
+	import { Hero, NavSections, NavSection, List, Li } from '@onsvisual/svelte-components';
+	import { capitalise } from '@onsvisual/robo-utils';
+	import { makePeriodFormatter, makeValueFormatter } from '$lib/utils';
+	import AreasLegend from '$lib/components/modals/AreasLegend.svelte';
+	import AreasModal from '$lib/components/modals/AreasModal.svelte';
+	import OptionsModal from '$lib/components/modals/OptionsModal.svelte';
+	import IndicatorChart from '$lib/components/charts/IndicatorChart.svelte';
 
 	let { data } = $props();
 	$inspect(data);
@@ -15,25 +15,25 @@
 
 	let charts = $derived(
 		[
-			data.indicator.standardised ? { key: "map", label: "Map" } : null,
-			data.periods.length > 1 ? { key: "line", label: "Line chart" } : null,
-			{ key: "bar", label: "Bar chart" },
-			{ key: "table", label: "Table" }
+			data.indicator.standardised ? { key: 'map', label: 'Map' } : null,
+			data.periods.length > 1 ? { key: 'line', label: 'Line chart' } : null,
+			{ key: 'bar', label: 'Bar chart' },
+			{ key: 'table', label: 'Table' }
 		].filter((c) => c)
 	);
 
-	function arrayJoin(arr, separators = [", ", " and "]) {
+	function arrayJoin(arr, separators = [', ', ' and ']) {
 		if (arr.length < 2) return arr.join(separators[0]);
 		return arr.slice(0, -1).join(separators[0]) + separators[1] + arr.slice(-1);
 	}
 
 	const parseDate = (str) => {
-		const intlString = str.split("/").reverse().join("-") + "T12:00";
+		const intlString = str.split('/').reverse().join('-') + 'T12:00';
 		const date = new Date(intlString);
-		return date.toLocaleString("en-GB", {
-			year: "numeric",
-			month: "long",
-			day: "2-digit"
+		return date.toLocaleString('en-GB', {
+			year: 'numeric',
+			month: 'long',
+			day: '2-digit'
 		});
 	};
 
@@ -51,23 +51,23 @@
 	width="medium"
 	meta={[
 		{
-			key: data.indicator.source.length === 1 ? "Data source" : "Data sources",
+			key: data.indicator.source.length === 1 ? 'Data source' : 'Data sources',
 			value: arrayJoin(
 				data.indicator.source.map((s) => `<a href="${s.href}" target="_blank">${s.name}</a>`)
 			)
 		},
 		{
-			key: "Published on",
+			key: 'Published on',
 			value: parseDate(data.indicator.updated)
 		}
 	]}
 	background="#eaeaea"
 	titleBadge={{
 		label: data.indicator.experimentalStatistic
-			? "Official statistics in development"
+			? 'Official statistics in development'
 			: capitalise(data.indicator.topic),
 		ariaLabel: `Topic: ${capitalise(data.indicator.topic)}`,
-		color: "#003c57"
+		color: '#003c57'
 	}}
 >
 	<p class="ons-hero__text">
@@ -144,9 +144,9 @@
 	<NavSection title="Other indicators">
 		<p>
 			{data.indicator.label} is one of {data.summaryStats.univariateCount} local indicators on the
-			<a href={resolve("/")}>Explore local statistics</a>
+			<a href={resolve('/')}>Explore local statistics</a>
 			service. See the
-			<a href={resolve("/indicators")}>full list of local indicators</a>.
+			<a href={resolve('/indicators')}>full list of local indicators</a>.
 		</p>
 	</NavSection>
 </NavSections>

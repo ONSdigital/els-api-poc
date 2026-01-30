@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Embed, Container } from "@onsvisual/svelte-components";
-	import IndicatorChart from "$lib/components/charts/IndicatorChart.svelte";
+	import { Embed, Container } from '@onsvisual/svelte-components';
+	import IndicatorChart from '$lib/components/charts/IndicatorChart.svelte';
 
 	let { data } = $props();
 

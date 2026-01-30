@@ -59,7 +59,7 @@ export async function abortIfNewFilesExist(previous_file_paths, csv_preprocess_d
 	filenames = filenames.filter(
 		(f) => f.endsWith('.csv') && !f.startsWith('out/') && !f.includes('_IDS')
 	);
-	
+
 	filenames = filenames.map((f) => `${csv_preprocess_dir}/${f}`);
 
 	const previous_filenames = previous_file_paths.array('filePath');

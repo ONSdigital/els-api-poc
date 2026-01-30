@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { Icon } from "@onsvisual/svelte-components";
+	import { Icon } from '@onsvisual/svelte-components';
 
 	let {
 		id,
 		hidden = $bindable(true),
-		buttonText = "Expand",
+		buttonText = 'Expand',
 		onToggle = () => null,
-		children,
+		children
 	} = $props();
 
 	function makeObserver(node, callback) {
@@ -20,10 +20,10 @@
 
 <div
 	{id}
-	hidden={hidden ? "until-found" : null}
+	hidden={hidden ? 'until-found' : null}
 	use:makeObserver={(e) => {
 		if (hidden && e?.target?.hidden === false) hidden = false;
-		else if (!hidden && e?.target?.hidden === "until-found") hidden = true;
+		else if (!hidden && e?.target?.hidden === 'until-found') hidden = true;
 	}}
 >
 	{@render children?.()}
@@ -32,7 +32,7 @@
 	type="button"
 	class="ons-btn ons-btn--small ons-btn--secondary"
 	aria-controls={id}
-	aria-expanded={hidden ? "false" : "true"}
+	aria-expanded={hidden ? 'false' : 'true'}
 	onclick={() => {
 		hidden = !hidden;
 		onToggle({ hidden });

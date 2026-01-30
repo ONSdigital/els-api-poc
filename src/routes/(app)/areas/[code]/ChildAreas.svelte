@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { resolve } from "$app/paths";
-	import { Tabs, Tab, Accordion, AccordionItem } from "@onsvisual/svelte-components";
-	import { getName, capitalise, pluralise } from "@onsvisual/robo-utils";
-	import { makeCanonicalSlug } from "$lib/api/geo/helpers/areaSlugUtils";
+	import { resolve } from '$app/paths';
+	import { Tabs, Tab, Accordion, AccordionItem } from '@onsvisual/svelte-components';
+	import { getName, capitalise, pluralise } from '@onsvisual/robo-utils';
+	import { makeCanonicalSlug } from '$lib/api/geo/helpers/areaSlugUtils';
 
 	let { areaProps, selected = $bindable() } = $props();
 </script>
@@ -27,10 +27,12 @@
 			</Tabs>
 		</div>
 		<div class="child-areas-accordion">
-			<Accordion on:toggle={(e) => {
-				console.log(e);
-				if (e?.detail?.open) selected = e?.detail?.id;
-			}}>
+			<Accordion
+				on:toggle={(e) => {
+					console.log(e);
+					if (e?.detail?.open) selected = e?.detail?.id;
+				}}
+			>
 				{#each areaProps.children as childGroup, i}
 					<AccordionItem title={capitalise(pluralise(childGroup.label))} id={childGroup.key}>
 						<ul class="list-columns">
@@ -48,7 +50,7 @@
 		</div>
 	{/key}
 {:else}
-	<p>No smaller areas available within {getName(areaProps, "the")}.</p>
+	<p>No smaller areas available within {getName(areaProps, 'the')}.</p>
 {/if}
 
 <style>

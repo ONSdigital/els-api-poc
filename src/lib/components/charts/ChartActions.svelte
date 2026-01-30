@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { resolve } from "$app/paths";
-	import snapdom from "@zumer/snapdom";
-	import { Icon, Textarea, Button } from "@onsvisual/svelte-components";
+	import { resolve } from '$app/paths';
+	import snapdom from '@zumer/snapdom';
+	import { Icon, Textarea, Button } from '@onsvisual/svelte-components';
 
 	let {
 		indicator,
@@ -30,20 +30,20 @@
 		chartType: string,
 		showIntervals: boolean
 	) {
-		const multiTime = ["line", "table"].includes(chartType) && timeRange[0] !== timeRange[1];
+		const multiTime = ['line', 'table'].includes(chartType) && timeRange[0] !== timeRange[1];
 
 		const chunks = [];
-		if (geoLevel) chunks.push({ key: "geo", value: geoLevel?.id || geoLevel });
-		if (selected.length) chunks.push({ key: "areas", value: selected.join(",") });
+		if (geoLevel) chunks.push({ key: 'geo', value: geoLevel?.id || geoLevel });
+		if (selected.length) chunks.push({ key: 'areas', value: selected.join(',') });
 		chunks.push({
-			key: "years",
+			key: 'years',
 			value: timeRange
 				.slice(multiTime ? 0 : 1)
 				.map((t) => t.slice(0, 10))
-				.join(",")
+				.join(',')
 		});
-		if (showIntervals) chunks.push({ key: "intervals", value: "true" });
-		const url = `https://www.ons.gov.uk/explore-local-statistics/indicators/${indicator}/embed?type=${chartType}&${chunks.map((c) => `${c.key}=${c.value}`).join("&")}`;
+		if (showIntervals) chunks.push({ key: 'intervals', value: 'true' });
+		const url = `https://www.ons.gov.uk/explore-local-statistics/indicators/${indicator}/embed?type=${chartType}&${chunks.map((c) => `${c.key}=${c.value}`).join('&')}`;
 		const id = `${chartType}-${indicator}`;
 		return (
 			`<div id="${id}"></div>
@@ -64,22 +64,22 @@
 	async function downloadPNG(e) {
 		e.preventDefault();
 		const result = await snapdom(chartDiv);
-		await result.download({ format: "png", filename: `${indicator}-${chartType}.png` });
+		await result.download({ format: 'png', filename: `${indicator}-${chartType}.png` });
 	}
 </script>
 
 {#snippet downloadUrl(url: string, format: string, formatLabel: string | null = null)}
 	{@const label = formatLabel || format.toUpperCase()}
-	<a href={url?.replace?.(".cols.json", `.${format}`)} download="{indicator}-{chartType}.{format}"
+	<a href={url?.replace?.('.cols.json', `.${format}`)} download="{indicator}-{chartType}.{format}"
 		>{label}</a
 	>
 {/snippet}
 
 {#snippet downloadLinks(url: string)}
-	{@render downloadUrl(url, "csv")},
-	{@render downloadUrl(url, "csvw")},
-	{@render downloadUrl(url, "xlsx")} or
-	{@render downloadUrl(url, "json", "JSON-Stat")}
+	{@render downloadUrl(url, 'csv')},
+	{@render downloadUrl(url, 'csvw')},
+	{@render downloadUrl(url, 'xlsx')} or
+	{@render downloadUrl(url, 'json', 'JSON-Stat')}
 {/snippet}
 
 <div class="chart-actions">
@@ -88,7 +88,7 @@
 		<li>
 			<Icon type="download" />
 			Download as
-			{#if chartDiv && chartType !== "table"}
+			{#if chartDiv && chartType !== 'table'}
 				<a href="#0" onclick={downloadPNG}>PNG</a>,
 			{/if}
 			{@render downloadLinks(dataUrl)}
@@ -98,21 +98,21 @@
 			<button
 				class="ons-btn-link"
 				aria-controls="{chartType}-embed"
-				aria-expanded={showEmbed ? "false" : "true"}
+				aria-expanded={showEmbed ? 'false' : 'true'}
 				onclick={() => (showEmbed = !showEmbed)}
-				>{showEmbed ? "Hide embed code" : "Show embed code"}</button
+				>{showEmbed ? 'Hide embed code' : 'Show embed code'}</button
 			>
 		</li>
 	</ul>
 	<div
 		id="{chartType}-embed"
 		class="chart-embed"
-		style:display={showEmbed ? "block" : "none"}
+		style:display={showEmbed ? 'block' : 'none'}
 		spellcheck="false"
 	>
 		<Textarea label="Embed code" value={embedCode} hideLabel />
-		<Button variant={clipped ? "secondary" : "primary"} on:click={copyEmbedCode} small
-			>{clipped ? "Code copied" : "Copy embed code"}</Button
+		<Button variant={clipped ? 'secondary' : 'primary'} on:click={copyEmbedCode} small
+			>{clipped ? 'Code copied' : 'Copy embed code'}</Button
 		>
 	</div>
 </div>
